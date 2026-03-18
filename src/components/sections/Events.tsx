@@ -153,7 +153,7 @@ export const Events = () => {
                         ))}
                       </div>
                       <Link href={`/events/${ev.slug}`}>
-                        <Button variant="primary" size="sm" className="rounded-xl text-[11px] px-5 py-2.5 shadow-sh-sm group/btn">
+                        <Button variant="primary" size="sm" className="rounded-xl  px-5 py-2.5 shadow-sh-sm group/btn">
                           More Details <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
                       </Link>
@@ -167,8 +167,8 @@ export const Events = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             <div className="bg-app-bg border-1.5 border-border-light rounded-[2rem] overflow-hidden shadow-sh-sm">
-              <div className="p-6 border-b border-border-light flex items-center gap-3 bg-navy">
-                <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center text-gold">
+              <div className="p-6 border-b border-border-light flex items-center gap-3 bg-primary">
+                <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center text-white">
                   <List size={16} />
                 </div>
                 <div className="text-sm font-bold text-white">Categories</div>
@@ -227,7 +227,7 @@ export const Events = () => {
 };
 
 const CountdownUnit = ({ value, label }: { value: string; label: string }) => (
-  <div className="bg-navy rounded-xl p-3 text-center border border-white/10 shadow-sh-sm">
+  <div className="bg-primary rounded-xl p-3 text-center border border-white/10 shadow-sh-sm">
     <div className="text-xl font-extrabold text-white leading-none">{value}</div>
     <div className="text-[8px] font-bold tracking-wider uppercase text-white/40 mt-1.5">{label}</div>
   </div>

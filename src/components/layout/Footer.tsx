@@ -11,14 +11,11 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-14 border-b border-white/10">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
-                <GraduationCap className="text-primary" size={20} />
-              </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">
-                Acadi<span className="text-gold">vate</span>
-              </span>
-            </div>
+              <Link href="/" className="flex items-center gap-3 shrink-0 mb-4 bg-white w-fit rounded-lg px-4 py-2">
+          <div>
+            <img src="/assets/Image/Acadivate logo-transpernt.png" width={150} height={120} alt="Logo" />
+          </div>
+        </Link>
             <p className="text-sm text-white/80 leading-relaxed mb-8 max-w-[255px]">
               Advancing research excellence, innovation, and interdisciplinary academic collaboration globally since 2022.
             </p>

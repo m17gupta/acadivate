@@ -172,7 +172,7 @@ export const About = () => {
                     ))}
                   </div>
 
-                  <Button variant="primary" size="lg">
+                  <Button variant="primary" size="md">
                     Learn More <ArrowRight size={18} />
                   </Button>
                 </motion.div>

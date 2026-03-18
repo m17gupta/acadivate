@@ -18,10 +18,10 @@ export const CTA = () => {
           Whether you're an institution seeking rankings, a researcher looking for call for papers opportunities, or a professional pursuing excellence — Acadivate is your premier global platform.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Button variant="gold" size="lg" className="px-10">
+          <Button variant="primary" size="md">
             <FileText size={18} /> Apply for Recognition
           </Button>
-          <Button variant="outline" size="lg" className="px-10 bg-white/5 backdrop-blur-md border-white/20 hover:bg-white/10">
+          <Button variant="outline" size="md" className=" bg-white/5 backdrop-blur-md border-white/20 hover:bg-white/10">
             Institutional Partnership
           </Button>
         </div>

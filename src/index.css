@@ -38,6 +38,9 @@
   --color-border-2: #c8d2e8;
   --color-text-muted: #768098;
   --color-text-subtle: #a8b4cc;
+  --border-gray-light: #d9ece9;
+  --border-strong: #b9dfda;
+  --subtle: #9fb3bc;
 
   --shadow-sh-xs: 0 1px 4px rgba(10, 24, 48, .06);
   --shadow-sh-sm: 0 2px 12px rgba(10, 24, 48, .09);
@@ -49,6 +52,8 @@
   --animate-shimmer: shimmer 5s linear infinite;
   --animate-pulse-slow: pulse 2.5s ease-in-out infinite;
   --animate-float: float 3s ease-in-out infinite;
+
+  
 
   @keyframes shimmer {
     0% { background-position: 200% center; }

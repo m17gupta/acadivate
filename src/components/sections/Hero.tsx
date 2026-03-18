@@ -47,7 +47,7 @@ export const Hero = () => {
   }, [next]);
 
   return (
-    <section className="relative h-[100vh] min-h-[680px] max-h-[900px] overflow-hidden bg-navy">
+    <section className="relative h-[85vh]  overflow-hidden bg-navy">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -71,7 +71,7 @@ export const Hero = () => {
 
       <div className="absolute inset-0 z-10 flex items-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
-          <div className="max-w-2xl">
+          <div className="max-w-5xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
@@ -86,7 +86,7 @@ export const Hero = () => {
                     {SLIDES[current].tag}
                   </span>
                 </div>
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] mb-6">
+                <h1 className="text-4xl md:text-4xl lg:text-6xl font-extrabold text-white leading-[1.05] mb-6">
                   {SLIDES[current].title}
                 </h1>
                 <p className="text-lg text-white/60 leading-relaxed mb-10 max-w-lg">

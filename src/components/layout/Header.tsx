@@ -29,21 +29,13 @@ export const Header = () => {
     <header className={cn(
       'sticky top-0 z-50 transition-all duration-300 border-b border-white/10',
       isScrolled
-        ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary shadow-sh-xl'
-        : 'bg-linear-to-r from-primary-deep via-primary-dark to-primary'
+        ? 'bg-white shadow-sh-xl'
+        : 'bg-white'
     )}>
       <div className="max-w-7xl mx-auto px-6 h-[76px] flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sh-sm">
-            <GraduationCap className="text-primary" size={24} />
-          </div>
           <div>
-            <div className="text-xl font-extrabold text-white leading-none">
-              Acadi<span className="text-gold">vate</span>
-            </div>
-            <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-white/60 mt-0.5">
-              Research & Innovation
-            </div>
+            <img src="/assets/Image/Acadivate logo-transpernt.png" width={150} height={120} alt="Logo" />
           </div>
         </Link>
 
@@ -66,12 +58,12 @@ export const Header = () => {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="hidden xl:flex text-white hover:bg-white/10">Sign In</Button>
-            <Button variant="gold" size="sm">Get Started</Button>
+            <Button variant="ghost"  className="hidden xl:flex text-black hover:bg-white/10">Sign In</Button>
+            <Button variant="primary" >Get Started</Button>
           </div>
 
           <button
-            className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="lg:hidden p-2 text-black hover:bg-white/10 rounded-lg transition-colors"
             onClick={() => setIsMobOpen(!isMobOpen)}
             aria-label="Toggle menu"
           >
@@ -112,7 +104,7 @@ const NavLink = ({ href, children, active }: { href: string; children: React.Rea
     href={href}
     className={cn(
       'px-3 py-2 rounded-lg text-[13.5px] font-semibold transition-all',
-      active ? 'text-gold bg-white/10' : 'text-white/90 hover:text-gold hover:bg-white/5'
+      active ? 'text-gold bg-gold/10' : 'text-black hover:text-gold hover:bg-white/5'
     )}
   >
     {children}
@@ -121,7 +113,7 @@ const NavLink = ({ href, children, active }: { href: string; children: React.Rea
 
 const NavDropdown = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="relative group">
-    <button className="px-3 py-2 rounded-lg text-[13.5px] font-semibold text-white/90 hover:text-gold hover:bg-white/5 flex items-center gap-1 transition-all">
+    <button className="px-3 py-2 rounded-lg text-[13.5px] font-semibold text-black hover:text-gold hover:bg-white/5 flex items-center gap-1 transition-all">
       {label}
       <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
     </button>
@@ -147,7 +139,7 @@ const DropdownItem = ({ icon, label, href }: { icon: React.ReactNode; label: str
 
 const MegaMenu = () => (
   <div className="relative group">
-    <Link href="/awards" className="px-3 py-2 rounded-lg text-[13.5px] font-semibold text-white/90 hover:text-gold hover:bg-white/5 flex items-center gap-1 transition-all">
+    <Link href="/awards" className="px-3 py-2 rounded-lg text-[13.5px] font-semibold text-black hover:text-gold hover:bg-white/5 flex items-center gap-1 transition-all">
       Awards
       <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
     </Link>

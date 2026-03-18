@@ -383,7 +383,7 @@ export const EventMain = () => {
             {/* TOC Card */}
             <div className="bg-app-bg border-1.5 border-border-light rounded-3xl overflow-hidden shadow-sh-sm">
               <div className="bg-navy p-5 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center text-gold">
+                <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center text-white">
                   <List size={16} />
                 </div>
                 <span className="text-sm font-bold text-white">Table of Contents</span>

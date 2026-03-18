@@ -27,16 +27,16 @@ export const Newsletter = () => {
                 <input 
                   type="text" 
                   placeholder="Your full name" 
-                  className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-app-bg text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
+                  className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 border-primary bg-white text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
                 />
                 <input 
                   type="email" 
                   placeholder="your@institution.edu" 
-                  className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-app-bg text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
+                  className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-white text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
                 />
               </div>
               <div className="flex gap-3">
-                <select className="flex-1 px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-app-bg text-navy focus:border-gold/50 focus:ring-0 transition-all outline-none cursor-pointer">
+                <select className="flex-1 px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-white text-navy focus:border-gold/50 focus:ring-0 transition-all outline-none cursor-pointer">
                   <option value="">Research field (optional)</option>
                   <option>Science & Technology</option>
                   <option>Social Sciences</option>

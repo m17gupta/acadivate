@@ -59,7 +59,7 @@ export const Features = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative bg-app-bg border-1.5 border-border-light rounded-3xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-sh-lg hover:border-border-2"
+              className="group hover:bg-white relative bg-app-bg border-1.5 border-border-light rounded-3xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-sh-lg hover:border-border-2"
             >
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${feat.color}`}>
                 {feat.icon}
