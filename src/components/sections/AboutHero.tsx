@@ -11,7 +11,7 @@ export const AboutHero = () => {
       {/* Decorative elements */}
       <div className="absolute -right-48 -bottom-48 w-[700px] h-[700px] rounded-full border border-white/10 pointer-events-none" />
       <div className="absolute -right-24 -bottom-24 w-[500px] h-[500px] rounded-full border border-white/10 pointer-events-none" />
-      
+
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -31,7 +31,7 @@ export const AboutHero = () => {
             <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg">
               Acadivate Research and Innovation Foundation (ARIF) is a professionally driven academic organisation committed to advancing research excellence, innovation, capacity building, and global academic collaboration.
             </p>
-            
+
             {/* Award badges */}
             <div className="flex flex-wrap gap-4 mb-10">
               <BadgeIcon icon={<Award size={20} />} label="Research Excellence" />
@@ -55,8 +55,8 @@ export const AboutHero = () => {
             <StatCard value="12" label="Countries" />
             <StatCard value="500" label="Delegates" />
             <StatCard value="33" label="Annual Awards" />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               className="col-span-2 p-6 rounded-3xl bg-white/10 border border-white/20 backdrop-blur-md"
@@ -66,7 +66,7 @@ export const AboutHero = () => {
                 <span className="text-gold font-bold">82%</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   initial={{ width: 0 }}
                   whileInView={{ width: '82%' }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
@@ -99,7 +99,7 @@ const BadgeIcon = ({ icon, label }: { icon: React.ReactNode; label: string }) =>
 );
 
 const StatCard = ({ value, label }: { value: string; label: string }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}

@@ -8,29 +8,29 @@ const FEATURES = [
     icon: <Award className="text-gold" size={24} />,
     color: 'bg-gold-pale',
     num: '01 / Conference',
-    title: 'International Research Conference 2026',
-    desc: 'World-class gatherings with Scopus and WoS indexed proceedings for global impact.'
+    title: 'International Research Conferences',
+    desc: 'Join global conferences with Scopus and WoS indexed proceedings for research presentation and publication.'
   },
   {
     icon: <Globe className="text-teal" size={24} />,
     color: 'bg-teal-2',
     num: '02 / Network',
-    title: 'Academic Research Network',
-    desc: 'A growing community of 80+ universities across 15+ countries accelerating scientific discovery.'
+    title: 'Global Academic Network',
+    desc: 'Connect with researchers, scholars, and universities worldwide to collaborate and share knowledge.'
   },
   {
     icon: <Lightbulb className="text-crimson" size={24} />,
     color: 'bg-crimson-2',
     num: '03 / Innovation',
-    title: 'Research Innovation Organization',
-    desc: 'Transparent, jury-driven excellence awards recognizing top scholars and institutional leadership.'
+    title: 'Research Awards & Recognition',
+    desc: 'Recognizing research excellence through transparent and peer-reviewed evaluation systems.'
   },
   {
     icon: <BookOpen className="text-sage" size={24} />,
     color: 'bg-sage-2',
     num: '04 / Journal',
-    title: 'Peer Reviewed Research Journal',
-    desc: 'High-impact publication pathways in scientific research journals and open access platforms.'
+    title: 'Peer-Reviewed Journals',
+    desc: 'Publish your research in high-quality journals with global visibility and academic credibility.'
   }
 ];
 

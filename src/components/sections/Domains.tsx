@@ -5,42 +5,42 @@ import { motion } from 'motion/react';
 const DOMAINS = [
   {
     title: 'Science & Technology',
-    desc: 'Cutting-edge research in engineering, computer science, and applied sciences driving global innovation.',
+    desc: 'Research in engineering, technology, and applied sciences driving innovation and global impact.',
     image: 'https://picsum.photos/seed/d1/600/320',
     conferences: 12,
     papers: '340+'
   },
   {
     title: 'Social Sciences',
-    desc: 'Research in sociology, economics, and public policy addressing the most pressing societal challenges.',
+    desc: 'Exploring sociology, economics, and public policy to address global societal challenges.',
     image: 'https://picsum.photos/seed/d2/600/320',
     conferences: 8,
     papers: '220+'
   },
   {
     title: 'Management & Business',
-    desc: 'Strategic management and business innovation research connecting academia with industry leadership.',
+    desc: 'Advancing business strategy, leadership, and innovation through academic research.',
     image: 'https://picsum.photos/seed/d3/600/320',
     conferences: 9,
     papers: '280+'
   },
   {
     title: 'Medicine & Health Sciences',
-    desc: 'Public health, clinical research, and medical innovation for improved global health outcomes.',
+    desc: 'Clinical research and public health innovation improving global healthcare outcomes.',
     image: 'https://picsum.photos/seed/d4/600/320',
     conferences: 6,
     papers: '180+'
   },
   {
     title: 'Environment & Sustainability',
-    desc: 'SDG-aligned research in climate change, green energy, and sustainable urban development.',
+    desc: 'Research in climate change, sustainability, and green development aligned with global goals.',
     image: 'https://picsum.photos/seed/d5/600/320',
     conferences: 7,
     papers: '210+'
   },
   {
-    title: 'Education Policy & Leadership',
-    desc: 'Higher education policy, institutional governance, and academic leadership shaping the future.',
+    title: 'Education & Leadership',
+    desc: 'Shaping the future through research in education policy, leadership, and institutional development.',
     image: 'https://picsum.photos/seed/d6/600/320',
     conferences: 5,
     papers: '160+'
@@ -56,10 +56,10 @@ export const Domains = () => {
             Research Areas
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-navy leading-tight mb-4">
-            Academic Domains & <em className="italic font-serif">Disciplines</em>
+            Research Domains & <em className="italic font-serif">Academic Disciplines</em>
           </h2>
           <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-            Acadivate supports research and collaboration across a wide spectrum of academic disciplines.
+            Explore key research areas connecting global scholars, institutions, and innovation.
           </p>
           <div className="w-12 h-0.5 bg-linear-to-r from-gold to-gold-2 mx-auto mt-6 rounded-full" />
         </div>

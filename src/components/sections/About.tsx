@@ -12,12 +12,12 @@ const TABS = [
     label: 'Mission',
     icon: '🎯',
     title: 'Our Mission',
-    desc: 'To promote research excellence, innovation, and interdisciplinary academic collaboration globally — connecting scholars, institutions, and industry across disciplines and borders.',
+    desc: 'To advance global research, innovation, and academic collaboration by connecting scholars, institutions, and industry.',
     items: [
-      'Advancing high-quality, evidence-based research',
-      'Supporting scholars with indexed publication pathways',
-      'Fostering sustainable academic-industry partnerships',
-      'Delivering world-class academic conferences'
+      'Promoting high-quality research',
+      'Supporting publication opportunities',
+      'Building academic collaborations',
+      'Hosting global conferences'
     ]
   },
   {
@@ -25,12 +25,12 @@ const TABS = [
     label: 'Vision',
     icon: '🔭',
     title: 'Our Vision',
-    desc: 'To become a globally trusted academic platform connecting institutions and scholars across 50+ countries — a hub where knowledge meets innovation and impact is measurable.',
+    desc: 'To become a trusted global academic platform connecting researchers and institutions worldwide.',
     items: [
-      'A trusted global academic ranking body',
-      '100+ affiliated institutions by 2027',
-      'Scopus & WoS indexed publication ecosystem',
-      'Recognition for 1,000+ academics annually'
+      'Global academic recognition platform',
+      'Expanding international network',
+      'Indexed publication ecosystem',
+      'Recognizing research excellence'
     ]
   },
   {
@@ -38,12 +38,12 @@ const TABS = [
     label: 'Goal',
     icon: '🏆',
     title: 'Our Goal',
-    desc: 'To create high-impact conferences, publications, and academic recognition programs that measurably improve the global research landscape and institutional capabilities.',
+    desc: 'To deliver impactful conferences, publications, and research recognition programs globally.',
     items: [
-      '50 conferences across 6 continents by 2028',
-      'Launch peer-reviewed Acadivate journal series',
-      'Expand awards to 100 categories',
-      'Digital dashboard for all member institutions'
+      'Organizing global conferences',
+      'Launching research journals',
+      'Expanding award programs',
+      'Supporting institutions digitally'
     ]
   },
   {
@@ -51,12 +51,12 @@ const TABS = [
     label: 'Partners',
     icon: '🤝',
     title: 'Our Partners',
-    desc: 'Universities, colleges, research institutions, and global academic bodies — building a worldwide network of academic collaboration and mutual recognition.',
+    desc: 'Collaborating with universities, institutions, and global academic organizations.',
     items: [
-      '60+ affiliated Universities',
-      '35+ Research Institute partners',
-      'Scopus & WoS Journal collaborations',
-      'Presence in 12+ countries'
+      'University partnerships',
+      'Research collaborations',
+      'Journal associations',
+      'Global presence'
     ]
   }
 ];
@@ -69,21 +69,21 @@ export const About = () => {
     <section id="foundation" className="py-24 bg-app-bg overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="relative"
           >
             <div className="relative rounded-3xl overflow-hidden shadow-sh-xl">
-              <img 
-                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80" 
-                alt="Acadivate Foundation" 
+              <img
+                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80"
+                alt="Acadivate Foundation"
                 className="w-full h-[520px] object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-navy/40 to-transparent" />
             </div>
-            
+
             <div className="absolute -bottom-6 -right-6 bg-gold rounded-3xl p-6 shadow-sh-gold max-w-[200px]">
               <div className="text-4xl font-extrabold text-navy leading-none mb-2">
                 25<span className="text-xl opacity-60 ml-1">+</span>
@@ -130,8 +130,8 @@ export const About = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
                     'px-6 py-2.5 rounded-full text-sm font-bold border-1.5 transition-all duration-300',
-                    activeTab === tab.id 
-                      ? 'bg-linear-to-br from-navy to-navy-md text-white border-navy shadow-sh-md' 
+                    activeTab === tab.id
+                      ? 'bg-linear-to-br from-navy to-navy-md text-white border-navy shadow-sh-md'
                       : 'border-border-light text-text-muted hover:border-navy hover:text-navy'
                   )}
                 >
@@ -171,10 +171,11 @@ export const About = () => {
                       </div>
                     ))}
                   </div>
-
-                  <Button variant="primary" size="md">
-                    Learn More <ArrowRight size={18} />
-                  </Button>
+                  <a href="/about">
+                    <Button variant="primary" size="md">
+                      Learn More <ArrowRight size={18} />
+                    </Button>
+                  </a>
                 </motion.div>
               </AnimatePresence>
             </div>

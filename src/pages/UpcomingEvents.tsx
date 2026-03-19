@@ -54,7 +54,7 @@ export const UpcomingEvents = () => {
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -91,9 +91,9 @@ export const UpcomingEvents = () => {
           </div>
           <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
-            <input 
-              type="text" 
-              placeholder="Search events..." 
+            <input
+              type="text"
+              placeholder="Search events..."
               className="w-full pl-10 pr-4 py-2 rounded-full bg-bg-soft border border-border-light focus:outline-none focus:border-primary text-sm"
             />
           </div>

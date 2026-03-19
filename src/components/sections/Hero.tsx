@@ -9,24 +9,24 @@ import { Button } from '../ui/Button';
 const SLIDES = [
   {
     tag: 'International Research Conference 2026 · Malaysia',
-    title: 'Advancing Academic Research, Innovation & Global Excellence',
-    desc: 'Acadivate Research and Innovation Foundation is a leading academic research organization connecting scholars and institutions through a global research collaboration platform.',
+    title: 'Global Platform for Academic Research, Innovation & Collaboration',
+    desc: 'Join a leading international research conference bringing together scholars, researchers, and institutions to share knowledge, publish research, and build global academic collaborations.',
     image: 'https://picsum.photos/seed/hero1/1600/900',
-    bc: 'Academic Excellence 2026'
+    bc: 'International Research Conference 2026'
   },
   {
-    tag: 'ICASD 2026 · Malaysia',
-    title: 'International Conference on Sustainable Development',
-    desc: 'Join 300+ delegates in Kuala Lumpur for the premier research conference 2026 focusing on innovation, intelligence, and education policy.',
+    tag: 'Call for Papers · ICASD 2026',
+    title: 'International Conference on Sustainable Development 2026',
+    desc: 'Submit your research paper and present your work at a global academic conference focused on sustainable development, innovation, and research excellence.',
     image: 'https://picsum.photos/seed/hero2/1600/900',
     bc: 'ICASD 2026 Conference'
   },
   {
-    tag: 'Excellence Awards · Research & Innovation',
-    title: 'Transparent Evaluation for Global Transparency',
-    desc: 'Recognizing outstanding academic contributions through peer-driven evaluation, awards, and the India Institutional Rankings 2026 cycle.',
+    tag: 'Research Awards & Rankings 2026',
+    title: 'Recognizing Excellence in Research & Academic Innovation',
+    desc: 'Explore global research awards, institutional rankings, and peer-reviewed recognition programs designed to highlight outstanding academic contributions.',
     image: 'https://picsum.photos/seed/hero3/1600/900',
-    bc: 'Awards & Rankings 2026'
+    bc: 'Research Awards & Rankings 2026'
   }
 ];
 
@@ -123,13 +123,13 @@ export const Hero = () => {
       </div>
 
       <div className="absolute top-1/2 -translate-y-1/2 w-full px-6 flex justify-between pointer-events-none z-20 hidden md:flex">
-        <button 
+        <button
           onClick={prev}
           className="w-12 h-12 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-white pointer-events-auto hover:bg-gold hover:border-gold hover:text-navy transition-all"
         >
           <ChevronLeft size={24} />
         </button>
-        <button 
+        <button
           onClick={next}
           className="w-12 h-12 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-white pointer-events-auto hover:bg-gold hover:border-gold hover:text-navy transition-all"
         >

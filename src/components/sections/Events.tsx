@@ -12,8 +12,8 @@ const EVENTS = [
     id: 1,
     type: 'conference',
     slug: 'icas-2026',
-    title: 'ICASD 2026 — International Scientific Conference',
-    desc: 'Join our call for papers international conference to present your work and network with global experts in Kuala Lumpur.',
+    title: 'ICASD 2026 — International Research Conference',
+    desc: 'Submit your research paper and join a leading international conference in Kuala Lumpur with global scholars and publication opportunities.',
     date: { day: '21', month: 'May' },
     time: '09:00 AM',
     location: 'Kuala Lumpur, Malaysia',
@@ -24,8 +24,8 @@ const EVENTS = [
     id: 2,
     type: 'conference',
     slug: 'icgsd-2025',
-    title: 'ICGSD 2025 — Academic Innovation Summit',
-    desc: 'Global academic summit at Abu Dhabi University with keynote speakers, institutional leaders, and indexed publication opportunities.',
+    title: 'ICGSD 2025 — Global Academic Conference',
+    desc: 'Attend a global academic conference with expert speakers, networking, and indexed research publication opportunities.',
     date: { day: '22', month: 'Jul' },
     time: '10:00 AM',
     location: 'Dubai, UAE',
@@ -37,7 +37,7 @@ const EVENTS = [
     type: 'award',
     slug: 'awards-2025',
     title: 'Academic Excellence Awards 2025',
-    desc: 'Annual ceremony recognising outstanding academics and institutions across 33 categories. Nominations are open.',
+    desc: 'Recognizing outstanding researchers and institutions through global awards and academic recognition programs.',
     date: { day: '15', month: 'Sep' },
     time: '06:00 PM',
     location: 'New Delhi, India',
@@ -48,8 +48,8 @@ const EVENTS = [
     id: 4,
     type: 'workshop',
     slug: 'workshop-2026',
-    title: 'Research Methodology FDP Workshop',
-    desc: 'Three-day faculty development programme on advanced research methodology, statistical tools, and academic writing.',
+    title: 'Research Methodology Workshop',
+    desc: 'Join an advanced workshop on research methodology, academic writing, and publication skills for researchers.',
     date: { day: '10', month: 'Aug' },
     time: '09:00 AM',
     location: 'Online / India',
@@ -57,7 +57,6 @@ const EVENTS = [
     tags: ['FDP', 'Online']
   }
 ];
-
 const FILTERS = [
   { id: 'all', label: 'All Events' },
   { id: 'conference', label: 'Conferences' },
@@ -74,17 +73,17 @@ export const Events = () => {
     <section className="py-24 bg-app-bg relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--color-navy) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
-      
+
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/30 text-[9.5px] font-bold tracking-[2px] uppercase text-gold mb-4">
             Upcoming Events
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-navy leading-tight mb-4">
-            International Academic <em className="italic font-serif font-medium">Events</em>
+            International Research <em className="italic font-serif font-medium">Events & Conferences</em>
           </h2>
           <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-            Discover world-class conferences, forums, and award ceremonies connecting scholars and institutions across disciplines.
+            Explore global conferences, workshops, and academic awards connecting researchers and institutions worldwide.
           </p>
           <div className="w-12 h-0.5 bg-linear-to-r from-gold to-gold-2 mx-auto mt-6 rounded-full" />
         </div>
@@ -96,8 +95,8 @@ export const Events = () => {
               onClick={() => setFilter(f.id)}
               className={cn(
                 'px-6 py-2 rounded-full text-sm font-bold border-1.5 transition-all duration-300',
-                filter === f.id 
-                  ? 'bg-navy text-white border-navy shadow-sh-md' 
+                filter === f.id
+                  ? 'bg-navy text-white border-navy shadow-sh-md'
                   : 'bg-app-bg border-border-light text-text-muted hover:border-navy hover:text-navy'
               )}
             >
@@ -180,8 +179,8 @@ export const Events = () => {
                     onClick={() => setFilter(f.id)}
                     className={cn(
                       'w-full flex items-center justify-between px-4 py-3.5 text-[13px] font-medium transition-all rounded-xl group',
-                      filter === f.id 
-                        ? 'bg-gold-pale text-gold font-bold' 
+                      filter === f.id
+                        ? 'bg-gold-pale text-gold font-bold'
                         : 'text-navy hover:bg-bg-soft hover:pl-6'
                     )}
                   >
@@ -199,7 +198,7 @@ export const Events = () => {
 
             <div className="bg-app-bg border-1.5 border-border-light rounded-[2rem] overflow-hidden shadow-sh-sm p-8 relative group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:scale-150 transition-transform duration-700" />
-              
+
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-gold-pale flex items-center justify-center text-gold">
                   <Clock size={20} />

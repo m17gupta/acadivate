@@ -3,6 +3,7 @@
 import { Trophy, Award, ArrowRight, Globe } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button } from '../ui/Button';
+import Link from 'next/link';
 
 const RANKINGS = [
   { pos: 1, name: 'Indian Institute of Technology Delhi', location: 'New Delhi, India', score: 94.8 },
@@ -27,25 +28,30 @@ export const Rankings = () => {
               Academic Rankings
             </div>
             <h2 className="text-4xl md:text-5xl font-extrabold text-navy leading-tight mb-6">
-              India Institutional <em className="italic font-serif">Rankings 2026</em>
+              India Institutional <em className="italic font-serif">Research Rankings 2026</em>
             </h2>
             <p className="text-lg text-text-muted leading-relaxed mb-8">
-              Acadivate's transparent, evidence-based ranking framework evaluates institutions across research output, teaching quality, and global engagement.
+              A transparent and data-driven academic ranking system evaluating institutions based on research performance, innovation, and global impact.
             </p>
-            
+
             <div className="space-y-4 mb-10">
-              <RankingFeature text="Data-driven, unbiased evaluation methodology" />
-              <RankingFeature text="Annual cycle with published scoring criteria" />
-              <RankingFeature text="Global visibility for ranked institutions" />
+              <RankingFeature text="Data-driven research evaluation framework" />
+              <RankingFeature text="Transparent and peer-reviewed methodology" />
+              <RankingFeature text="Global recognition for top institutions" />
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Button variant="gold">
-                View Full Rankings <ArrowRight size={16} />
-              </Button>
-              <Button variant="ghost">
-                Apply for Ranking
-              </Button>
+              <Link href="/rankings">
+                <Button variant="gold">
+                  View Rankings <ArrowRight size={16} />
+                </Button>
+              </Link>
+
+              <Link href="/apply-for-ranking">
+                <Button variant="ghost">
+                  Submit for Ranking
+                </Button>
+              </Link>
             </div>
           </motion.div>
 
@@ -75,7 +81,7 @@ export const Rankings = () => {
                   <div className="text-right min-w-[80px]">
                     <div className="text-sm font-bold text-navy">{rank.score}</div>
                     <div className="h-1 bg-bg-2 rounded-full mt-1.5 overflow-hidden">
-                      <motion.div 
+                      <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${rank.score}%` }}
                         viewport={{ once: true }}

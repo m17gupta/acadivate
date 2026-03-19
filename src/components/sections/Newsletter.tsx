@@ -14,24 +14,24 @@ export const Newsletter = () => {
               Academic Newsletter
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-navy leading-tight mb-4">
-              Stay Ahead with the Global Research Community
+              Join Our Global Research Community
             </h2>
             <p className="text-lg text-navy/70 leading-relaxed">
-              Get alerts on upcoming international conferences 2025-2026 and the latest academic research journal call for papers.
+              Subscribe for updates on international conferences, call for papers, and academic recognition programs.
             </p>
           </div>
 
           <div>
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input 
-                  type="text" 
-                  placeholder="Your full name" 
+                <input
+                  type="text"
+                  placeholder="Your full name"
                   className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 border-primary bg-white text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
                 />
-                <input 
-                  type="email" 
-                  placeholder="your@institution.edu" 
+                <input
+                  type="email"
+                  placeholder="your@institution.edu"
                   className="w-full px-4 py-3 rounded-xl border-1.5 border-teal-2/30 bg-white text-navy placeholder:text-navy/30 focus:border-gold/50 focus:ring-0 transition-all outline-none"
                 />
               </div>
@@ -51,10 +51,10 @@ export const Newsletter = () => {
               <ShieldCheck size={12} /> No spam. Unsubscribe anytime. Your data is protected.
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-              <Perk text="International conference updates" />
-              <Perk text="Award nomination windows" />
-              <Perk text="Call for papers alerts" />
-              <Perk text="Ranking announcements" />
+              <Perk text="Conference & Event Alerts" />
+              <Perk text="Call for Papers Updates" />
+              <Perk text="Award Nomination Windows" />
+              <Perk text="Institutional Rankings" />
             </div>
           </div>
         </div>
