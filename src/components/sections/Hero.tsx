@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/src/lib/utils';
 import { Button } from '../ui/Button';
+import Link from 'next/link';
 
 const SLIDES = [
   {
@@ -93,9 +94,14 @@ export const Hero = () => {
                   {SLIDES[current].desc}
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <Button variant="gold" size="lg">
+                  <Link href="/nomination-form">
+                    <Button variant="gold" size="lg">
+                      Nominate Now <ArrowRight size={18} />
+                    </Button>
+                  </Link>
+                  {/* <Button variant="gold" size="lg">
                     Nominate Now <ArrowRight size={18} />
-                  </Button>
+                  </Button> */}
                   <Button variant="outline" size="lg">
                     View Conferences
                   </Button>
