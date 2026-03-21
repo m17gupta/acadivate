@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { cn } from '@/src/lib/utils';
 import { Button } from '../ui/Button';
 
+
 const EVENTS = [
   {
     id: 1,
@@ -214,9 +215,11 @@ export const Events = () => {
                 <CountdownUnit value="45" label="Mins" />
                 <CountdownUnit value="08" label="Secs" />
               </div>
-              <Button variant="gold" className="w-full py-4 rounded-xl shadow-sh-md relative z-10">
-                Register Now <ArrowRight size={16} />
-              </Button>
+              <Link href="/registration-form" className="block w-full relative z-10">
+                <Button variant="gold" className="w-full py-4 rounded-xl shadow-sh-md">
+                  Register Now <ArrowRight size={16} />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
