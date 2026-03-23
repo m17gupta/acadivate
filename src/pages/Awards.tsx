@@ -148,14 +148,20 @@ export const Awards = () => {
               </p>
 
               <div className="flex flex-wrap gap-4 mb-12">
-                <Button variant="gold" size="lg" className="rounded-xl px-8 py-4 text-base shadow-sh-gold hover:shadow-sh-gold-lg">
-                  <Download size={18} className="mr-2" /> Submit Nomination
-                </Button>
-                <Button variant="outline" size="lg" className="rounded-xl px-8 py-4 text-base text-navy border-navy/20 hover:bg-navy/5 backdrop-blur-md">
-                  <Award size={18} className="mr-2" /> Explore Categories
-                </Button>
-              </div>
+                {/* Submit Nomination Link */}
+                <Link href="/nomination-form">
+                  <Button variant="gold" size="lg" className="rounded-xl px-8 py-4 text-base shadow-sh-gold hover:shadow-sh-gold-lg">
+                    <Download size={18} className="mr-2" /> Submit Nomination
+                  </Button>
+                </Link>
 
+                {/* Explore Categories Link */}
+                <Link href="/awards#categories">
+                  <Button variant="outline" size="lg" className="rounded-xl px-8 py-4 text-base text-navy border-navy/20 hover:bg-navy/5 backdrop-blur-md">
+                    <Award size={18} className="mr-2" /> Explore Categories
+                  </Button>
+                </Link>
+              </div>
               {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-primary/10 border border-primary/10 rounded-2xl overflow-hidden backdrop-blur-sm">
                 <StatItem label="Categories" value="33" plus />
                 <StatItem label="Laureates" value="500" plus />
@@ -644,9 +650,11 @@ export const Awards = () => {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="gold" size="lg" className="rounded-2xl px-10 py-5 text-lg shadow-sh-gold hover:shadow-sh-gold-lg">
-              Submit Nomination Now
-            </Button>
+            <Link href="/nomination-form">
+              <Button variant="gold" size="lg" className="rounded-2xl px-10 py-5 text-lg shadow-sh-gold hover:shadow-sh-gold-lg">
+                Submit Nomination Now
+              </Button>
+            </Link>
             <Button variant="outline" size="lg" className="rounded-2xl px-10 py-5 text-lg text-navy border-navy/20 hover:bg-navy/5 backdrop-blur-md">
               Download Guidelines
             </Button>

@@ -33,12 +33,12 @@ export const AboutHero = () => {
             </p>
 
             {/* Award badges */}
-            <div className="flex flex-wrap gap-4 mb-10">
+            {/* <div className="flex flex-wrap gap-4 mb-10">
               <BadgeIcon icon={<Award size={20} />} label="Research Excellence" />
               <BadgeIcon icon={<Globe size={20} />} label="Global Innovation" />
               <BadgeIcon icon={<GraduationCap size={20} />} label="Academic Excellence" />
               <BadgeIcon icon={<Star size={20} />} label="Impact Award" />
-            </div>
+            </div> */}
 
             <div className="flex flex-wrap gap-4">
               <Button variant="gold" size="lg">
@@ -50,7 +50,7 @@ export const AboutHero = () => {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <StatCard value="25" label="Conferences" />
             <StatCard value="12" label="Countries" />
             <StatCard value="500" label="Delegates" />
@@ -72,15 +72,15 @@ export const AboutHero = () => {
                   transition={{ duration: 1.5, ease: "easeOut" }}
                   className="h-full bg-linear-to-r from-gold to-gold-lt"
                 />
-              </div>
-              <div className="flex justify-between mt-3 text-[10px] font-bold uppercase tracking-wider text-white/40">
+              </div> */}
+          {/* <div className="flex justify-between mt-3 text-[10px] font-bold uppercase tracking-wider text-white/40">
                 <span>Research</span>
                 <span>Publications</span>
                 <span>Conferences</span>
                 <span>Awards</span>
               </div>
             </motion.div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

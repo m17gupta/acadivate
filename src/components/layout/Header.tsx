@@ -16,7 +16,7 @@ export const Header = () => {
     const handleScroll = () => setIsScrolled(window.scrollY > 24);
     handleScroll();
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);  
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
 
@@ -61,7 +61,12 @@ export const Header = () => {
             <Button variant="ghost" className="hidden xl:flex text-black hover:bg-white/10"
               onClick={() => router.push('/auth/signin')}
             >Sign In</Button>
-            <Button variant="primary" >Get Started</Button>
+            <Button
+              variant="primary"
+              onClick={() => router.push('/registration-form')}
+            >
+              Get Started
+            </Button>
           </div>
 
           <button
@@ -150,54 +155,54 @@ const MegaMenu = () => (
     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[780px] opacity-0 translate-y-[-10px] pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 ease-soft z-50">
       <div className="bg-app-bg border border-black/5 rounded-[1.5rem] shadow-sh-xl overflow-hidden">
         <div className="grid grid-cols-[1fr_1px_1fr_1px_1fr]">
-        <div className="p-6">
-          <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
-            Featured
-          </div>
-          <div className="rounded-xl overflow-hidden relative group/feat cursor-pointer">
-            <img src="https://picsum.photos/seed/awards-hero/500/260" alt="Awards" className="w-full h-32 object-cover group-hover/feat:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-linear-to-t from-primary-deep/85 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <span className="text-[9px] font-bold tracking-[1.5px] uppercase px-2 py-0.5 rounded-full bg-gold text-white mb-2 inline-block">
-                Nominations Open
-              </span>
-              <div className="text-[13.5px] font-semibold text-white leading-tight">
-                Academic Excellence Awards 2026 — Nominate Now
+          <div className="p-6">
+            <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
+              Featured
+            </div>
+            <div className="rounded-xl overflow-hidden relative group/feat cursor-pointer">
+              <img src="https://picsum.photos/seed/awards-hero/500/260" alt="Awards" className="w-full h-32 object-cover group-hover/feat:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-linear-to-t from-primary-deep/85 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <span className="text-[9px] font-bold tracking-[1.5px] uppercase px-2 py-0.5 rounded-full bg-gold text-white mb-2 inline-block">
+                  Nominations Open
+                </span>
+                <div className="text-[13.5px] font-semibold text-white leading-tight">
+                  Academic Excellence Awards 2026 — Nominate Now
+                </div>
               </div>
             </div>
           </div>
+          <div className="bg-border-light" />
+          <div className="p-6">
+            <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
+              Categories
+            </div>
+            <div className="space-y-1">
+              <MegaLink icon={<Award size={14} />} title="Excellence in Research" sub="Original research contributions" />
+              <MegaLink icon={<GraduationCap size={14} />} title="Innovation Leadership" sub="Academic innovation" />
+              <MegaLink icon={<Trophy size={14} />} title="Lifetime Achievement" sub="Career-long impact" />
+            </div>
+          </div>
+          <div className="bg-border-light" />
+          <div className="p-6">
+            <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
+              Past Winners
+            </div>
+            <div className="space-y-3">
+              <WinnerItem name="Prof. Rashida Ahmed" year="2025" />
+              <WinnerItem name="Dr. Sanjay Nair" year="2025" />
+              <WinnerItem name="Dr. Lin Wei" year="2025" />
+            </div>
+          </div>
         </div>
-        <div className="bg-border-light" />
-        <div className="p-6">
-          <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
-            Categories
-          </div>
-          <div className="space-y-1">
-            <MegaLink icon={<Award size={14} />} title="Excellence in Research" sub="Original research contributions" />
-            <MegaLink icon={<GraduationCap size={14} />} title="Innovation Leadership" sub="Academic innovation" />
-            <MegaLink icon={<Trophy size={14} />} title="Lifetime Achievement" sub="Career-long impact" />
-          </div>
+        <div className="bg-bg-light border-t border-border-light p-4 flex items-center justify-between">
+          <Link href="/awards" className="text-[12.5px] font-semibold text-navy hover:text-gold flex items-center gap-2 transition-colors">
+            <Award size={14} /> All Award Categories
+          </Link>
+          <Link href="/awards#nominate" className="text-[12.5px] font-bold text-gold flex items-center gap-2 transition-colors">
+            Nominate Now — 2026 <ChevronDown size={14} className="-rotate-90" />
+          </Link>
         </div>
-        <div className="bg-border-light" />
-        <div className="p-6">
-          <div className="text-[9.5px] font-bold tracking-[2px] uppercase text-text-muted mb-4 flex items-center gap-2 after:h-px after:flex-1 after:bg-border-light">
-            Past Winners
-          </div>
-          <div className="space-y-3">
-            <WinnerItem name="Prof. Rashida Ahmed" year="2025" />
-            <WinnerItem name="Dr. Sanjay Nair" year="2025" />
-            <WinnerItem name="Dr. Lin Wei" year="2025" />
-          </div>
-        </div>
-      </div>
-      <div className="bg-bg-light border-t border-border-light p-4 flex items-center justify-between">
-        <Link href="/awards" className="text-[12.5px] font-semibold text-navy hover:text-gold flex items-center gap-2 transition-colors">
-          <Award size={14} /> All Award Categories
-        </Link>
-        <Link href="/awards#nominate" className="text-[12.5px] font-bold text-gold flex items-center gap-2 transition-colors">
-          Nominate Now — 2026 <ChevronDown size={14} className="-rotate-90" />
-        </Link>
-      </div>
       </div>
     </div>
   </div>
