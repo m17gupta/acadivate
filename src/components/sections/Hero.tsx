@@ -12,21 +12,21 @@ const SLIDES = [
     tag: 'Global Research Hub · 2026',
     title: 'Advancing Academic Research & Innovation',
     desc: 'Connecting scholars and institutions to foster research breakthroughs and strategic global collaborations through innovation.',
-    image: 'https://picsum.photos/seed/hero1/1600/900',
+    image: 'assets/Image/international.jpg',
     bc: 'Research & Innovation'
   },
   {
     tag: 'Call for Papers · ICASD 2026',
     title: 'International Conference on Sustainable Development',
     desc: 'Submit your research to a premier global platform focused on pioneering solutions for a sustainable and innovative future.',
-    image: 'https://picsum.photos/seed/hero2/1600/900',
+    image: 'assets/Image/research-conferences.png',
     bc: 'ICASD 2026'
   },
   {
     tag: 'Scholarly Awards · 2026',
     title: 'Celebrating Excellence in Research Innovation',
     desc: 'Recognizing outstanding academic impact through peer-reviewed awards and prestigious institutional rankings globally.',
-    image: 'https://picsum.photos/seed/hero3/1600/900',
+    image: 'assets/Image/research-innovation.jpg',
     bc: 'Awards & Rankings'
   }
 ];
@@ -102,9 +102,11 @@ export const Hero = () => {
                   {/* <Button variant="gold" size="lg">
                     Nominate Now <ArrowRight size={18} />
                   </Button> */}
-                  <Button variant="outline" size="lg">
-                    View Conferences
-                  </Button>
+                  <Link href="/events/international-conferences">
+                    <Button variant="outline" size="lg">
+                      View Conferences
+                    </Button>
+                  </Link>
                 </div>
               </motion.div>
             </AnimatePresence>
