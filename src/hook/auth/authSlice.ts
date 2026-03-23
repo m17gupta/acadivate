@@ -14,7 +14,38 @@ interface AuthState {
   error: string | null;
 }
 
-const initialState: AuthState = {
+const loadState = () => {
+  try {
+    const serializedUser = localStorage.getItem('user');
+    const serializedToken = localStorage.getItem('token');
+    if (serializedUser === null) {
+      return {
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      };
+    }
+    return {
+      user: JSON.parse(serializedUser),
+      token: serializedToken,
+      isAuthenticated: true,
+      isLoading: false,
+      error: null,
+    };
+  } catch (err) {
+    return {
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    };
+  }
+};
+
+const initialState: AuthState = typeof window !== 'undefined' ? loadState() : {
   user: null,
   token: null,
   isAuthenticated: false,
@@ -34,11 +65,19 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.error = null;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        localStorage.setItem('token', action.payload.token);
+      }
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -60,6 +99,11 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.isLoading = false;
       state.error = null;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        // Note: token is not currently in the loginThunk payload, 
+        // but if it were, we would set it here as well.
+      }
     })
     .addCase(loginThunk.rejected, (state, action) => {
       state.isLoading = false;

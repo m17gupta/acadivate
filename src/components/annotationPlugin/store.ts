@@ -5,13 +5,16 @@ export type ScreenSize = 'mobile' | 'tablet' | 'desktop' | 'all';
 
 export interface Annotation {
   id: string;
-  selector: string;
-  offsetX: number; // Percentage 0-100
-  offsetY: number; // Percentage 0-100
-  content: string;
-  status: CommentStatus;
-  screenSize: ScreenSize;
-  createdAt: number;
+  pageId?: string;
+  slug?: string;
+  _id?: string;
+  selector?: string;
+  offsetX?: number; // Percentage 0-100
+  offsetY?: number; // Percentage 0-100
+  content?: string;
+  status?: CommentStatus;
+  screenSize?: ScreenSize;
+  createdAt?: number;
 }
 
 export interface AnnotatorSettings {
@@ -32,7 +35,10 @@ interface AnnotatorStore {
   updateAnnotationPosition: (id: string, selector: string, offsetX: number, offsetY: number) => void;
   setActiveAnnotationId: (id: string | null) => void;
   updateSettings: (settings: Partial<AnnotatorSettings>) => void;
+  setAnnotations: (annotations: Annotation[]) => void;
 }
+
+const getAnnotationKey = (annotation: Annotation) => annotation._id ?? annotation.id;
 
 export const useAnnotatorStore = create<AnnotatorStore>((set) => ({
   annotations: [],
@@ -59,21 +65,24 @@ export const useAnnotatorStore = create<AnnotatorStore>((set) => ({
     ]
   })),
   
+  setAnnotations: (annotations: Annotation[]) => set((state) => ({
+    annotations: annotations
+  })),
   removeAnnotation: (id) => set((state) => ({
-    annotations: state.annotations.filter((a) => a.id !== id),
+    annotations: state.annotations.filter((a) => getAnnotationKey(a) !== id),
     activeAnnotationId: state.activeAnnotationId === id ? null : state.activeAnnotationId
   })),
   
   updateAnnotationStatus: (id, status) => set((state) => ({
-    annotations: state.annotations.map(a => a.id === id ? { ...a, status } : a)
+    annotations: state.annotations.map((a) => getAnnotationKey(a) === id ? { ...a, status } : a)
   })),
 
   updateAnnotationScreen: (id, screenSize) => set((state) => ({
-    annotations: state.annotations.map(a => a.id === id ? { ...a, screenSize } : a)
+    annotations: state.annotations.map((a) => getAnnotationKey(a) === id ? { ...a, screenSize } : a)
   })),
 
   updateAnnotationPosition: (id, selector, offsetX, offsetY) => set((state) => ({
-    annotations: state.annotations.map(a => a.id === id ? { ...a, selector, offsetX, offsetY } : a)
+    annotations: state.annotations.map((a) => getAnnotationKey(a) === id ? { ...a, selector, offsetX, offsetY } : a)
   })),
   
   setActiveAnnotationId: (id) => set({ activeAnnotationId: id }),

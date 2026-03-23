@@ -6,6 +6,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChevronDown, Menu, X, Award, Users, Calendar, BookOpen, GraduationCap, Trophy } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { Button } from '../ui/Button';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/src/hook/store';
+import { logout } from '@/src/hook/auth/authSlice';
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -18,13 +21,18 @@ export const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-
+  const dispatch=useDispatch()
+const {user,token,isAuthenticated}=useSelector((state:RootState)=>state.auth);
 
   React.useEffect(() => {
     setIsMobOpen(false);
   }, [pathname]);
 
+
+  const handleLogout=()=>{
+       dispatch(logout())
+       router.push("/")
+  }
   return (
     <header data-annotate-id="site-header" className={cn(
       'sticky top-0 z-50 transition-all duration-300 border-b border-white/10',
@@ -58,10 +66,12 @@ export const Header = () => {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2">
-            <Button variant="ghost" className="hidden xl:flex text-black hover:bg-white/10"
+         {  !isAuthenticated? <Button variant="ghost" className="hidden xl:flex text-black hover:bg-white/10"
               onClick={() => router.push('/auth/signin')}
-            >Sign In</Button>
-            <Button
+            >Sign In</Button>:<Button variant="ghost" className="hidden xl:flex text-black hover:bg-white/10"
+              onClick={handleLogout}
+            >Sign out</Button>}
+             <Button
               variant="primary"
               onClick={() => router.push('/registration-form')}
             >
@@ -98,6 +108,7 @@ export const Header = () => {
           <MobileNavLink href="/contact">Contact</MobileNavLink>
           <div className="mt-4 pt-4 border-t border-white/10 flex flex-col gap-3 pb-10">
             <Button variant="ghost" className="w-full text-white hover:bg-white/10">Sign In</Button>
+            <Button variant="ghost" className="w-full text-white hover:bg-white/10">Sign Up</Button>
             <Button variant="gold" className="w-full">Get Started</Button>
           </div>
         </div>

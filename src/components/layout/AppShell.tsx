@@ -13,7 +13,7 @@ import { store } from '@/src/hook/store';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isDashboardRoute = pathname.startsWith('/dashboard');
+  const isDashboardRoute = pathname?.startsWith('/dashboard');
   const [showBackToTop, setShowBackToTop] = React.useState(false);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {

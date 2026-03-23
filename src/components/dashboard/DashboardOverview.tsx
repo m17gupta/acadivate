@@ -67,7 +67,7 @@ function VisitsChart() {
 }
 
 function DonutCard() {
-  const gradients = [];
+  const gradients: string[] = [];
   let offset = 0;
 
   for (const stat of donutStats) {

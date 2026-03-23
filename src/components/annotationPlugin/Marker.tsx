@@ -2,10 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageCircle, Trash2, CheckCircle2, Clock, AlertCircle, MonitorSmartphone, GripHorizontal } from 'lucide-react';
+import { MessageCircle, Trash2, CheckCircle2, Clock, AlertCircle, MonitorSmartphone, GripHorizontal, Save } from 'lucide-react';
 import type { Annotation, CommentStatus, ScreenSize } from './store';
 import { useAnnotatorStore } from './store';
-import { isPointVisible, getCssSelector, getScreenSize } from './utils';
+import { isPointVisible, getCssSelector, getScreenSize, resolveTargetElement } from './utils';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/src/hook/store';
+import { deleteCommentThunk, updateCommentThunk } from '@/src/hook/comments/commentThunk';
+import { toast } from 'sonner';
 
 interface MarkerProps {
   annotation: Annotation;
@@ -19,23 +23,26 @@ const statusConfig: Record<CommentStatus, { color: string; icon: React.ElementTy
 
 export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
   const markerRef = useRef<HTMLDivElement>(null);
-  const { 
-    activeAnnotationId, 
-    setActiveAnnotationId, 
-    removeAnnotation, 
+  const {
+    activeAnnotationId,
+    setActiveAnnotationId,
+    removeAnnotation,
     updateAnnotationStatus,
     updateAnnotationScreen,
     updateAnnotationPosition,
-    settings
+    settings,
+    annotations
   } = useAnnotatorStore();
-  
+  const dispatch = useDispatch<AppDispatch>();
+
   const [isDragging, setIsDragging] = useState(false);
   const [currentScreenSize, setCurrentScreenSize] = useState<ScreenSize>(() =>
     typeof window === 'undefined' ? 'desktop' : getScreenSize(window.innerWidth)
   );
+  const annotationKey = annotation._id ?? annotation.id;
 
-  const isActive = activeAnnotationId === annotation.id;
-  const config = statusConfig[annotation.status];
+  const isActive = activeAnnotationId === annotationKey;
+  const config = statusConfig[annotation?.status ?? "open"];
 
   useEffect(() => {
     const handleResize = () => setCurrentScreenSize(getScreenSize(window.innerWidth));
@@ -51,8 +58,8 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
         if (!isDragging) rafId = requestAnimationFrame(updatePosition);
         return;
       }
-      
-      const target = document.querySelector(annotation.selector);
+
+      const target = resolveTargetElement(annotation?.selector);
 
       if (!target) {
         markerRef.current.style.opacity = '0';
@@ -60,10 +67,22 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
         rafId = requestAnimationFrame(updatePosition);
         return;
       }
+      let x = 0;
+      let y = 0;
+      let rect: DOMRect | Pick<DOMRect, 'width' | 'height' | 'left' | 'top' | 'right' | 'bottom'> = {
+        width: 0,
+        height: 0,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+      };
 
-      const rect = target.getBoundingClientRect();
-      const x = rect.left + (rect.width * annotation.offsetX) / 100;
-      const y = rect.top + (rect.height * annotation.offsetY) / 100;
+      if (typeof annotation.offsetX === 'number' && typeof annotation.offsetY === 'number') {
+        rect = target.getBoundingClientRect();
+        x = rect.left + (rect.width * annotation.offsetX) / 100;
+        y = rect.top + (rect.height * annotation.offsetY) / 100;
+      }
 
       const isVisible = rect.width > 0 && rect.height > 0 && isPointVisible(x, y, target);
 
@@ -112,7 +131,7 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
       const offsetX = ((e.clientX - rect.left) / rect.width) * 100;
       const offsetY = ((e.clientY - rect.top) / rect.height) * 100;
       const selector = getCssSelector(target);
-      updateAnnotationPosition(annotation.id, selector, offsetX, offsetY);
+      updateAnnotationPosition(annotationKey, selector, offsetX, offsetY);
     }
   };
 
@@ -120,9 +139,52 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
   if (!settings.showResolved && annotation.status === 'done') return null;
   if (annotation.screenSize !== 'all' && annotation.screenSize !== currentScreenSize) return null;
 
+
+  const updateComment = async () => {
+    const updatedData = annotations.find((item) => (item._id ?? item.id) === annotationKey);
+    if (updatedData && updatedData._id) {
+      try {
+        await dispatch(updateCommentThunk({
+          id: updatedData._id,
+          commentData: updatedData
+        })).unwrap();
+        setActiveAnnotationId(annotationKey);
+        toast.success('Annotation updated successfully');
+      } catch (error) {
+        console.error('Failed to update annotation in Redux:', error);
+        toast.error('Failed to update annotation');
+      }
+    }
+  };
+
+  const handleStatusChange = async (status: CommentStatus) => {
+    updateAnnotationStatus(annotationKey, status);
+    setActiveAnnotationId(annotationKey);
+  };
+
+  const handleScreenChange = async (screenSize: ScreenSize) => {
+    updateAnnotationScreen(annotationKey, screenSize);
+    setActiveAnnotationId(annotationKey);
+  };
+
+  const handleDeleteComment = async () => {
+    try {
+      if (annotation._id) {
+        await dispatch(deleteCommentThunk(annotation._id)).unwrap();
+      }
+      removeAnnotation(annotationKey);
+      setActiveAnnotationId(null);
+      toast.success('Annotation deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete annotation:', error);
+      toast.error('Failed to delete annotation');
+    }
+  };
+
   return (
     <div
       ref={markerRef}
+      data-annotator-ui="true"
       className="fixed top-0 left-0 z-[9999]"
       style={{ transformOrigin: 'top left', touchAction: 'none' }}
     >
@@ -131,13 +193,12 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className={`absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-white transition-transform ${
-          isActive ? `${config.color.split(' ')[0]} scale-110 ring-4 ${config.color.split(' ')[1]}` : `${config.color.split(' ')[0]} hover:scale-110`
-        } ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
+        className={`absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-white transition-transform ${isActive ? `${config.color.split(' ')[0]} scale-110 ring-4 ${config.color.split(' ')[1]}` : `${config.color.split(' ')[0]} hover:scale-110`
+          } ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
         onClick={(e) => {
           if (isDragging) return;
           e.stopPropagation();
-          setActiveAnnotationId(isActive ? null : annotation.id);
+          setActiveAnnotationId(isActive ? null : annotationKey);
         }}
       >
         <MessageCircle size={16} />
@@ -160,7 +221,10 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
                 <config.icon size={16} className={config.color.split(' ')[2]} />
                 <select
                   value={annotation.status}
-                  onChange={(e) => updateAnnotationStatus(annotation.id, e.target.value as CommentStatus)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    void handleStatusChange(e.target.value as CommentStatus);
+                  }}
                   className="text-sm font-medium bg-transparent border-none focus:ring-0 cursor-pointer p-0 text-slate-700"
                 >
                   <option value="open">Open</option>
@@ -173,7 +237,10 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
                   <MonitorSmartphone size={14} />
                   <select
                     value={annotation.screenSize}
-                    onChange={(e) => updateAnnotationScreen(annotation.id, e.target.value as ScreenSize)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      void handleScreenChange(e.target.value as ScreenSize);
+                    }}
                     className="text-xs bg-transparent border-none focus:ring-0 cursor-pointer p-0 text-slate-500"
                   >
                     <option value="all">All Screens</option>
@@ -183,7 +250,7 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
                   </select>
                 </div>
                 <button
-                  onClick={() => removeAnnotation(annotation.id)}
+                  onClick={() => void handleDeleteComment()}
                   className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
                   title="Delete annotation"
                 >
@@ -198,15 +265,26 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
                 {annotation.content}
               </p>
             </div>
-            
+
             {/* Footer */}
             <div className="px-4 py-2 border-t border-slate-100 flex justify-between items-center">
               <span className="text-xs text-slate-400">
-                {new Date(annotation.createdAt).toLocaleString()}
+                {annotation.createdAt ? new Date(annotation.createdAt).toLocaleString() : 'just now'}
               </span>
-              <div className="flex items-center gap-1 text-slate-400 text-xs" title="Drag pin to move">
-                <GripHorizontal size={12} />
-                <span>Draggable</span>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => void updateComment()}
+                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-dark"
+                  title="Update comment"
+                >
+                  <Save size={12} />
+                  Update
+                </button>
+                <div className="flex items-center gap-1 text-slate-400 text-xs" title="Drag pin to move">
+                  <GripHorizontal size={12} />
+                  <span>Draggable</span>
+                </div>
               </div>
             </div>
           </motion.div>

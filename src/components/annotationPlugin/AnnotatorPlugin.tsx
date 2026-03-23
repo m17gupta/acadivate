@@ -2,9 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, MessageSquareOff, MessageSquarePlus, Settings2, Eye, EyeOff, ScanLine } from 'lucide-react';
-import { useAnnotatorStore } from './store';
+import { Annotation, useAnnotatorStore } from './store';
 import { getCssSelector, getScreenSize } from './utils';
 import { Marker } from './Marker';
+import { useAppDispatch } from '@/src/hook/hooks';
+import { createCommentThunk } from '@/src/hook/comments/commentThunk';
+import { toast } from 'sonner';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/src/hook/store';
+import GetAllCommments from './GetAllCommments';
+import { usePathname } from 'next/navigation';
 
 export const AnnotatorPlugin: React.FC = () => {
   const { 
@@ -14,9 +21,10 @@ export const AnnotatorPlugin: React.FC = () => {
     addAnnotation, 
     setActiveAnnotationId,
     settings,
+    setAnnotations,
     updateSettings
   } = useAnnotatorStore();
-  
+    const {currentPages}=useSelector((state:RootState)=>state.pages)
   const [draft, setDraft] = useState<{
     x: number;
     y: number;
@@ -27,8 +35,21 @@ export const AnnotatorPlugin: React.FC = () => {
   
   const [draftContent, setDraftContent] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const {allComments}=useSelector((state:RootState)=>state.comments)
+   const dispatch= useAppDispatch()
+  
+  // get url slug
 
-  console.log("annotations", annotations)
+  const pathname= usePathname()
+  const slug = pathname?.split("/").filter(Boolean).pop() || 'home';
+
+  // update the annotation
+  useEffect(()=>{
+    const filterComments = allComments.filter((comment)=>comment.slug === slug)
+    if(filterComments.length>0){
+      setAnnotations(filterComments)
+    }
+  },[slug,allComments])
   // Apply calibration mode styles
   useEffect(() => {
     if (settings.calibrationMode && isCommentModeActive) {
@@ -63,6 +84,10 @@ export const AnnotatorPlugin: React.FC = () => {
       if (!target) return;
     }
 
+    if (target instanceof Element && target.closest('[data-annotator-ui="true"]')) {
+      return;
+    }
+
     // 4. Calculate relative percentages
     const rect = target.getBoundingClientRect();
     const offsetX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -92,18 +117,29 @@ export const AnnotatorPlugin: React.FC = () => {
     return () => window.removeEventListener('click', handleGlobalClick);
   }, [isCommentModeActive, draft, setActiveAnnotationId]);
 
-  const handleSaveDraft = () => {
-    if (!draft || !draftContent.trim()) return;
-    addAnnotation({
+  const handleSaveDraft =async() => {
+    if (!draft || !draftContent.trim() || !currentPages?._id) return;
+    const data: Omit<Annotation, 'id' | 'createdAt'> = {
       selector: draft.selector,
       offsetX: draft.offsetX,
       offsetY: draft.offsetY,
       content: draftContent.trim(),
-      status: 'open', // Default status is Open (Red)
-      screenSize: getScreenSize(window.innerWidth) // Default to current screen size
-    });
+      status: 'open',
+      screenSize: getScreenSize(window.innerWidth),
+      pageId: currentPages._id,
+      slug: currentPages.slug
+    }
+    addAnnotation(data);
     setDraft(null);
     setDraftContent('');
+
+    // add comment inot Db
+    const response= await dispatch(createCommentThunk(data)).unwrap()
+    if(response.success){
+      toast.success("Comment added successfully")
+    }else{
+      toast.error("Failed to add comment")
+    }
   };
 
   const handleCancelDraft = () => {
@@ -112,6 +148,9 @@ export const AnnotatorPlugin: React.FC = () => {
   };
   return (
     <>
+
+    {/* get all comments */}
+    <GetAllCommments/>
       {/* Calibration Mode Global Styles */}
       <style>{`
         body.annotator-calibration-mode [data-annotate-id] {
@@ -137,7 +176,7 @@ export const AnnotatorPlugin: React.FC = () => {
       `}</style>
 
       {/* Floating Action Button & Settings */}
-      <div className="fixed bottom-6 right-6 z-[10000] flex flex-col items-end gap-2">
+      <div data-annotator-ui="true" className="fixed bottom-6 right-6 z-[10000] flex flex-col items-end gap-2">
         
         {/* Settings Panel */}
         {showSettings && isCommentModeActive && (
@@ -238,6 +277,7 @@ export const AnnotatorPlugin: React.FC = () => {
           {/* Invisible overlay to capture clicks when in annotation mode */}
           {!draft && (
             <div
+              data-annotator-ui="true"
               className="fixed inset-0 z-[9998] cursor-crosshair"
               onClickCapture={handleCanvasClick}
             >
@@ -248,12 +288,13 @@ export const AnnotatorPlugin: React.FC = () => {
 
           {/* Render existing markers */}
           {annotations.map((annotation) => (
-            <Marker key={annotation.id} annotation={annotation} />
+            <Marker key={annotation._id ?? annotation.id} annotation={annotation} />
           ))}
 
           {/* Draft Annotation Popover */}
           {draft && (
             <div 
+              data-annotator-ui="true"
               className="fixed z-[10000] -translate-x-1/2 -translate-y-1/2"
               style={{ left: draft.x, top: draft.y }}
             >
