@@ -16,14 +16,14 @@ import { RootState } from '@/src/hook/store';
 
 export const About = () => {
 
-    const {user,isAuthenticated} = useAppSelector((state:RootState) => state.auth);
+    // const {user,isAuthenticated} = useAppSelector((state:RootState) => state.auth);
   return (
     <>
         {/* get all pahes data */}
         <GetAllHomepage/>
 
         {/* comments plugin */}
-     { isAuthenticated && <AnnotatorPlugin />}
+     {/* { isAuthenticated && <AnnotatorPlugin />} */}
      
     <div className="overflow-hidden">
     

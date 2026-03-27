@@ -122,8 +122,8 @@ export const Marker: React.FC<MarkerProps> = ({ annotation }) => {
         return;
       }
 
-      hasDraggedRef.current = true;
-      setIsDragging(true);
+      // hasDraggedRef.current = true;
+      // setIsDragging(true);
     }
 
     markerRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;

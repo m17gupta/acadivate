@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AppShell } from '@/src/components/layout/AppShell';
 import { Toaster } from 'sonner';
+import { AnnoatationpluginHome } from '../components/annotationPlugin/AnnoatationpluginHome';
 
 
 
@@ -29,7 +30,7 @@ export default function RootLayout({
       </head>
       <body>
         <AppShell>{children}</AppShell>
-     
+         
         <Toaster position="top-right" richColors />
       </body>
     </html>

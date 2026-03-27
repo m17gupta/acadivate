@@ -34,7 +34,7 @@ export const Home = () => {
   
   return (
     <>
-     { isAuthenticated && <AnnotatorPlugin />}
+     {/* { isAuthenticated && <AnnotatorPlugin />} */}
      <GetAllHomepage />
       <Hero />
       
