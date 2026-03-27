@@ -27,6 +27,7 @@ interface AnnotatorStore {
   isCommentModeActive: boolean;
   activeAnnotationId: string | null;
   settings: AnnotatorSettings;
+  isSettingsOpen: boolean;
   toggleCommentMode: () => void;
   addAnnotation: (annotation: Omit<Annotation, 'id' | 'createdAt'>) => void;
   removeAnnotation: (id: string) => void;
@@ -36,6 +37,8 @@ interface AnnotatorStore {
   setActiveAnnotationId: (id: string | null) => void;
   updateSettings: (settings: Partial<AnnotatorSettings>) => void;
   setAnnotations: (annotations: Annotation[]) => void;
+  toggleSettingsOpen: () => void;
+  setSettingsOpen: (isOpen: boolean) => void;
 }
 
 const getAnnotationKey = (annotation: Annotation) => annotation._id ?? annotation.id;
@@ -44,6 +47,7 @@ export const useAnnotatorStore = create<AnnotatorStore>((set) => ({
   annotations: [],
   isCommentModeActive: false,
   activeAnnotationId: null,
+  isSettingsOpen: false,
   settings: {
     showResolved: true,
     calibrationMode: false,
@@ -90,4 +94,12 @@ export const useAnnotatorStore = create<AnnotatorStore>((set) => ({
   updateSettings: (newSettings) => set((state) => ({
     settings: { ...state.settings, ...newSettings }
   })),
+
+  toggleSettingsOpen: () => set((state) => ({
+    isSettingsOpen: !state.isSettingsOpen
+  })),
+
+  setSettingsOpen: (isOpen) => set({
+    isSettingsOpen: isOpen
+  }),
 }));

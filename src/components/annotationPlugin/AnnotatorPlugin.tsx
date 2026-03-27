@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, MessageSquareOff, MessageSquarePlus, Settings2, Eye, EyeOff, ScanLine } from 'lucide-react';
+import { MessageSquarePlus, Settings2, Eye, EyeOff, ScanLine } from 'lucide-react';
 import { Annotation, useAnnotatorStore } from './store';
 import { getCssSelector, getScreenSize } from './utils';
 import { Marker } from './Marker';
@@ -12,17 +12,20 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/src/hook/store';
 import GetAllCommments from './GetAllCommments';
 import { usePathname } from 'next/navigation';
+import { CommentToggleButton } from './CommentToggleButton';
+import { CommentSettingsButton } from './CommentSettingsButton';
 
 export const AnnotatorPlugin: React.FC = () => {
   const { 
     annotations, 
     isCommentModeActive, 
-    toggleCommentMode, 
     addAnnotation, 
     setActiveAnnotationId,
     settings,
     setAnnotations,
-    updateSettings
+    updateSettings,
+    isSettingsOpen,
+    setSettingsOpen
   } = useAnnotatorStore();
     const {currentPages}=useSelector((state:RootState)=>state.pages)
   const [draft, setDraft] = useState<{
@@ -34,20 +37,27 @@ export const AnnotatorPlugin: React.FC = () => {
   } | null>(null);
   
   const [draftContent, setDraftContent] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   const {allComments}=useSelector((state:RootState)=>state.comments)
    const dispatch= useAppDispatch()
   
   // get url slug
 
-  const pathname= usePathname()
-  const slug = pathname?.split("/").filter(Boolean).pop() || 'home';
+     const pathname= usePathname()
 
+const segments = pathname?.split("/").filter(Boolean) || [];
+
+const slug = segments.length === 0
+  ? "home"
+  : segments[segments.length - 1];
+  console.log("slug",slug)
   // update the annotation
   useEffect(()=>{
     const filterComments = allComments.filter((comment)=>comment.slug === slug)
+   console.log("filterComments",filterComments)
     if(filterComments.length>0){
       setAnnotations(filterComments)
+    }else{
+      setAnnotations([])
     }
   },[slug,allComments])
   // Apply calibration mode styles
@@ -62,6 +72,13 @@ export const AnnotatorPlugin: React.FC = () => {
       document.body.classList.remove('annotator-calibration-mode');
     };
   }, [settings.calibrationMode, isCommentModeActive]);
+
+  // Reset transient UI whenever comment mode is toggled from any location.
+  useEffect(() => {
+    setDraft(null);
+    setDraftContent('');
+    setSettingsOpen(false);
+  }, [isCommentModeActive]);
 
   // Handle clicking on the document to create an annotation
   const handleCanvasClick = (e: React.MouseEvent) => {
@@ -103,14 +120,14 @@ export const AnnotatorPlugin: React.FC = () => {
       offsetX,
       offsetY
     });
-    setShowSettings(false);
+    setSettingsOpen(false);
   };
   // Close active annotation if clicking outside
   useEffect(() => {
     const handleGlobalClick = () => {
       if (!isCommentModeActive && !draft) {
         setActiveAnnotationId(null);
-        setShowSettings(false);
+        setSettingsOpen(false);
       }
     };
     window.addEventListener('click', handleGlobalClick);
@@ -127,7 +144,7 @@ export const AnnotatorPlugin: React.FC = () => {
       status: 'open',
       screenSize: getScreenSize(window.innerWidth),
       pageId: currentPages._id,
-      slug: currentPages.slug
+      slug: slug
     }
     addAnnotation(data);
     setDraft(null);
@@ -176,10 +193,10 @@ export const AnnotatorPlugin: React.FC = () => {
       `}</style>
 
       {/* Floating Action Button & Settings */}
-      <div data-annotator-ui="true" className="fixed bottom-6 right-6 z-[10000] flex flex-col items-end gap-2">
+      <div data-annotator-ui="true" className="fixed bottom-6 right-6 z-[10000] flex flex-col items-end gap-2 sm:hidden">
         
         {/* Settings Panel */}
-        {showSettings && isCommentModeActive && (
+        {isSettingsOpen && isCommentModeActive && (
           <div 
             className="bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-64 mb-2 origin-bottom-right animate-in fade-in slide-in-from-bottom-4"
             onClick={(e) => e.stopPropagation()}
@@ -226,48 +243,12 @@ export const AnnotatorPlugin: React.FC = () => {
         )}
 
         <div className="flex items-center gap-2">
-          {isCommentModeActive && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSettings(!showSettings);
-              }}
-              className={`p-3 rounded-full shadow-lg transition-all ${
-                showSettings 
-                  ? 'bg-slate-800 text-white' 
-                  : 'bg-white text-slate-600 hover:bg-slate-50'
-              }`}
-              title="Plugin Settings"
-            >
-              <Settings2 size={20} />
-            </button>
-          )}
+          <CommentSettingsButton />
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleCommentMode();
-              setDraft(null);
-              setShowSettings(false);
-            }}
-            className={`flex items-center gap-2 px-4 py-3 rounded-full shadow-xl font-medium transition-all ${
-              isCommentModeActive 
-                ? 'bg-slate-900 text-white ring-4 ring-slate-200' 
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-2xl hover:-translate-y-1'
-            }`}
-          >
-            {isCommentModeActive ? (
-              <>
-                <MessageSquareOff size={20} />
-                <span>Hide Comments</span>
-              </>
-            ) : (
-              <>
-                <MessageSquare size={20} />
-                <span>Show Comments ({annotations.length})</span>
-              </>
-            )}
-          </button>
+          <CommentToggleButton
+            variant="floating"
+            className="min-w-[180px]"
+          />
         </div>
       </div>
 

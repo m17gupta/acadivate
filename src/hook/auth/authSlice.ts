@@ -4,6 +4,7 @@ import { loginThunk } from './authThunks';
 interface User {
   userName?: string;
   password?: string;
+  role?: string;
 }
 
 interface AuthState {

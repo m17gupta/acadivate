@@ -11,6 +11,7 @@ import { cn } from '@/src/lib/utils';
 import { Provider } from 'react-redux';
 import { store } from '@/src/hook/store';
 import { AnnoatationpluginHome } from '../annotationPlugin/AnnoatationpluginHome';
+import CommentTop from '../annotationPlugin/CommentTop';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -47,7 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-gold to-gold-2 z-[100] origin-left shadow-[0_0_10px_rgba(197,147,58,0.6)]"
             style={{ scaleX }}
           />
-
+        <CommentTop/>
           <TopBar />
           <Header />
 
