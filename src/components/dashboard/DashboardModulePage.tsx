@@ -11,11 +11,12 @@ import { DashboardModuleList } from './DashboardModuleList';
 import { getRecordLabel, slugifyValue } from './dashboardModuleFormUtils';
 import type {
   DashboardAccent,
-  DashboardModuleConfig,
   DashboardModuleField,
+  DashboardModuleId,
   DashboardModuleRow,
   DashboardStatusTone,
 } from './dashboardModules';
+import { dashboardModuleList } from './dashboardModules';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/src/hook/store';
 import {
@@ -91,7 +92,8 @@ function getFileValues(value: string | string[] | undefined) {
 
 type DraftValue = string | string[];
 
-export function DashboardModulePage({ config }: { config: DashboardModuleConfig }) {
+export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId }) {
+  const config = dashboardModuleList.find((module) => module.id === moduleId) ?? dashboardModuleList[0];
   const [draft, setDraft] = useState<Record<string, DraftValue>>(() => buildEmptyDraft(config.fields));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -99,14 +101,14 @@ export function DashboardModulePage({ config }: { config: DashboardModuleConfig 
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const slugManuallyEditedRef = useRef(false);
   const searchParams = useSearchParams();
-  const formId = `${config.id}-form`;
-  const tableId = `${config.id}-table`;
+  const formId = `${moduleId}-form`;
+  const tableId = `${moduleId}-table`;
   const shouldOpenFromQuery = searchParams?.get('open') === 'form';
   const hasSlugField = config.fields.some((field) => field.key === 'slug');
   const dispatch = useDispatch<AppDispatch>();
-  const moduleCrud = useMemo(() => getDashboardModuleCrud(config.id), [config.id]);
+  const moduleCrud = useMemo(() => getDashboardModuleCrud(moduleId), [moduleId]);
   const moduleSnapshot = useSelector(
-    (state: RootState) => selectDashboardModuleSnapshot(state, config.id),
+    (state: RootState) => selectDashboardModuleSnapshot(state, moduleId),
     shallowEqual
   );
   const records = moduleSnapshot.records.map((record) => moduleCrud.mapRecordToRow(record));
