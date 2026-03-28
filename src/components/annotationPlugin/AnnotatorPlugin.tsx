@@ -135,7 +135,7 @@ const slug = segments.length === 0
   }, [isCommentModeActive, draft, setActiveAnnotationId]);
 
   const handleSaveDraft =async() => {
-    if (!draft || !draftContent.trim() || !currentPages?._id) return;
+    if (!draft || !draftContent.trim() ) return;
     const data: Omit<Annotation, 'id' | 'createdAt'> = {
       selector: draft.selector,
       offsetX: draft.offsetX,
@@ -143,7 +143,7 @@ const slug = segments.length === 0
       content: draftContent.trim(),
       status: 'open',
       screenSize: getScreenSize(window.innerWidth),
-      pageId: currentPages._id,
+      pageId: currentPages?._id || "",
       slug: slug
     }
     addAnnotation(data);

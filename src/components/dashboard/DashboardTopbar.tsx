@@ -2,16 +2,20 @@
 
 import { Bell, Globe2, MoonStar, Search, Settings2, ShoppingBag } from 'lucide-react';
 
-export function DashboardTopbar() {
+export function DashboardTopbar({ searchPlaceholder }: { searchPlaceholder: string }) {
   return (
     <div className="flex flex-col gap-4 border-b border-border-light bg-white/80 px-5 py-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between lg:px-8">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-light bg-bg-soft text-navy">
           <Search size={18} />
         </div>
-        <div className="rounded-2xl border border-border-light bg-bg-soft px-4 py-2.5 text-sm text-text-muted shadow-sh-xs sm:min-w-[280px]">
-          Search reports, institutions, conferences...
-        </div>
+        <label className="relative block sm:min-w-[280px]">
+          <input
+            type="search"
+            placeholder={searchPlaceholder}
+            className="h-11 w-full rounded-2xl border border-border-light bg-bg-soft px-4 pl-4 text-sm text-navy outline-none transition placeholder:text-text-muted focus:border-primary"
+          />
+        </label>
       </div>
 
       <div className="flex items-center gap-2 self-end sm:self-auto">

@@ -1,0 +1,154 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import type {
+  NominationCreateInput,
+  NominationRecord,
+  NominationUpdateInput,
+} from './nominationType';
+
+type ApiResponse<T> = {
+  success?: boolean;
+  items?: T[];
+  item?: T;
+  deletedId?: string;
+  error?: string;
+  message?: string;
+};
+
+async function parseResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
+  const data = (await response.json().catch(() => null)) as ApiResponse<T> | null;
+
+  if (!response.ok) {
+    throw new Error(data?.error || data?.message || fallbackMessage);
+  }
+
+  return data as T;
+}
+
+export const fetchNominationsThunk = createAsyncThunk<
+  NominationRecord[],
+  void,
+  { rejectValue: string }
+>('nominations/fetchAll', async (_, { rejectWithValue }) => {
+  try {
+    const response = await fetch('/api/nominations');
+    const data = await parseResponse<{ items?: NominationRecord[] }>(
+      response,
+      'Failed to fetch nominations'
+    );
+
+    return data.items ?? [];
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Failed to fetch nominations'
+    );
+  }
+});
+
+export const fetchNominationThunk = createAsyncThunk<
+  NominationRecord,
+  string,
+  { rejectValue: string }
+>('nominations/fetchOne', async (id, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`/api/nominations?id=${encodeURIComponent(id)}`);
+    const data = await parseResponse<{ item?: NominationRecord }>(
+      response,
+      'Failed to fetch nomination'
+    );
+
+    if (!data.item) {
+      throw new Error('Nomination not found');
+    }
+
+    return data.item;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Failed to fetch nomination'
+    );
+  }
+});
+
+export const createNominationThunk = createAsyncThunk<
+  NominationRecord,
+  NominationCreateInput,
+  { rejectValue: string }
+>('nominations/create', async (payload, { rejectWithValue }) => {
+  try {
+    const response = await fetch('/api/nominations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await parseResponse<{ item?: NominationRecord }>(
+      response,
+      'Failed to create nomination'
+    );
+
+    if (!data.item) {
+      throw new Error('Unable to create nomination');
+    }
+
+    return data.item;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Failed to create nomination'
+    );
+  }
+});
+
+export const updateNominationThunk = createAsyncThunk<
+  NominationRecord,
+  NominationUpdateInput,
+  { rejectValue: string }
+>('nominations/update', async (payload, { rejectWithValue }) => {
+  try {
+    const response = await fetch('/api/nominations', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await parseResponse<{ item?: NominationRecord }>(
+      response,
+      'Failed to update nomination'
+    );
+
+    if (!data.item) {
+      throw new Error('Unable to update nomination');
+    }
+
+    return data.item;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Failed to update nomination'
+    );
+  }
+});
+
+export const deleteNominationThunk = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('nominations/delete', async (id, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`/api/nominations?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+
+    const data = await parseResponse<{ deletedId?: string }>(
+      response,
+      'Failed to delete nomination'
+    );
+
+    return data.deletedId ?? id;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Failed to delete nomination'
+    );
+  }
+});
