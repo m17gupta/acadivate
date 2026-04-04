@@ -5,6 +5,7 @@ import type { AwardRecord } from '@/src/hook/awards/awardType';
 import type { RankingRecord } from '@/src/hook/rankings/rankingType';
 import type { LeadRecord } from '@/src/hook/leads/leadType';
 import type { NominationRecord } from '@/src/hook/nominations/nominationType';
+import type { CategoryRecord } from '@/src/hook/categories/categoryType';
 import {
   createEventThunk,
   deleteEventThunk,
@@ -35,6 +36,12 @@ import {
   fetchNominationsThunk,
   updateNominationThunk,
 } from '@/src/hook/nominations/nominationThunk';
+import {
+  createCategoryThunk,
+  deleteCategoryThunk,
+  fetchCategoriesThunk,
+  updateCategoryThunk,
+} from '@/src/hook/categories/categoryThunk';
 
 type AnyRecord = {
   _id?: string;
@@ -154,6 +161,21 @@ function mapNominationRecordToRow(record: AnyRecord): DashboardModuleRow {
   };
 }
 
+function mapCategoryRecordToRow(record: AnyRecord): DashboardModuleRow {
+  const category = record as unknown as CategoryRecord;
+
+  return {
+    id: String(category._id ?? category.title ?? 'category'),
+    values: {
+      title: category.title ?? '',
+      desc: category.desc ?? '',
+      tags: category.tags ?? '',
+      count: category.count ?? '',
+      color: category.color ?? '',
+    },
+  };
+}
+
 export function selectDashboardModuleSnapshot(
   state: RootState,
   moduleId: DashboardModuleId
@@ -171,6 +193,11 @@ export function selectDashboardModuleSnapshot(
       return {
         records: state.nominations.allNomination,
         isFetched: state.nominations.isFetchedNomination,
+      };
+    case 'categories':
+      return {
+        records: state.categories.allCategory,
+        isFetched: state.categories.isFetchedCategory,
       };
     default:
       return { records: [], isFetched: false };
@@ -218,6 +245,14 @@ export function getDashboardModuleCrud(moduleId: DashboardModuleId): DashboardMo
         updateThunk: updateNominationThunk as AnyThunk,
         deleteThunk: deleteNominationThunk as AnyThunk,
         mapRecordToRow: mapNominationRecordToRow,
+      };
+    case 'categories':
+      return {
+        fetchAllThunk: fetchCategoriesThunk as AnyThunk,
+        createThunk: createCategoryThunk as AnyThunk,
+        updateThunk: updateCategoryThunk as AnyThunk,
+        deleteThunk: deleteCategoryThunk as AnyThunk,
+        mapRecordToRow: mapCategoryRecordToRow,
       };
     default:
       return {

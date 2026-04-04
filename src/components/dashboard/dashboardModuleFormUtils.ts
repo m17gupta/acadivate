@@ -30,6 +30,9 @@ export function readFileAsDataUrl(file: File) {
 }
 
 export function getTextValue(value: DraftValue | undefined) {
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
   return typeof value === 'string' ? value : '';
 }
 

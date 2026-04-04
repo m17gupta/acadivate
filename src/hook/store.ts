@@ -7,6 +7,7 @@ import awardReducer from './awards/awardSlice';
 import rankingReducer from './rankings/rankingSlice';
 import leadReducer from './leads/leadSlice';
 import nominationReducer from './nominations/nominationSlice';
+import categoryReducer from './categories/categorySlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     rankings: rankingReducer,
     leads: leadReducer,
     nominations: nominationReducer,
+    categories: categoryReducer,
   },
 });
 
