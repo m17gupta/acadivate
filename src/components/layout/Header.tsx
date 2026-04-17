@@ -17,13 +17,13 @@ export const Header = () => {
   const [logo, setLogo] = React.useState('/assets/Image/Acadivate logo-transpernt.png');
   const pathname = usePathname();
   const router = useRouter();
-  
+
   React.useEffect(() => {
     setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 24);
     handleScroll();
     window.addEventListener('scroll', handleScroll);
-    
+
     // Fetch dynamic logo
     fetch('/api/settings')
       .then(res => res.json())
@@ -36,17 +36,17 @@ export const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const dispatch=useDispatch()
-const {user,token,isAuthenticated}=useSelector((state:RootState)=>state.auth);
+  const dispatch = useDispatch()
+  const { user, token, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   React.useEffect(() => {
     setIsMobOpen(false);
   }, [pathname]);
 
 
-  const handleLogout=()=>{
-       dispatch(logout())
-       router.push("/")
+  const handleLogout = () => {
+    dispatch(logout())
+    router.push("/")
   }
   return (
     <header data-annotate-id="site-header" className={cn(
@@ -65,7 +65,7 @@ const {user,token,isAuthenticated}=useSelector((state:RootState)=>state.auth);
         <nav className="hidden lg:flex items-center gap-1">
           <NavLink href="/" active={pathname === '/'}>Home</NavLink>
           <NavDropdown label="Events">
-            <DropdownItem href="/events/international-conferences" icon={<Users size={14} />} label="International Conferences" />
+            <DropdownItem href="/events/All Events" icon={<Users size={14} />} label="All Events" />
             <DropdownItem href="/events/upcoming-events" icon={<Calendar size={14} />} label="Upcoming Events" />
             {/* <DropdownItem href="/events/research-forums" icon={<BookOpen size={14} />} label="Research Forums" />
             <DropdownItem href="/events/workshops-fdp" icon={<GraduationCap size={14} />} label="Workshops & FDPs" /> */}
@@ -92,7 +92,7 @@ const {user,token,isAuthenticated}=useSelector((state:RootState)=>state.auth);
                 >Sign out</Button>
               )
             )}
-             <Button
+            <Button
               variant="primary"
               onClick={() => router.push('/registration-form')}
             >
@@ -117,7 +117,7 @@ const {user,token,isAuthenticated}=useSelector((state:RootState)=>state.auth);
         <div className="p-6 flex flex-col gap-2 h-full overflow-y-auto">
           <MobileNavLink href="/">Home</MobileNavLink>
           <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/40 mt-4">Events</div>
-          <MobileNavLink href="/events/international-conferences">International Conferences</MobileNavLink>
+          <MobileNavLink href="/events/all-events">All Events</MobileNavLink>
           <MobileNavLink href="/events/upcoming-events">Upcoming Events</MobileNavLink>
           {/* <MobileNavLink href="/events/research-forums">Research Forums</MobileNavLink>
           <MobileNavLink href="/events/workshops-fdp">Workshops & FDPs</MobileNavLink> */}

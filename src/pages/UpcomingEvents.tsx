@@ -14,6 +14,9 @@ const FILTERS = [
   { id: 'workshop', label: 'Workshops' }
 ];
 
+const HIDDEN_EVENT_SLUGS = new Set(['awards-2025', 'research-methodology-workshop']);
+const HIDDEN_EVENT_TITLES = new Set(['Academic Excellence Awards 2025', 'Research Methodology Workshop']);
+
 export const UpcomingEvents = () => {
   const [events, setEvents] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -30,6 +33,7 @@ export const UpcomingEvents = () => {
           // Filter only published events and map to frontend structure
           const mappedEvents = data.items
             .filter((item: any) => item.status === 'Published')
+            .filter((item: any) => !HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
             .map((item: any) => {
               const eventDate = new Date(item.eventDate);
               return {
@@ -42,10 +46,11 @@ export const UpcomingEvents = () => {
                   day: eventDate.getDate().toString().padStart(2, '0'),
                   month: eventDate.toLocaleString('en-US', { month: 'short' })
                 },
+                rawDate: eventDate,
                 time: item.startTime,
                 location: item.location,
-                image: Array.isArray(item.imageUrl) && item.imageUrl.length > 0 
-                  ? item.imageUrl[0] 
+                image: Array.isArray(item.imageUrl) && item.imageUrl.length > 0
+                  ? item.imageUrl[0]
                   : (typeof item.imageUrl === 'string' ? item.imageUrl : '/assets/Image/event1.jpeg'),
                 tags: item.tags ? item.tags.split(',').map((t: string) => t.trim()) : []
               };
@@ -62,7 +67,9 @@ export const UpcomingEvents = () => {
     fetchEvents();
   }, []);
 
-  const filteredEvents = events.filter(ev => filter === 'all' || ev.type === filter);
+  const filteredEvents = events
+    .filter(ev => filter === 'all' || ev.type === filter)
+    .sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
 
   if (!mounted) return null;
 
@@ -115,7 +122,7 @@ export const UpcomingEvents = () => {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_328px] gap-8 items-start">
-            
+
             {/* Left Side: Events List */}
             <div>
               <div className="flex flex-wrap justify-start gap-2 mb-10">

@@ -45,6 +45,7 @@ const EVENTS = [
     image: 'assets/Image/confrence2.jpeg',
     tags: ['Awards', 'Recognition']
   },
+  /*
   {
     id: 4,
     type: 'workshop',
@@ -57,7 +58,11 @@ const EVENTS = [
     image: 'assets/Image/conference3.jpeg',
     tags: ['FDP', 'Online']
   }
+  */
 ];
+
+const HIDDEN_EVENT_SLUGS = new Set(['awards-2025', 'research-methodology-workshop']);
+const HIDDEN_EVENT_TITLES = new Set(['Academic Excellence Awards 2025', 'Research Methodology Workshop']);
 const FILTERS = [
   { id: 'all', label: 'All Events' },
   { id: 'conference', label: 'Conferences' },
@@ -79,6 +84,7 @@ export const Events = () => {
           // Filter only published events and map to frontend structure
           const mappedEvents = data.items
             .filter((item: any) => item.status === 'Published')
+            .filter((item: any) => !HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
             .map((item: any) => {
               const eventDate = new Date(item.eventDate);
               return {
