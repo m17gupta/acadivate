@@ -1,6 +1,7 @@
 'use client';
 
-import { PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Eye, PencilLine, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '../ui/Button';
 import { cn } from '@/src/lib/utils';
 import type { DashboardModuleConfig, DashboardModuleRow, DashboardStatusTone } from './dashboardModules';
@@ -61,7 +62,7 @@ export function DashboardModuleList({
           <div className="min-w-[760px]">
             <div
               className="grid gap-4 bg-bg-soft px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle"
-              style={{ gridTemplateColumns: `${config.tableTemplateColumns} 11rem` }}
+              style={{ gridTemplateColumns: `${config.tableTemplateColumns} 9rem` }}
             >
               {config.columns.map((column) => (
                 <div key={column.key}>{column.label}</div>
@@ -78,7 +79,7 @@ export function DashboardModuleList({
                       'grid gap-4 px-5 py-4 text-sm',
                       editingId === row.id ? 'bg-gold-pale/40' : 'bg-white'
                     )}
-                    style={{ gridTemplateColumns: `${config.tableTemplateColumns} 11rem` }}
+                    style={{ gridTemplateColumns: `${config.tableTemplateColumns} 9rem` }}
                   >
                     {config.columns.map((column) => {
                       const value = getTextValue(row.values[column.key]) || '—';
@@ -108,21 +109,30 @@ export function DashboardModuleList({
                     })}
 
                     <div className="flex items-center gap-2">
+                      {config.id === 'events' && (
+                        <Link
+                          href={`/dashboard/events/${row.id}`}
+                          title="View"
+                          className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-xl border border-border-light bg-bg-soft text-navy transition hover:border-primary hover:text-primary"
+                        >
+                          <Eye size={15} />
+                        </Link>
+                      )}
                       <button
                         type="button"
                         onClick={() => onEdit(row)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-bg-soft px-3 py-2 text-xs font-bold text-navy transition hover:border-primary hover:text-primary"
+                        title="Edit"
+                        className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-xl border border-border-light bg-bg-soft text-navy transition hover:border-primary hover:text-primary"
                       >
-                        <PencilLine size={13} />
-                        Edit
+                        <PencilLine size={15} />
                       </button>
                       <button
                         type="button"
                         onClick={() => onDelete(row)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-white px-3 py-2 text-xs font-bold text-crimson transition hover:border-crimson hover:bg-crimson-2"
+                        title="Delete"
+                        className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-xl border border-border-light bg-white text-crimson transition hover:border-crimson hover:bg-crimson-2"
                       >
-                        <Trash2 size={13} />
-                        Delete
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
