@@ -70,7 +70,11 @@ const FILTERS = [
   { id: 'workshop', label: 'Workshops' }
 ];
 
-export const Events = () => {
+type EventsProps = {
+  includeHiddenEvents?: boolean;
+};
+
+export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
   const [events, setEvents] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [filter, setFilter] = React.useState('all');
@@ -84,11 +88,14 @@ export const Events = () => {
           // Filter only published events and map to frontend structure
           const mappedEvents = data.items
             .filter((item: any) => item.status === 'Published')
-            .filter((item: any) => !HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
+            .filter((item: any) =>
+              includeHiddenEvents ||
+              (!HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
+            )
             .map((item: any) => {
               const eventDate = new Date(item.eventDate);
               return {
-                id: item._id,
+                id: String(item._id),
                 type: (item.type || 'conference').toLowerCase(),
                 slug: item.slug,
                 title: item.title,
@@ -210,7 +217,7 @@ export const Events = () => {
                             </span>
                           ))}
                         </div>
-                        <Link href={`/events/${ev.slug}`}>
+                        <Link href={`/events/${ev.id}`}>
                           <Button variant="primary" size="sm" className="rounded-xl px-5 py-2.5 shadow-sh-sm group/btn">
                             More Details <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                           </Button>

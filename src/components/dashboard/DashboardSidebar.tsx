@@ -6,7 +6,7 @@ import {
   ArrowRight, LogOut, Settings, Bell, ChevronUp, User, LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import { dashboardModuleList, dashboardNavItems } from './dashboardModules';
+import { dashboardNavItems } from './dashboardModules';
 import { useAppSelector, useAppDispatch } from '@/src/hook/hooks';
 import { logout } from '@/src/hook/auth/authSlice';
 import { useRouter } from 'next/navigation';
