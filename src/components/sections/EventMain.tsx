@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 import {
   Share2, Linkedin, Twitter, Facebook, Link as LinkIcon,
   Clock, Calendar, MapPin, FileText, User, Star,
@@ -421,9 +422,11 @@ export const EventMain = () => {
                   <InfoItem icon={<MapPin size={14} />} label="Venue" value="Petaling Jaya, Malaysia" color="primary" />
                   <InfoItem icon={<FileText size={14} />} label="Deadline" value="02 March 2026" color="navy" />
                 </div>
-                <Button variant="primary" className="w-full py-4 rounded-xl shadow-sh-md group">
-                  Register Now <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <Link href="/nomination-form1" className="w-full block">
+                  <Button variant="primary" className="w-full py-4 rounded-xl shadow-sh-md group">
+                    Register Now <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
               </div>
             </div>
 

@@ -31,7 +31,7 @@ export default function EventViewPage({ params }: { params: Promise<{ id: string
   const rowInfo = record ? moduleCrud.mapRecordToRow(record) : null;
   const rowToUse = rowInfo || eventsModule.initialRows.find((r) => r.id === id);
 
-  if (moduleSnapshot.isLoading && !rowToUse) {
+  if (!moduleSnapshot.isFetched && !rowToUse) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-navy font-semibold">
         Loading event details...
