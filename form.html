@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Global Awards | Nomination Registration</title>
+    <!-- Google Fonts & simple CSS reset -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f5f9ff 0%, #eef2f8 100%);
+            color: #1a2c3e;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header / Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #ffd966cc;
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2d4a22;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c2c, #2b6e3c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            color: #4a627a;
+            font-size: 1.1rem;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* card style */
+        .form-card {
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .form-header {
+            background: #1e3c2c;
+            padding: 1.5rem 2rem;
+            color: white;
+        }
+
+        .form-header h2 {
+            font-weight: 600;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-header p {
+            opacity: 0.85;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        form {
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        /* Grid layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem 2rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c5a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group label i {
+            width: 1.25rem;
+            color: #3c9e4d;
+        }
+
+        input, select, textarea {
+            padding: 0.85rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+            background: #fefefe;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2b6e3c;
+            box-shadow: 0 0 0 3px rgba(43, 110, 60, 0.2);
+        }
+
+        /* Ownership pattern inline radios */
+        .ownership-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: #f9fbfd;
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            border: 1.5px solid #e2edf2;
+        }
+
+        .ownership-group label {
+            font-weight: 500;
+            text-transform: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: #1f3b2c;
+        }
+
+        /* Categories sections */
+        .categories-section {
+            background: #fafcf8;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0 1.5rem 0;
+            border: 1px solid #deecd9;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3c2c;
+            border-left: 5px solid #3cac4d;
+            padding-left: 1rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem 1.2rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .cat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            background: white;
+            padding: 0.5rem 0.8rem;
+            border-radius: 40px;
+            border: 1px solid #e2efdf;
+            transition: 0.1s;
+        }
+
+        .cat-item:hover {
+            background: #f0f9eb;
+            border-color: #9bcf8a;
+        }
+
+        .cat-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: #2b6e3c;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .cat-item label {
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 0.85rem;
+            color: #1f2f3a;
+        }
+
+        /* payment & fee row */
+        .fee-summary {
+            background: #f1f9ef;
+            border-radius: 1.2rem;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0 1.2rem;
+        }
+
+        .fee-block {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .fee-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .fee-item strong {
+            color: #1e5e2d;
+        }
+
+        .payable {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #1c4d2d;
+        }
+
+        .mode-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .mode-row label {
+            font-weight: 500;
+            text-transform: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .terms {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        button {
+            background: #1e3c2c;
+            border: none;
+            padding: 1rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            border-radius: 3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: #2d6a41;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+        }
+
+        .error-msg {
+            color: #d9534f;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .success-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #2b6e3c;
+            color: white;
+            padding: 1rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .success-toast.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 780px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            form {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .cat-grid {
+                max-height: 320px;
+            }
+        }
+
+        hr {
+            margin: 1rem 0;
+            border-color: #e9ecef;
+        }
+        select, input[type="number"] {
+            appearance: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <div class="hero-badge"><i class="fas fa-trophy"></i> Nominations Are Now Open</div>
+        <h1><i class="fas fa-award"></i> Acadivate Award Registration</h1>
+        <div class="subhead">If you wish to nominate for awards, kindly fill in the form below. Select one or more categories.</div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h2><i class="fas fa-pen-alt"></i> Nomination Form</h2>
+            <p>Please provide accurate details. Registration fee applies per selected category.</p>
+        </div>
+        <form id="nominationForm">
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label><i class="fas fa-building"></i> Name of the Organization</label>
+                    <input type="text" id="orgName" placeholder="Enter Organization" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-user-tie"></i> Name of the promoter</label>
+                    <input type="text" id="promoter" placeholder="Enter Promoter" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-chart-line"></i> Ownership Pattern</label>
+                    <div class="ownership-group" id="ownershipGroup">
+                        <label><input type="radio" name="ownership" value="Academcian"> Academcian</label>
+                        <label><input type="radio" name="ownership" value="Scientist"> Scientist</label>
+                        <label><input type="radio" name="ownership" value="Reseach Scholar"> Reseach Scholar</label>
+                        <label><input type="radio" name="ownership" value="Proprietary"> Proprietary</label>
+                        <label><input type="radio" name="ownership" value="Partnership"> Partnership</label>
+                        <label><input type="radio" name="ownership" value="Pvt Limited"> Pvt Limited</label>
+                        <label><input type="radio" name="ownership" value="Public Limited"> Public Limited</label>
+                        <label><input type="radio" name="ownership" value="NGOs"> NGOs</label>
+                        <label><input type="radio" name="ownership" value="Others"> Others</label>
+                    </div>
+                </div>
+                <div class="input-group full-width">
+                    <label><i class="fas fa-map-marker-alt"></i> Address of Correspondence</label>
+                    <textarea id="address" placeholder="Full address" required></textarea>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-mobile-alt"></i> Mobile Number</label>
+                    <input type="tel" id="mobile" placeholder="Enter Mobile Number" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-globe"></i> State</label>
+                    <select id="state" required>
+                        <option value="" disabled selected>Select State</option>
+                        <option>Maharashtra</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>West Bengal</option><option>Uttar Pradesh</option><option>Rajasthan</option><option>Others</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-city"></i> City</label>
+                    <select id="city" required>
+                        <option value="" disabled selected>Select City</option>
+                        <option>Mumbai</option><option>Delhi</option><option>Bengaluru</option><option>Chennai</option><option>Kolkata</option><option>Hyderabad</option><option>Pune</option><option>Ahmedabad</option><option>Others</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-envelope"></i> Email id</label>
+                    <input type="email" id="email" placeholder="Enter Email" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-link"></i> Website URL</label>
+                    <input type="url" id="website" placeholder="Enter Website URL">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-file-invoice"></i> GSTIN</label>
+                    <input type="text" id="gstin" placeholder="Enter GSTIN">
+                </div>
+            </div>
+
+            <!-- Award Categories: Three main groups (Academic, Startup, Rise, Entrepreneur) -->
+            <div class="categories-section">
+                <div class="section-title"><i class="fas fa-graduation-cap"></i> Academic and Research Awards</div>
+                <div class="cat-grid" id="academicCatGrid">
+                    <!-- categories populated via js for easier management but we also build static list -->
+                </div>
+            </div>
+
+            <div class="categories-section">
+                <div class="section-title"><i class="fas fa-rocket"></i> Start-up Awards</div>
+                <div class="cat-grid" id="startupCatGrid"></div>
+            </div>
+
+            <div class="categories-section">
+                <div class="section-title"><i class="fas fa-chart-line"></i> Rise Awards</div>
+                <div class="cat-grid" id="riseCatGrid"></div>
+            </div>
+
+            <div class="categories-section">
+                <div class="section-title"><i class="fas fa-crown"></i> Entrepreneur Awards (Top Honours)</div>
+                <div class="cat-grid" id="entrepreneurCatGrid"></div>
+            </div>
+
+            <!-- Fees & Payment -->
+            <div class="fee-summary">
+                <div class="fee-block">
+                    <div class="fee-item"><strong>Registration Fees:</strong> INR 5500 (Exclusive GST 18% per category + handling charges)</div>
+                </div>
+                <div class="payable" id="payableAmountSpan">Payable Amount: INR 0</div>
+            </div>
+
+            <div class="input-group full-width">
+                <label><i class="fas fa-credit-card"></i> Mode of Payment</label>
+                <div class="mode-row" id="modeRow">
+                    <label><input type="radio" name="paymentMode" value="Online Banking" checked> Online Banking</label>
+                    <label><input type="radio" name="paymentMode" value="Credit/Debit Card"> Credit/Debit Card</label>
+                    <label><input type="radio" name="paymentMode" value="UPI"> UPI</label>
+                    <label><input type="radio" name="paymentMode" value="Bank Transfer"> Bank Transfer</label>
+                </div>
+            </div>
+
+            <div class="terms">
+                <input type="checkbox" id="agreeTerms" required>
+                <label for="agreeTerms" style="text-transform: none; font-weight: 500;">I agree to Terms & Conditions.</label>
+            </div>
+
+            <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Submit Nomination</button>
+        </form>
+    </div>
+</div>
+
+<div id="toastMsg" class="success-toast"><i class="fas fa-check-circle"></i> <span id="toastText">Nomination submitted!</span></div>
+
+<script>
+    // -------- DEFINE ALL AWARD LISTS BASED ON PROVIDED DATA --------
+    const academicAwards = [
+        "Life Time Achievement Award (above 55 Years of Age)", "Hon. Fellowship (FAFSRI) (Below 40 Years of Age)", "Eminent Scientist award",
+        "Senior Scientist Award (Above 45 years of age)", "Scientist Associate Award Research", "Young Scientist Award in Agriculture Science",
+        "Young Scientist Award in Chemical Science", "Young Scientist Award in Animal Husbandry", "Young Scientist Award in Animal Science",
+        "Young Scientist Award in Fisheries Sciences", "Young Scientist Award in Plant Science", "Young Scientist Award in Agriculture Outstanding Achievement Award",
+        "Young Scientist Award in Social Sciences", "Innovative Biologist Award for Wild Life/ Biodiversity Conservation", "Young Scientist Award for Humanistic Studies",
+        "Best Academician Award (Humanities/ Commerce and Managements/ Interdisciplinary Studies)", "Excellence in Extension Scientist Award",
+        "Outstanding Extension Professional/Agriculture Scientist/ Social Services Award", "Excellence in Teaching Award (Humanities/ Commerce and Managements/ Interdisciplinary Studies.)",
+        "Excellence in Research Award (Humanities/ Commerce and Managements/ Interdisciplinary Studies.)",
+        "Distinguished Scientist Award/Distinguished Service Award / Distinguished Teacher Award (Crop, Plant Protection, Horticulture, Fisheries, Home Science, Social Science, Animal Science, Life Science etc.)",
+        "Technological Innovations Award", "Young Woman Scientist Award", "Young Botanist/Zoologist/Scientist Award (below 30 years of age; mainly for research scholar)",
+        "Excellence in Research Award for Humanistic Studies", "Young Professional Award (Humanities/ Commerce and Managements/ Interdisciplinary Studies)",
+        "Young Environmentalist Award", "Best Research Scholar Award"
+    ];
+
+    const startupAwards = [
+        "Digital / Online Start-up", "eRetail Start up of the Year", "Best HR Tech Start up of the Year", "B2B Start up of the Year",
+        "Tech Startup of the Year", "On-Demand Delivery Startup of the year", "Fashion Startup of the year", "Social Commerce Startup of the Year",
+        "Agritech Startup of the Year", "Fintech Startup of the Year", "Health Tech Startup of the Year", "Best Drone Tech Start Up of the Year",
+        "Cloud Startup of the Year", "Networking Startup of the Year", "InsureTech Startup of the Year", "Proptech Startup of the Year",
+        "Media/Entertainment Startup of the Year", "SpaceTech Startup of the Year", "Edtech Startup of the Year", "Accelerator of the Year",
+        "Innovative Start-up of the Year", "Home or Craft-based Startup", "Gaming app of the year", "Emerging Start-up",
+        "Mobility Start-up of the year", "Energy Start-up of the Year", "Logistics /Fulfilment Start-up of the Year", "Food Startup",
+        "Beverage Startup", "Beauty Startup", "Wellness Startup", "Best healthcare startup", "Best Education Startup Of The Year",
+        "Blockchain Innovator of the year", "Best NFT Platform of the Year", "Metaverse Startup of the Year", "CEO of the Year (Large Business)",
+        "Bootstrapped Business Of The Year", "Retail Startup Of The Year", "Travel Startup of the year", "Real Estate Startup Of The Year",
+        "Startup Leader Of The Year", "Founder Of The Year", "Creative Entrepreneur Of The Year - Start-up", "Best Social Impact Startup",
+        "Gifting startup of the year", "Clean Tech / Green Startup of the Year"
+    ];
+
+    const riseAwards = [
+        "Most Enterprising Business", "Best Customer Service", "Business Innovation", "Best Financial Performance", "Best Use of Technology",
+        "Business Transformation", "Cross Border Business Growth", "National Quality Award", "Best Workplace of the Year",
+        "Most Socially Responsible Company of the Year", "Best Digital Transformation Award", "Best CSR Initiative"
+    ];
+
+    const entrepreneurAwards = [
+        "Celebrity Entrepreneur of the Year", "Entrepreneur of the Year (Consumer Business)", "Acharya of the Year / Business Mentor of the Year",
+        "Entrepreneur of the Year (Innovation in Financial Services)", "Dynamic Entrepreneur of the Year (Business Transformation)",
+        "Entrepreneur of the Year (Innovation in Technology)", "Professional Entrepreneur of the Year", "Family Entrepreneur of the Year",
+        "Entrepreneur of the Year ( Media & Entertainment )", "Social Entrepreneur of the Year", "Creative Entrepreneur of the Year",
+        "Young Entrepreneur of the Year", "Restoration Entrepreneur of the Year", "Serial Entrepreneur of the Year", "Student Entrepreneur of the Year",
+        "Intrapreneur of the Year", "Micro /Small online business Entrepreneur of the year", "Green Entrepreneur of the Year", "Entrepreneur of the Year",
+        "Woman Entrepreneur of the Year", "Lifetime Achievement", "Entrepreneur of the Year - Real Estate", "Venture Capitalist of the Year",
+        "Angel Investor of the Year", "Entrepreneur of the Year in Trading Business", "Entrepreneur of the Year in Service Business",
+        "Entrepreneur of the Year in Product or Manufacturing Business"
+    ];
+
+    function buildCheckboxGroup(containerId, items) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = '';
+        items.forEach(title => {
+            const div = document.createElement('div');
+            div.className = 'cat-item';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = title;
+            cb.className = 'award-checkbox';
+            const label = document.createElement('label');
+            label.textContent = title;
+            div.appendChild(cb);
+            div.appendChild(label);
+            container.appendChild(div);
+        });
+    }
+
+    buildCheckboxGroup('academicCatGrid', academicAwards);
+    buildCheckboxGroup('startupCatGrid', startupAwards);
+    buildCheckboxGroup('riseCatGrid', riseAwards);
+    buildCheckboxGroup('entrepreneurCatGrid', entrepreneurAwards);
+
+    // Fee calculation: 25000 INR per selected category + GST 18% + handling charges (we add flat 2% handling approx but as per description "per category + handling charges", we simply compute 25000*1.18*selected = gst inclusive, then add small handling 300? To keep clarity: Base + GST 18% + 2% handling? but real: "Exclusive GST (18%) per category + handling charges". Better compute total = selected * 25000 * 1.18 + (selected * 500) handling. Realistic handling ~500 per cat. For clarity:
+    const BASE_FEE = 5500;
+    const GST_RATE = 0.18;
+    const HANDLING_PER_CAT = 500; // nominal handling charges per category
+
+    function computePayable() {
+        const allCheckboxes = document.querySelectorAll('.award-checkbox');
+        let selectedCount = 0;
+        allCheckboxes.forEach(cb => { if(cb.checked) selectedCount++; });
+        if(selectedCount === 0) {
+            document.getElementById('payableAmountSpan').innerHTML = 'Payable Amount: INR 0';
+            return 0;
+        }
+        const subtotal = selectedCount * BASE_FEE;
+        const gst = subtotal * GST_RATE;
+        const handling = selectedCount * HANDLING_PER_CAT;
+        const total = subtotal + gst + handling;
+        document.getElementById('payableAmountSpan').innerHTML = `Payable Amount: INR ${total.toLocaleString('en-IN', {maximumFractionDigits:0})}`;
+        return total;
+    }
+
+    // Attach event listeners to all checkboxes for dynamic calculation
+    function attachFeeEvents() {
+        const allCbs = document.querySelectorAll('.award-checkbox');
+        allCbs.forEach(cb => {
+            cb.addEventListener('change', computePayable);
+        });
+    }
+    attachFeeEvents();
+    computePayable(); // initial
+
+    // Form validation and submission simulation
+    const form = document.getElementById('nominationForm');
+    const toast = document.getElementById('toastMsg');
+    const toastTextSpan = document.getElementById('toastText');
+
+    function showToast(message, isError = false) {
+        toastTextSpan.innerText = message;
+        toast.style.background = isError ? '#c73e2f' : '#2b6e3c';
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Basic required fields validation
+        const org = document.getElementById('orgName').value.trim();
+        const promoter = document.getElementById('promoter').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const mobile = document.getElementById('mobile').value.trim();
+        const state = document.getElementById('state').value;
+        const city = document.getElementById('city').value;
+        const email = document.getElementById('email').value.trim();
+        const ownershipSelected = document.querySelector('input[name="ownership"]:checked');
+        const agree = document.getElementById('agreeTerms').checked;
+
+        if(!org) { showToast('Organization name required', true); return; }
+        if(!promoter) { showToast('Promoter name required', true); return; }
+        if(!ownershipSelected) { showToast('Please select ownership pattern', true); return; }
+        if(!address) { showToast('Address required', true); return; }
+        if(!mobile) { showToast('Mobile number required', true); return; }
+        if(mobile.length < 8) { showToast('Enter valid mobile number', true); return; }
+        if(!state || state === 'Select State') { showToast('Select state', true); return; }
+        if(!city || city === 'Select City') { showToast('Select city', true); return; }
+        if(!email || !email.includes('@')) { showToast('Valid email required', true); return; }
+        if(!agree) { showToast('You must agree to Terms & Conditions', true); return; }
+
+        const selectedAwards = [];
+        document.querySelectorAll('.award-checkbox:checked').forEach(cb => {
+            selectedAwards.push(cb.value);
+        });
+
+        if(selectedAwards.length === 0) {
+            showToast('Please select at least one award category', true);
+            return;
+        }
+
+        const paymentMode = document.querySelector('input[name="paymentMode"]:checked')?.value || 'Not specified';
+        const totalAmount = computePayable();
+        if(totalAmount === 0) {
+            showToast('Cannot proceed with zero fee (select categories)', true);
+            return;
+        }
+
+        // Gather full data for console / simulation
+        const formData = {
+            organization: org,
+            promoter,
+            ownership: ownershipSelected.value,
+            address,
+            mobile,
+            state,
+            city,
+            email,
+            website: document.getElementById('website').value,
+            gstin: document.getElementById('gstin').value,
+            selectedCategories: selectedAwards,
+            paymentMode,
+            totalAmount: totalAmount,
+            termsAccepted: true
+        };
+
+        console.log('Nomination Submitted:', formData);
+        showToast(`✓ Nomination submitted! Selected ${selectedAwards.length} categories. Total: ₹${totalAmount.toLocaleString('en-IN')}`, false);
+        // Optional: you could reset checkboxes or not; for UX, we leave but user can see.
+        // Here we don't reset automatically to avoid frustration. But we can optionally but not mandatory.
+        // Uncomment to reset form? Not required for demo.
+        // if(confirm('Submission recorded. Clear form?')) form.reset(); computePayable(); attachFeeEvents();
+    });
+
+    // handle default GST & dynamic if any extra fields
+    window.addEventListener('load', () => {
+        computePayable();
+        // additional validation styling
+    });
+</script>
+</body>
+</html>
