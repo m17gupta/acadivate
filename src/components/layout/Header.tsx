@@ -65,7 +65,7 @@ export const Header = () => {
         <nav className="hidden lg:flex items-center gap-1">
           <NavLink href="/" active={pathname === '/'}>Home</NavLink>
           <NavDropdown label="Events">
-            <DropdownItem href="/events/All Events" icon={<Users size={14} />} label="All Events" />
+            <DropdownItem href="/events/all-events" icon={<Users size={14} />} label="All Events" />
             <DropdownItem href="/events/upcoming-events" icon={<Calendar size={14} />} label="Upcoming Events" />
             {/* <DropdownItem href="/events/research-forums" icon={<BookOpen size={14} />} label="Research Forums" />
             <DropdownItem href="/events/workshops-fdp" icon={<GraduationCap size={14} />} label="Workshops & FDPs" /> */}

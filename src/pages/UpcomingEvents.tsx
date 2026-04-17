@@ -17,7 +17,11 @@ const FILTERS = [
 const HIDDEN_EVENT_SLUGS = new Set(['awards-2025', 'research-methodology-workshop']);
 const HIDDEN_EVENT_TITLES = new Set(['Academic Excellence Awards 2025', 'Research Methodology Workshop']);
 
-export const UpcomingEvents = () => {
+type UpcomingEventsProps = {
+  includeHiddenEvents?: boolean;
+};
+
+export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsProps) => {
   const [events, setEvents] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [filter, setFilter] = React.useState('all');
@@ -30,14 +34,24 @@ export const UpcomingEvents = () => {
         const response = await fetch('/api/events');
         const data = await response.json();
         if (data.success) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
           // Filter only published events and map to frontend structure
           const mappedEvents = data.items
             .filter((item: any) => item.status === 'Published')
-            .filter((item: any) => !HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
+            .filter((item: any) =>
+              includeHiddenEvents ||
+              (!HIDDEN_EVENT_SLUGS.has(item.slug) && !HIDDEN_EVENT_TITLES.has(item.title))
+            )
             .map((item: any) => {
               const eventDate = new Date(item.eventDate);
+              if (Number.isNaN(eventDate.getTime()) || eventDate < today) {
+                return null;
+              }
+
               return {
-                id: item._id,
+                id: String(item._id),
                 type: (item.type || 'conference').toLowerCase(),
                 slug: item.slug,
                 title: item.title,
@@ -54,7 +68,8 @@ export const UpcomingEvents = () => {
                   : (typeof item.imageUrl === 'string' ? item.imageUrl : '/assets/Image/event1.jpeg'),
                 tags: item.tags ? item.tags.split(',').map((t: string) => t.trim()) : []
               };
-            });
+            })
+            .filter(Boolean);
           setEvents(mappedEvents);
         }
       } catch (error) {
@@ -188,7 +203,7 @@ export const UpcomingEvents = () => {
                                 </span>
                               ))}
                             </div>
-                            <Link href={`/events/${ev.slug}`}>
+                            <Link href={`/events/${ev.id}`}>
                               <Button variant="primary" size="sm" className="rounded-xl px-5 py-2.5 shadow-sh-sm group/btn">
                                 More Details <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                               </Button>

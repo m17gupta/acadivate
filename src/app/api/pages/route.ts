@@ -1,13 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/src/lib/mongodb";
+import { NextResponse } from "next/server";
+import { getAllPages } from "@/src/lib/pages";
 
 //get all pages
-export async function GET(req: NextRequest) {
+export async function GET() {
     console.log("API: GET /api/pages called");
     try {
-        const client = await clientPromise;
-        const db = client.db("kalp_tenant_acadivate");
-        const pages = await db.collection("pages").find({}).toArray();
+        const pages = await getAllPages();
         return NextResponse.json({ success: true, pages });
     } catch (error) {
         console.error("Error fetching pages:", error);

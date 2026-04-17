@@ -8,6 +8,7 @@ import { leadsModule } from '../leads/leadsModule';
 import { categoriesModule } from '../categories/categoriesModule';
 import { registrationsModule } from '../registrations/registrationsModule';
 import { slidersModule } from '../sliders/slidersModule';
+import { formsModule } from '../forms/formsModule';
 
 export {
   eventsModule,
@@ -24,6 +25,7 @@ export const dashboardModuleList = [
   eventsModule,
   awardsModule,
   nominationsModule,
+  formsModule,
   rankingsModule,
   leadsModule,
   categoriesModule,
@@ -48,6 +50,7 @@ export const dashboardRouteSearchPlaceholders: Record<string, string> = {
   '/dashboard/categories': categoriesModule.searchPlaceholder,
   '/dashboard/registrations': registrationsModule.searchPlaceholder,
   '/dashboard/sliders': slidersModule.searchPlaceholder,
+  '/dashboard/forms': formsModule.searchPlaceholder,
 };
 
 export function resolveDashboardSearchPlaceholder(pathname?: string | null) {
@@ -85,6 +88,10 @@ export function resolveDashboardSearchPlaceholder(pathname?: string | null) {
 
   if (pathname.startsWith('/dashboard/sliders')) {
     return slidersModule.searchPlaceholder;
+  }
+
+  if (pathname.startsWith('/dashboard/forms')) {
+    return formsModule.searchPlaceholder;
   }
 
   return dashboardRouteSearchPlaceholders['/dashboard'];

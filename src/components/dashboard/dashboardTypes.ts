@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 
-export type DashboardModuleId = 'events' | 'awards' | 'nominations' | 'rankings' | 'leads' | 'categories' | 'registrations' | 'sliders';
+export type DashboardModuleId = 'events' | 'awards' | 'nominations' | 'rankings' | 'leads' | 'categories' | 'registrations' | 'sliders' | 'forms';
 
 export type DashboardStatusTone = 'neutral' | 'success' | 'warning' | 'danger';
 
