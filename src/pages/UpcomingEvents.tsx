@@ -272,7 +272,7 @@ export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsPr
                   <CountdownUnit value="45" label="Mins" />
                   <CountdownUnit value="08" label="Secs" />
                 </div>
-                <Link href="/registration-form" className="block w-full relative z-10">
+                <Link href="/nomination-form1" className="block w-full relative z-10">
                   <Button variant="gold" className="w-full py-4 rounded-xl shadow-sh-md">
                     Register Now <ArrowRight size={16} />
                   </Button>
