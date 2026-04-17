@@ -194,6 +194,7 @@ const slug = segments.length === 0
       `}</style>
 
       {/* Floating Action Button & Settings */}
+      {false && (
       <motion.div 
         drag
         dragElastic={0.1}
@@ -259,6 +260,7 @@ const slug = segments.length === 0
           />
         </div>
       </motion.div>
+      )}
 
       {/* Only render markers and capture layer if Comment Mode is ACTIVE */}
       {isCommentModeActive && (

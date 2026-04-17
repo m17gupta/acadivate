@@ -13,9 +13,14 @@ import { useRouter } from 'next/navigation';
 
 export function DashboardSidebar({ currentPath }: { currentPath: string }) {
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const isActive = (href: string) => {
     if (currentPath === href) return true;
@@ -124,8 +129,8 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
                     <User size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-navy">{user?.userName || 'Admin User'}</p>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{user?.role || 'SUPERADMIN'}</p>
+                    <p className="truncate text-sm font-bold text-navy">{isMounted && user?.userName ? user.userName : 'Admin User'}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{isMounted && user?.role ? user.role : 'SUPERADMIN'}</p>
                   </div>
                 </div>
                 
@@ -171,7 +176,7 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
               <User size={22} />
             </div>
             <div className="min-w-0 flex-1 text-left">
-              <p className="truncate text-sm font-bold text-navy">{user?.userName || 'Admin'}</p>
+              <p className="truncate text-sm font-bold text-navy">{isMounted && user?.userName ? user.userName : 'Admin'}</p>
               <p className="truncate text-[11px] font-medium text-text-subtle">admin@nestcraft.com</p>
             </div>
             <ChevronUp 
