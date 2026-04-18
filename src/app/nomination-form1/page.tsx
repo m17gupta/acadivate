@@ -4,8 +4,6 @@ import NominationForm from '../../components/forms/Nomination/NominationForm';
 export default function NominationForm1Page() {
   return (
     <>
-     
-
       <NominationForm />
     </>
   );

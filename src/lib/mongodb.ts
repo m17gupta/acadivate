@@ -5,6 +5,13 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env",
+  );
+}
+
 const options = {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -24,8 +31,20 @@ if (process.env.NODE_ENV === "development") {
   };
 
   if (!globalWithMongo._mongoClientPromise) {
+    console.log("MongoDB: Starting new connection attempt...");
     client = new MongoClient(uri, options);
-    globalWithMongo._mongoClientPromise = client.connect();
+    globalWithMongo._mongoClientPromise = client
+      .connect()
+      .then((c) => {
+        console.log("MongoDB: Connected successfully");
+        return c;
+      })
+      .catch((err) => {
+        console.error("MongoDB: Connection failed:", err);
+        // Clear the failed promise so we can retry on the next reload
+        globalWithMongo._mongoClientPromise = undefined;
+        throw err;
+      });
   }
   clientPromise = globalWithMongo._mongoClientPromise;
 } else {
