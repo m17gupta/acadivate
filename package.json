@@ -16,6 +16,7 @@
     "mongodb": "^7.1.0",
     "motion": "^12.23.24",
     "next": "^15.2.0",
+    "razorpay": "^2.9.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
