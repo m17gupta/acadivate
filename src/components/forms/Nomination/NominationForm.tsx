@@ -59,7 +59,7 @@ const entrepreneurAwards = [
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
 const HANDLING_PER_CAT = 500;
-
+ console.log("academicAwards",academicAwards)
 
 const NominationForm: React.FC = () => {
 
@@ -75,6 +75,7 @@ const NominationForm: React.FC = () => {
     email: '',
     website: '',
     gstin: '',
+    selectedAwards:[],
     paymentMode: 'Online Banking',
     agreeTerms: false,
     researchPublication: [] as File[],
@@ -104,6 +105,8 @@ const NominationForm: React.FC = () => {
     }
   };
 
+
+  console.log("formData---",formData)
   // Delete a file from a specific field
   const handleDeleteFile = (field: keyof typeof formData, index: number) => {
     setFormData(prev => ({
@@ -137,8 +140,9 @@ const NominationForm: React.FC = () => {
   };
 
   const handleSubmit = async(e: React.FormEvent) => {
+    debugger
     e.preventDefault();
-
+   console.log("submiutetdgdvd")
     const { orgName, promoter, ownership, address, mobile, state, city, email, agreeTerms } = formData;
 
     if (!orgName.trim()) { showToast('Organization name required', true); return; }
@@ -183,8 +187,13 @@ const NominationForm: React.FC = () => {
     };
     console.log('Nomination Submitted:', formDataObj);
 
-    const responce= await dispatch(createNominationThunk(formDataObj))
-    showToast(`✓ Nomination submitted! Selected ${selectedAwards.length} categories. Total: ₹${payableAmount.toLocaleString('en-IN')}`, false);
+    const responce= await dispatch(createNominationThunk(formDataObj)).unwrap()
+    console.log("respeoinse forem national", responce)
+    if(responce.status){
+      showToast(`✓ Nomination submitted! Selected ${selectedAwards.length} categories. Total: ₹${payableAmount.toLocaleString('en-IN')}`, false);
+    }else{
+      showToast(`✗ Nomination submission failed!`, true);
+    }
   };
 
   const renderAwardSection = (title: string, icon: string, awards: string[], gridId: string) => (
@@ -223,7 +232,7 @@ const NominationForm: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className={styles['form-grid']}>
             <div className={`${styles['input-group']} ${styles['full-width']}`}>
-              <label><i className="fas fa-building"></i> Name of the Organization</label>
+              <label><i className="fas fa-building"></i> Name of the Organizatio</label>
               <input type="text" name="orgName" value={formData.orgName} onChange={handleInputChange} placeholder="Enter Organization" required />
             </div>
             <div className={styles['input-group']}>
