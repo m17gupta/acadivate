@@ -64,88 +64,88 @@ export const nominationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // .addCase(fetchNominationsThunk.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(fetchNominationsThunk.fulfilled, (state, action) => {
-      //   state.allNomination = action.payload;
-      //   state.isFetchedNomination = true;
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(fetchNominationsThunk.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error =
-      //     action.payload || action.error.message || 'Failed to fetch nominations';
-      // })
-      // .addCase(fetchNominationThunk.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(fetchNominationThunk.fulfilled, (state, action) => {
-      //   state.currentNomination = action.payload;
-      //   state.allNomination = upsertNomination(state.allNomination, action.payload);
-      //   state.isFetchedNomination = true;
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(fetchNominationThunk.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error =
-      //     action.payload || action.error.message || 'Failed to fetch nomination';
-      // })
-      // .addCase(createNominationThunk.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(createNominationThunk.fulfilled, (state, action) => {
-      //   state.allNomination = [action.payload, ...state.allNomination];
-      //   state.currentNomination = action.payload;
-      //   state.isFetchedNomination = true;
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(createNominationThunk.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error =
-      //     action.payload || action.error.message || 'Failed to create nomination';
-      // })
-      // .addCase(updateNominationThunk.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(updateNominationThunk.fulfilled, (state, action) => {
-      //   state.allNomination = upsertNomination(state.allNomination, action.payload);
-      //   state.currentNomination = action.payload;
-      //   state.isFetchedNomination = true;
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(updateNominationThunk.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error =
-      //     action.payload || action.error.message || 'Failed to update nomination';
-      // })
-      // .addCase(deleteNominationThunk.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(deleteNominationThunk.fulfilled, (state, action) => {
-      //   state.allNomination = removeNomination(state.allNomination, action.payload);
+      .addCase(fetchNominationsThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchNominationsThunk.fulfilled, (state, action) => {
+        state.allNomination = action.payload;
+        state.isFetchedNomination = true;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchNominationsThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to fetch nominations';
+      })
+      .addCase(fetchNominationThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchNominationThunk.fulfilled, (state, action) => {
+        state.currentNomination = action.payload;
+        state.allNomination = upsertNomination(state.allNomination, action.payload);
+        state.isFetchedNomination = true;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchNominationThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to fetch nomination';
+      })
+      .addCase(createNominationThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createNominationThunk.fulfilled, (state, action) => {
+        state.allNomination = [action.payload, ...state.allNomination];
+        state.currentNomination = action.payload;
+        state.isFetchedNomination = true;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(createNominationThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to create nomination';
+      })
+      .addCase(updateNominationThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateNominationThunk.fulfilled, (state, action) => {
+        state.allNomination = upsertNomination(state.allNomination, action.payload);
+        state.currentNomination = action.payload;
+        state.isFetchedNomination = true;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(updateNominationThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to update nomination';
+      })
+      .addCase(deleteNominationThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteNominationThunk.fulfilled, (state, action) => {
+        state.allNomination = removeNomination(state.allNomination, action.payload);
 
-      //   if (state.currentNomination?._id === action.payload) {
-      //     state.currentNomination = null;
-      //   }
+        if (state.currentNomination?._id === action.payload) {
+          state.currentNomination = null;
+        }
 
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(deleteNominationThunk.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error =
-      //     action.payload || action.error.message || 'Failed to delete nomination';
-      // });
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(deleteNominationThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to delete nomination';
+      });
   },
 });
 

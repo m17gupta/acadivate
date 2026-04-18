@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { DashboardModulePage } from '@/src/components/dashboard/DashboardModulePage';
+import NominationHome from '@/src/components/forms/Nomination/NominationHome';
 
 export default function Page() {
   return (
@@ -11,7 +12,7 @@ export default function Page() {
         </div>
       }
     >
-      <DashboardModulePage moduleId="nominations" />
+   <NominationHome/>
     </Suspense>
   );
 }

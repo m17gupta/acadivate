@@ -32,6 +32,8 @@ import {
   getDashboardModuleCrud,
   selectDashboardModuleSnapshot,
 } from './dashboardModuleRegistry';
+import GetAllNomination from '../forms/Nomination/GetAllNomination';
+import ShowNominationtable from '../forms/Nomination/ShowNominationtable';
 
 
 
@@ -42,7 +44,7 @@ const summaryToneDotClasses: Record<DashboardStatusTone, string> = {
   danger: 'bg-crimson',
 };
 
-const accentClasses: Record<DashboardAccent, string> = {
+export const accentClasses: Record<DashboardAccent, string> = {
   primary: 'from-primary-deep via-primary-dark to-primary',
   gold: 'from-gold via-gold-2 to-gold-3',
   sage: 'from-sage via-primary-dark to-primary',
@@ -56,7 +58,7 @@ type DraftValue = string | string[];
 export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId }) {
   const config = dashboardModuleList.find((module) => module.id === moduleId) ?? dashboardModuleList[0];
   
-    console.log("ward config",config)
+  const {allNomination,isFetchedNomination}=useSelector((state:RootState)=>state.nominations)
   const [draft, setDraft] = useState<Record<string, DraftValue>>(() => buildEmptyDraft(config.fields));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -282,6 +284,9 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
   };
 
   return (
+    <>
+
+    <GetAllNomination />
     <section className="space-y-6">
       <article
         className={cn(
@@ -384,6 +389,7 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
         onDelete={handleDelete}
         onAddMore={openForm}
       />
+      <ShowNominationtable/>
 
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -394,5 +400,6 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
         message={`Are you sure you want to remove "${rowToDelete ? getRecordLabel(rowToDelete.values) : 'this record'}"? This action cannot be undone.`}
       />
     </section>
+    </>
   );
 }

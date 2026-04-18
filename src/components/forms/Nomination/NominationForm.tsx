@@ -84,7 +84,12 @@ const NominationForm: React.FC = () => {
     patentPolicyDocument: [] as File[],
     status:"pending"
   });
-  const [selectedAwards, setSelectedAwards] = useState<string[]>([]);
+  const [selectedAwards, setSelectedAwards] = useState({
+    academic: [] as string[],
+    startup: [] as string[],
+    rise: [] as string[],
+    entrepreneur: [] as string[]
+  });
   const [payableAmount, setPayableAmount] = useState(0);
   const [toast, setToast] = useState({ show: false, message: '', isError: false });
  const dispatch= useDispatch<AppDispatch>()
@@ -115,14 +120,17 @@ const NominationForm: React.FC = () => {
     }));
   };
 
-  const handleAwardChange = (award: string, checked: boolean) => {
-    setSelectedAwards(prev => 
-      checked ? [...prev, award] : prev.filter(a => a !== award)
-    );
+  const handleAwardChange = (category: keyof typeof selectedAwards, award: string, checked: boolean) => {
+    setSelectedAwards(prev => ({
+      ...prev,
+      [category]: checked 
+        ? [...prev[category], award] 
+        : prev[category].filter(a => a !== award)
+    }));
   };
 
   useEffect(() => {
-    const selectedCount = selectedAwards.length;
+    const selectedCount = Object.values(selectedAwards).flat().length;
     if (selectedCount === 0) {
       setPayableAmount(0);
     } else {
@@ -139,64 +147,71 @@ const NominationForm: React.FC = () => {
     setTimeout(() => setToast({ show: false, message: '', isError: false }), 3500);
   };
 
-  const handleSubmit = async(e: React.FormEvent) => {
-    debugger
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    debugger
    console.log("submiutetdgdvd")
-    const { orgName, promoter, ownership, address, mobile, state, city, email, agreeTerms } = formData;
+   debugger
+    // const { orgName, promoter, ownership, address, mobile, state, city, email, agreeTerms } = formData;
 
-    if (!orgName.trim()) { showToast('Organization name required', true); return; }
-    if (!promoter.trim()) { showToast('Promoter name required', true); return; }
-    if (!ownership) { showToast('Please select ownership pattern', true); return; }
-    if (!address.trim()) { showToast('Address required', true); return; }
-    if (!mobile.trim()) { showToast('Mobile number required', true); return; }
-    if (mobile.length < 8) { showToast('Enter valid mobile number', true); return; }
-    if (!state || state === 'Select State') { showToast('Select state', true); return; }
-    if (!city || city === 'Select City') { showToast('Select city', true); return; }
-    if (!email.trim() || !email.includes('@')) { showToast('Valid email required', true); return; }
-    if (!agreeTerms) { showToast('You must agree to Terms & Conditions', true); return; }
+    // if (!orgName.trim()) { showToast('Organization name required', true); return; }
+    // if (!promoter.trim()) { showToast('Promoter name required', true); return; }
+    // if (!ownership) { showToast('Please select ownership pattern', true); return; }
+    // if (!address.trim()) { showToast('Address required', true); return; }
+    // if (!mobile.trim()) { showToast('Mobile number required', true); return; }
+    // if (mobile.length < 8) { showToast('Enter valid mobile number', true); return; }
+    // if (!state || state === 'Select State') { showToast('Select state', true); return; }
+    // if (!city || city === 'Select City') { showToast('Select city', true); return; }
+    // if (!email.trim() || !email.includes('@')) { showToast('Valid email required', true); return; }
+    // if (!agreeTerms) { showToast('You must agree to Terms & Conditions', true); return; }
 
-    if (selectedAwards.length === 0) {
-      showToast('Please select at least one award category', true);
-      return;
-    }
+    // if (selectedAwards.length === 0) {
+    //   showToast('Please select at least one award category', true);
+    //   return;
+    // }
 
     if (payableAmount === 0) {
       showToast('Cannot proceed with zero fee (select categories)', true);
       return;
     }
 
-    const formDataObj:NominationFormType = {
-        orgName: formData.orgName,
-    promoter: formData.promoter,
-    ownership: formData.ownership,
-    address: formData.address,
-    mobile: formData.mobile,
-    state: formData.state,
-    city: formData.city,
-    email: formData.email,
-    website: formData.website,
-    gstin: formData.gstin,
-    paymentMode: 'Online Banking',
-    agreeTerms: false,
-    researchPublication: [],
-    bookPublication: [] ,
-    researchProject: [] ,
-    patentPolicyDocument: [],
-    status:"pending"
+    const formDataObj: NominationFormType = {
+      orgName: formData.orgName,
+      promoter: formData.promoter,
+      ownership: formData.ownership,
+      address: formData.address,
+      mobile: formData.mobile,
+      state: formData.state,
+      city: formData.city,
+      email: formData.email,
+      website: formData.website,
+      gstin: formData.gstin,
+      // selectedAwards: Object.values(selectedAwards).flat(),
+      academicAwards: selectedAwards.academic,
+      startupAwards: selectedAwards.startup,
+      riseAwards: selectedAwards.rise,
+      entrepreneurAwards: selectedAwards.entrepreneur,
+      paymentMode: formData.paymentMode,
+      agreeTerms: formData.agreeTerms,
+      researchPublication: [],
+      bookPublication: [],
+      researchProject: [],
+      patentPolicyDocument: [],
+      status: "pending",
     };
     console.log('Nomination Submitted:', formDataObj);
 
     const responce= await dispatch(createNominationThunk(formDataObj)).unwrap()
     console.log("respeoinse forem national", responce)
     if(responce.status){
-      showToast(`✓ Nomination submitted! Selected ${selectedAwards.length} categories. Total: ₹${payableAmount.toLocaleString('en-IN')}`, false);
+      const totalCount = Object.values(selectedAwards).flat().length;
+      showToast(`✓ Nomination submitted! Selected ${totalCount} categories. Total: ₹${payableAmount.toLocaleString('en-IN')}`, false);
     }else{
       showToast(`✗ Nomination submission failed!`, true);
     }
   };
 
-  const renderAwardSection = (title: string, icon: string, awards: string[], gridId: string) => (
+  const renderAwardSection = (title: string, icon: string, awards: string[], category: keyof typeof selectedAwards) => (
     <div className={styles['categories-section']}>
       <div className={styles['section-title']}>
         <i className={`fas ${icon}`}></i> {title}
@@ -206,8 +221,8 @@ const NominationForm: React.FC = () => {
           <div key={award} className={styles['cat-item']}>
             <input
               type="checkbox"
-              checked={selectedAwards.includes(award)}
-              onChange={(e) => handleAwardChange(award, e.target.checked)}
+              checked={selectedAwards[category].includes(award)}
+              onChange={(e) => handleAwardChange(category, award, e.target.checked)}
             />
             <label>{award}</label>
           </div>
@@ -374,10 +389,10 @@ const NominationForm: React.FC = () => {
 
       
 
-          {renderAwardSection('Academic and Research Awards', 'fa-graduation-cap', academicAwards, 'academicCatGrid')}
-          {renderAwardSection('Start-up Awards', 'fa-rocket', startupAwards, 'startupCatGrid')}
-          {renderAwardSection('Rise Awards', 'fa-chart-line', riseAwards, 'riseCatGrid')}
-          {renderAwardSection('Entrepreneur Awards (Top Honours)', 'fa-crown', entrepreneurAwards, 'entrepreneurCatGrid')}
+          {renderAwardSection('Academic and Research Awards', 'fa-graduation-cap', academicAwards, 'academic')}
+          {renderAwardSection('Start-up Awards', 'fa-rocket', startupAwards, 'startup')}
+          {renderAwardSection('Rise Awards', 'fa-chart-line', riseAwards, 'rise')}
+          {renderAwardSection('Entrepreneur Awards (Top Honours)', 'fa-crown', entrepreneurAwards, 'entrepreneur')}
 
           <div className={styles['fee-summary']}>
             <div className={styles['fee-block']}>
@@ -402,7 +417,7 @@ const NominationForm: React.FC = () => {
             <label style={{ textTransform: 'none', fontWeight: 500 }}>I agree to Terms & Conditions.</label>
           </div>
 
-          <button type="submit"><i className="fas fa-paper-plane"></i> Submit Nomination</button>
+          <button type="submit"><i className="fas fa-paper-plane"></i> Submit Nominationfff</button>
 
           {/* <button type="submit" onClick={onClose}><i className="fas fa-paper-plane"></i> Close</button> */}
         </form>
