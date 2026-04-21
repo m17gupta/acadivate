@@ -27,6 +27,8 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   const currentNomination = useSelector(
     (state: RootState) => state.nominations.currentNomination,
   );
+  const isEditMode = !!currentNomination?._id;
+
   const [formData, setFormData] = useState({
     orgName: "",
     promoter: "",
@@ -266,19 +268,31 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         bookPublication: [],
         researchProject: [],
         patentPolicyDocument: [],
-        status: "pending",
+        status: isEditMode ? currentNomination?.status : "pending",
         totalAmount: payableAmount,
       };
 
-      const response = await dispatch(
-        createNominationThunk(formDataObj),
-      ).unwrap();
+      let response: any;
+      if (isEditMode) {
+        response = await dispatch(
+          updateNominationThunk({ ...formDataObj, _id: currentNomination._id }),
+        ).unwrap();
+      } else {
+        response = await dispatch(
+          createNominationThunk(formDataObj),
+        ).unwrap();
+      }
 
       if (response._id) {
-        setLoadingStep("paying");
-        const paymentResult = await paymentHandler(response);
+        let paymentSuccessful = true;
         
-        if (paymentResult.success) {
+        if (!isEditMode) {
+          setLoadingStep("paying");
+          const paymentResult = await paymentHandler(response);
+          paymentSuccessful = paymentResult.success;
+        }
+        
+        if (paymentSuccessful) {
           setLoadingStep("uploading");
           const uploadResult = await uploadFiles({
             researchPublication: formData.researchPublication,
@@ -293,16 +307,15 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               ...response,
               ...uploadResult.data
             })).unwrap();
-            showToast("Nomination submitted successfully!");
-            // Optional: Redirect or reset form
-            // router.push("/dashboard");
+            showToast(isEditMode ? "Nomination updated successfully!" : "Nomination submitted successfully!");
           } else {
-            showToast("Payment successful, but file upload failed. Please contact support.", true);
+            showToast(isEditMode ? "Data updated, but file upload failed." : "Payment successful, but file upload failed. Please contact support.", true);
           }
         } else {
-          // Payment failed or dismissed, status remains pending
+          // Payment failed or dismissed, only relevant for new nominations
           showToast("Payment was not completed.", true);
         }
+
         
         setLoading(false);
         setLoadingStep("");
@@ -449,7 +462,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               Please provide accurate details. Registration fee applies per
               selected category.
             </p>
-            {!readOnly && (
+            {/* {!readOnly && (
               <button
                 type="button"
                 onClick={handleAutoFill}
@@ -470,7 +483,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               >
                 <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
               </button>
-            )}
+            )} */}
           </div>
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>
@@ -1015,8 +1028,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-paper-plane"></i> Submit Nomination
+                      <i className="fas fa-paper-plane"></i> {isEditMode ? "Update Nomination" : "Submit Nomination"}
                     </>
+
                   )}
                 </button>
 
