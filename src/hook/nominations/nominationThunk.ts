@@ -91,8 +91,8 @@ export const createNominationThunk = createAsyncThunk<
 
   
     const req = await response.json();
-    console.log("req",req)
-     console.log("order",req.item);
+
+   
     if (req.success) {
       return req.item;
     } else {

@@ -5,7 +5,7 @@ import { downloadNominationPDF } from './downloadNominationPDF';
 import styles from './NominationForm.module.css';
 import { AppDispatch, RootState } from '@/src/hook/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNominationThunk } from '@/src/hook/nominations/nominationThunk';
+import { createNominationThunk, updateNominationThunk } from '@/src/hook/nominations/nominationThunk';
 import { NominationFormType } from '@/src/hook/nominations/nominationType';
 import { useRouter } from 'next/navigation';
 import { setCurrentNomination } from '@/src/hook/nominations/nominationSlice';
@@ -155,7 +155,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   };
 
   const paymentHandler = async (data: NominationFormType) => {
-    console.log("payment start")
+
     let options: any = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
       amount: `${data?.totalAmount ?? 6990}`, // Amount is in currency subunits.
@@ -165,7 +165,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       image: "https://acadivate.com/logo.png",
       order_id: (data as any).order?.id, // Use the order ID returned from server
       handler: async function (response: any) {
-        console.log("payment success--->", response);
+   
         alert(response.razorpay_payment_id);
         alert(response.razorpay_order_id);
         alert(response.razorpay_signature);
@@ -206,7 +206,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         color: "#3399cc",
       },
     };
-    console.log("payment start")
+
     if (!(window as any).Razorpay) {
       showToast("Razorpay SDK failed to load. Please check your internet connection.", true);
       return;
@@ -215,7 +215,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
 
     rzp1.on("payment.failed", function (response: any) {
       setLoading(false);
-      console.log("payment failed--->", response);
+  
       alert(response.error.description);
     });
     rzp1.open();
@@ -259,17 +259,31 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       const response = await dispatch(
         createNominationThunk(formDataObj),
       ).unwrap();
-      
-      console.log("response submitted", response);
+
+ 
       if (response._id) {
-        console.log("payment start")
-        await paymentHandler(response);
+     
+         await paymentHandler(response);
+  //       const uploadResult = await uploadFiles({
+  //         researchPublication: formData.researchPublication,
+  //         bookPublication: formData.bookPublication,
+  //         researchProject: formData.researchProject,
+  //         patentPolicyDocument: formData.patentPolicyDocument,
+  //         pathName: `/nomination-form/${response._id}`,
+  //       });
+  //  console.log("upload data- files-->", uploadResult)
+  //       if (uploadResult.success) {
+  //         await dispatch(updateNominationThunk({
+  //           ...response,
+  //           ...uploadResult.data
+  //         })).unwrap();
+  //       }
       } else {
         showToast(`✗ Nomination submission failed!`, true);
         setLoading(false);
       }
     } catch (error) {
-      console.error("Submission error:", error);
+
       showToast("✗ Something went wrong. Please try again.", true);
       setLoading(false);
     }
@@ -332,12 +346,38 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       </div>
     </div>
   );
-   const handleClose=()=>{
+  const handleClose = () => {
     dispatch(setCurrentNomination(null))
     router.back()
-   }
+  }
 
-   const handleDownloadPDF = async () => {
+  const handleAutoFill = () => {
+    setFormData((prev) => ({
+      ...prev,
+      orgName: "Acadivate Tech Solutions",
+      promoter: "John Doe",
+      ownership: "Pvt Limited",
+      address: "123 Innovation Drive, Tech Park, Mumbai 400001",
+      mobile: "9876543210",
+      state: "Maharashtra",
+      city: "Mumbai",
+      email: "test@acadivate.com",
+      website: "https://acadivate.com",
+      gstin: "27AAAAA0000A1Z5",
+      paymentMode: "Online Banking",
+      agreeTerms: true,
+    }));
+
+    // Select one award from each category as sample
+    setSelectedAwards({
+      academic: [academicAwards[0]],
+      startup: [startupAwards[0]],
+      rise: [riseAwards[0]],
+      entrepreneur: [entrepreneurAwards[0]],
+    });
+  };
+
+  const handleDownloadPDF = async () => {
     // Strip File[] fields – they're not serialisable and not needed in the PDF
     const { researchPublication, bookPublication, researchProject, patentPolicyDocument, ...rest } = formData;
     const pdfData = {
@@ -378,6 +418,28 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               Please provide accurate details. Registration fee applies per
               selected category.
             </p>
+            {/* {!readOnly && (
+              <button
+                type="button"
+                onClick={handleAutoFill}
+                className={styles["autofill-btn"]}
+                style={{
+                  marginTop: "1rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.8rem",
+                  background: "#eef2ff",
+                  border: "1px solid #c7d2fe",
+                  borderRadius: "6px",
+                  color: "#4338ca",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
+              </button>
+            )} */}
           </div>
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>
@@ -908,40 +970,40 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </label>
             </div>
 
-          <div className={styles['btn-row']}>
-            {!readOnly && (
-              <button type="submit" className={styles['btn-submit']} disabled={loading}>
-                {loading ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i> Processing...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-paper-plane"></i> Submit Nomination
-                  </>
-                )}
+            <div className={styles['btn-row']}>
+              {!readOnly && (
+                <button type="submit" className={styles['btn-submit']} disabled={loading}>
+                  {loading ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i> Processing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-paper-plane"></i> Submit Nomination
+                    </>
+                  )}
+                </button>
+              )}
+
+              <button type="button" className={styles['btn-pdf']} onClick={handleDownloadPDF}>
+                <FileDown size={18} /> Download PDF
               </button>
-            )}
 
-            <button type="button" className={styles['btn-pdf']} onClick={handleDownloadPDF}>
-              <FileDown size={18} /> Download PDF
-            </button>
-
-            <button type="button" className={styles['btn-close']} onClick={handleClose}>
-              <i className="fas fa-times-circle"></i> Close
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {toast.show && (
-        <div
-          className={`${styles["success-toast"]} ${toast.show ? styles.show : ""}`}
-          style={{ background: toast.isError ? "#c73e2f" : "#2b6e3c" }}
-        >
-          <i className="fas fa-check-circle"></i> <span>{toast.message}</span>
+              <button type="button" className={styles['btn-close']} onClick={handleClose}>
+                <i className="fas fa-times-circle"></i> Close
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+
+        {toast.show && (
+          <div
+            className={`${styles["success-toast"]} ${toast.show ? styles.show : ""}`}
+            style={{ background: toast.isError ? "#c73e2f" : "#2b6e3c" }}
+          >
+            <i className="fas fa-check-circle"></i> <span>{toast.message}</span>
+          </div>
+        )}
       </div>
     </>
   );

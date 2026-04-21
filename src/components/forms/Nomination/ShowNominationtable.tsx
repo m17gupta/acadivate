@@ -25,7 +25,7 @@ const ShowNominationtable = () => {
     const handleEdit = (nomination: any) => {
         dispatch(setCurrentNomination(nomination))
         // Logic for editing (e.g., opening a modal or navigating) can be added here
-        console.log("Edit nomination:", nomination)
+
         router.push(`/nomination-form/${nomination._id}`)
     }
 

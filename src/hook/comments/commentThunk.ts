@@ -12,7 +12,7 @@ export const fetchCommentsThunk = createAsyncThunk(
         throw new Error(errorData.message || 'Failed to fetch comments');
       }
       const data = await response.json();
-      console.log("data", data.pages)
+   
       return data.pages;
     } catch (error: any) {
       return rejectWithValue(error.message);

@@ -4,15 +4,16 @@ import path from "path";
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
+    const pathName = (formData.get("pathName") as string) || "";
 
-    const categories = [
-      "researchPublication",
-      "bookPublication",
-      "researchProject",
-      "patentPolicyDocument",
-    ];
+    // Base uploads directory in public
+    const baseUploadDir = path.join(process.cwd(), "public/uploads");
+    
+    // Resolve full target directory. Sanitize pathName to prevent path traversal
+    const sanitizedPathName = pathName.replace(/^\/+/, ""); 
+    const uploadDir = path.resolve(process.cwd(), "public/uploads", sanitizedPathName);
 
-    const uploadDir = path.join(process.cwd(), "public/uploads");
+    console.log("Saving files to absolute path:", uploadDir);
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -20,29 +21,45 @@ export async function POST(req: Request) {
 
     const result: Record<string, string[]> = {};
 
-    for (const category of categories) {
-      const files = formData.getAll(category) as File[];
+    // Get unique keys from formData
+    const keys = Array.from(new Set(formData.keys()));
 
-      result[category] = [];
+    for (const key of keys) {
+      if (key === "pathName") continue;
 
-      for (const file of files) {
-        if (!file || typeof file === "string") continue;
+      const entries = formData.getAll(key);
+      result[key] = [];
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+      for (const entry of entries) {
+        if (entry instanceof File) {
+          const buffer = Buffer.from(await entry.arrayBuffer());
 
-        const fileName = `${category}-${Date.now()}-${file.name}`;
-        const filePath = path.join(uploadDir, fileName);
+          // Clean filename to remove spaces or harmful characters
+          const safeFileName = entry.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+          const fileName = `${key}-${Date.now()}-${safeFileName}`;
+          const filePath = path.join(uploadDir, fileName);
 
-        await fs.promises.writeFile(filePath, buffer);
+          await fs.promises.writeFile(filePath, buffer);
 
-        result[category].push(`/uploads/${fileName}`);
+          // Construct relative path for client access (ensure leading slash)
+          const publicPath = path.join("/uploads", sanitizedPathName, fileName);
+          result[key].push(publicPath);
+        }
       }
     }
 
-    return new Response(JSON.stringify({ success: true, data: result }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: result,
+        debug_absolute_path: uploadDir,
+      }),
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
+    console.error("Upload failed server-side:", error);
     return new Response(JSON.stringify({ error: "Upload failed" }), {
       status: 500,
     });
