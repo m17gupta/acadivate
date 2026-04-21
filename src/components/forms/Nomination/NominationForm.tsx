@@ -191,7 +191,8 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         if (result.success) {
           showToast("Payment successful");
         } else {
-          showToast(result.error, true);
+          console.log(result.error)
+          // showToast(result.error, true);
         }
       },
       prefill: {
@@ -264,20 +265,20 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       if (response._id) {
      
          await paymentHandler(response);
-  //       const uploadResult = await uploadFiles({
-  //         researchPublication: formData.researchPublication,
-  //         bookPublication: formData.bookPublication,
-  //         researchProject: formData.researchProject,
-  //         patentPolicyDocument: formData.patentPolicyDocument,
-  //         pathName: `/nomination-form/${response._id}`,
-  //       });
-  //  console.log("upload data- files-->", uploadResult)
-  //       if (uploadResult.success) {
-  //         await dispatch(updateNominationThunk({
-  //           ...response,
-  //           ...uploadResult.data
-  //         })).unwrap();
-  //       }
+        const uploadResult = await uploadFiles({
+          researchPublication: formData.researchPublication,
+          bookPublication: formData.bookPublication,
+          researchProject: formData.researchProject,
+          patentPolicyDocument: formData.patentPolicyDocument,
+          pathName: `/nomination-form/${response._id}`,
+        });
+   console.log("upload data- files-->", uploadResult)
+        if (uploadResult.success) {
+          await dispatch(updateNominationThunk({
+            ...response,
+            ...uploadResult.data
+          })).unwrap();
+        }
       } else {
         showToast(`✗ Nomination submission failed!`, true);
         setLoading(false);
@@ -316,7 +317,8 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       body: formData,
     });
 
-    return await res.json();
+    const result = await res.json();
+    return result;
   };
 
   const renderAwardSection = (
