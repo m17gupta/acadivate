@@ -54,7 +54,7 @@ const slug = segments.length === 0
   // update the annotation
   useEffect(()=>{
     const filterComments = allComments.filter((comment)=>comment.slug === slug)
-   console.log("filterComments",filterComments)
+
     if(filterComments.length>0){
       setAnnotations(filterComments)
     }else{

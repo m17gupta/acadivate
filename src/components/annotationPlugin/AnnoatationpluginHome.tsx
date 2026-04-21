@@ -21,7 +21,6 @@ export const AnnoatationpluginHome = () => {
   const segments = pathname?.split("/").filter(Boolean) || [];
   const slug = segments.length === 0 ? "home" : segments[segments.length - 1];
   
-  console.log("AnnoatationpluginHome Rendering", { mounted, slug, role: user?.role });
 
   useEffect(() => {
     setMounted(true);

@@ -61,7 +61,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     isError: false,
   });
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(""); // "submitting", "paying", "uploading"
   const dispatch = useDispatch<AppDispatch>();
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -154,74 +156,84 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     );
   };
 
-  const paymentHandler = async (data: NominationFormType) => {
+  const paymentHandler = (data: NominationFormType): Promise<{ success: boolean }> => {
+    return new Promise((resolve) => {
+      const payamount = data?.totalAmount ? data.totalAmount * 100 : 6990;
+      let options: any = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: `${payamount}`,
+        currency: "INR",
+        name: "Acadivate",
+        description: "Test Transaction",
+        image: "https://acadivate.com/logo.png",
+        order_id: (data as any).order?.id,
+        handler: async function (response: any) {
+          try {
+            const orderData: OrderType = {
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              signature: response.razorpay_signature,
+              amount: data?.totalAmount ?? 0,
+              formId: data._id,
+              status: "success",
+            };
 
-    let options: any = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
-      amount: `${data?.totalAmount ?? 6990}`, // Amount is in currency subunits.
-      currency: "INR",
-      name: "Acadivate", //your business name
-      description: "Test Transaction",
-      image: "https://acadivate.com/logo.png",
-      order_id: (data as any).order?.id, // Use the order ID returned from server
-      handler: async function (response: any) {
-   
-        alert(response.razorpay_payment_id);
-        alert(response.razorpay_order_id);
-        alert(response.razorpay_signature);
-
-        const orderData: OrderType = {
-          paymentId: response.razorpay_payment_id,
-          orderId: response.razorpay_order_id,
-          signature: response.razorpay_signature,
-          amount: data?.totalAmount ?? 0,
-          formId: data._id,
-          status: "success",
-        }
-
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+            const res = await fetch("/api/orders", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(orderData),
+            });
+            const result = await res.json();
+            if (result.success) {
+              showToast("Payment successful");
+              resolve({ success: true });
+            } else {
+              console.error(result.error);
+              showToast("Payment recorded but failed to update status", true);
+              resolve({ success: false });
+            }
+          } catch (err) {
+            console.error(err);
+            showToast("Failed to process payment data", true);
+            resolve({ success: false });
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            resolve({ success: false });
           },
-          body: JSON.stringify(orderData),
-        });
-        const result = await res.json();
-        setLoading(false);
-        if (result.success) {
-          showToast("Payment successful");
-        } else {
-          console.log(result.error)
-          // showToast(result.error, true);
-        }
-      },
-      prefill: {
-        name: data.promoter, //your customer's name
-        email: data.email,
-        contact: data.mobile, //Provide the customer's phone number for better conversion rates
-      },
-      notes: {
-        address: data.address,
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+        },
+        prefill: {
+          name: data.promoter,
+          email: data.email,
+          contact: data.mobile,
+        },
+        notes: {
+          address: data.address,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
 
-    if (!(window as any).Razorpay) {
-      showToast("Razorpay SDK failed to load. Please check your internet connection.", true);
-      return;
-    }
-    var rzp1: any = new (window as any).Razorpay(options);
-
-    rzp1.on("payment.failed", function (response: any) {
-      setLoading(false);
-  
-      alert(response.error.description);
+      if (!(window as any).Razorpay) {
+        showToast("Razorpay SDK failed to load.", true);
+        resolve({ success: false });
+        return;
+      }
+      
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.on("payment.failed", function (response: any) {
+        console.error(response.error.description);
+        showToast(`Payment failed: ${response.error.description}`, true);
+        resolve({ success: false });
+      });
+      rzp1.open();
     });
-    rzp1.open();
-
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -231,6 +243,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     }
 
     setLoading(true);
+    setLoadingStep("submitting");
     try {
       const formDataObj: NominationFormType = {
         orgName: formData.orgName,
@@ -261,33 +274,49 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         createNominationThunk(formDataObj),
       ).unwrap();
 
- 
       if (response._id) {
-     
-         await paymentHandler(response);
-        const uploadResult = await uploadFiles({
-          researchPublication: formData.researchPublication,
-          bookPublication: formData.bookPublication,
-          researchProject: formData.researchProject,
-          patentPolicyDocument: formData.patentPolicyDocument,
-          pathName: `/nomination-form/${response._id}`,
-        });
-   console.log("upload data- files-->", uploadResult)
-        if (uploadResult.success) {
-          await dispatch(updateNominationThunk({
-            ...response,
-            ...uploadResult.data
-          })).unwrap();
+        setLoadingStep("paying");
+        const paymentResult = await paymentHandler(response);
+        
+        if (paymentResult.success) {
+          setLoadingStep("uploading");
+          const uploadResult = await uploadFiles({
+            researchPublication: formData.researchPublication,
+            bookPublication: formData.bookPublication,
+            researchProject: formData.researchProject,
+            patentPolicyDocument: formData.patentPolicyDocument,
+            pathName: `/nomination-form/${response._id}`,
+          });
+
+          if (uploadResult.success) {
+            await dispatch(updateNominationThunk({
+              ...response,
+              ...uploadResult.data
+            })).unwrap();
+            showToast("Nomination submitted successfully!");
+            // Optional: Redirect or reset form
+            // router.push("/dashboard");
+          } else {
+            showToast("Payment successful, but file upload failed. Please contact support.", true);
+          }
+        } else {
+          // Payment failed or dismissed, status remains pending
+          showToast("Payment was not completed.", true);
         }
-      } else {
-        showToast(`✗ Nomination submission failed!`, true);
+        
         setLoading(false);
+        setLoadingStep("");
+      } else {
+        showToast(`✗ Nomination creation failed!`, true);
+        setLoading(false);
+        setLoadingStep("");
       }
     } catch (error) {
-
       showToast("✗ Something went wrong. Please try again.", true);
       setLoading(false);
+      setLoadingStep("");
     }
+
   };
 
   const uploadFiles = async (data: {
@@ -420,7 +449,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               Please provide accurate details. Registration fee applies per
               selected category.
             </p>
-            {/* {!readOnly && (
+            {!readOnly && (
               <button
                 type="button"
                 onClick={handleAutoFill}
@@ -441,7 +470,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               >
                 <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
               </button>
-            )} */}
+            )}
           </div>
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>
@@ -977,7 +1006,12 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                 <button type="submit" className={styles['btn-submit']} disabled={loading}>
                   {loading ? (
                     <>
-                      <i className="fas fa-spinner fa-spin"></i> Processing...
+                      <i className="fas fa-spinner fa-spin"></i> {
+                        loadingStep === "submitting" ? "Creating Nomination..." :
+                        loadingStep === "paying" ? "Waiting for Payment..." :
+                        loadingStep === "uploading" ? "Uploading Documents..." :
+                        "Processing..."
+                      }
                     </>
                   ) : (
                     <>
@@ -985,6 +1019,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                     </>
                   )}
                 </button>
+
               )}
 
               <button type="button" className={styles['btn-pdf']} onClick={handleDownloadPDF}>

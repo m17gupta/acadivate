@@ -75,7 +75,7 @@ async function POST(req: NextRequest) {
     const findLastReceipt = await collection.countDocuments();
     const lastReceipt = findLastReceipt + 1;
     const order = await instance.orders.create({
-      amount: payload.totalAmount,
+      amount: Math.round(payload.totalAmount * 100),
       currency: "INR",
       receipt: `order_rcptid_${lastReceipt}`,
     });
