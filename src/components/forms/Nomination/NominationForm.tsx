@@ -462,6 +462,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               Please provide accurate details. Registration fee applies per
               selected category.
             </p>
+            
             {/* {!readOnly && (
               <button
                 type="button"
