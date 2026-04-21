@@ -24,7 +24,7 @@ export interface NominationFormType {
   researchProject?: string[];
   patentPolicyDocument?: string[];
   status?: string;
-  totalAmount?:number;
+  totalAmount?: number;
   // selectedAwards?: string[];
   academicAwards?: string[];
   startupAwards?: string[];
@@ -32,6 +32,7 @@ export interface NominationFormType {
   entrepreneurAwards?: string[];
   created_at?: string;
   updated_at?: string;
+  id?: string;
 }
 export interface NominationRecord {
   _id?: string;

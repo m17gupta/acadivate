@@ -36,6 +36,22 @@ export async function POST(req: NextRequest) {
       website,
       totalAmount,
     } = await req.json();
+    console.log(
+      address,
+      agreeTerms,
+      city,
+      email,
+      gstin,
+      mobile,
+      orgName,
+      ownership,
+      paymentMode,
+      promoter,
+      selectedCategories,
+      state,
+      website,
+      totalAmount,
+    );
     const ordersCollection = await getCollection("orders");
     const findLastReceipt = await ordersCollection.countDocuments();
     const lastReceipt = findLastReceipt + 1;
@@ -70,7 +86,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, order });
+    return NextResponse.json({ success: true, order: finalOrderData });
   } catch (error) {
     console.error("Error creating order:", error);
     return NextResponse.json(

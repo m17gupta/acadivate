@@ -1,24 +1,29 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import type {
   NominationCreateInput,
   NominationFormType,
   NominationRecord,
   NominationUpdateInput,
-} from './nominationType';
+} from "./nominationType";
 
 type ApiResponse<T> = {
-  success?: boolean;
+  success: boolean;
   items?: T[];
-  item?: T;
+  data?: T;
   deletedId?: string;
-  error?: string;
-  message?: string;
+  error: string;
+  message: string;
 };
 
-async function parseResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
-  const data = (await response.json().catch(() => null)) as ApiResponse<T> | null;
+async function parseResponse<T>(
+  response: any,
+  fallbackMessage: string,
+): Promise<T> {
+  const data = (await response
+    .json()
+    .catch(() => null)) as ApiResponse<T> | null;
 
-  if (!response.ok) {
+  if (!response.success) {
     throw new Error(data?.error || data?.message || fallbackMessage);
   }
 
@@ -29,18 +34,18 @@ export const fetchNominationsThunk = createAsyncThunk<
   NominationRecord[],
   void,
   { rejectValue: string }
->('nominations/fetchAll', async (_, { rejectWithValue }) => {
+>("nominations/fetchAll", async (_, { rejectWithValue }) => {
   try {
-    const response = await fetch('/api/nominations');
+    const response = await fetch("/api/nominations");
     const data = await parseResponse<{ items?: NominationRecord[] }>(
       response,
-      'Failed to fetch nominations'
+      "Failed to fetch nominations",
     );
 
     return data.items ?? [];
   } catch (error) {
     return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to fetch nominations'
+      error instanceof Error ? error.message : "Failed to fetch nominations",
     );
   }
 });
@@ -49,53 +54,57 @@ export const fetchNominationThunk = createAsyncThunk<
   NominationFormType,
   string,
   { rejectValue: string }
->('nominations/fetchOne', async (id, { rejectWithValue }) => {
+>("nominations/fetchOne", async (id, { rejectWithValue }) => {
   try {
-    const response = await fetch(`/api/nominations?id=${encodeURIComponent(id)}`);
+    const response = await fetch(
+      `/api/nominations?id=${encodeURIComponent(id)}`,
+    );
     const data = await parseResponse<{ item?: NominationFormType }>(
       response,
-      'Failed to fetch nomination'
+      "Failed to fetch nomination",
     );
 
     if (!data.item) {
-      throw new Error('Nomination not found');
+      throw new Error("Nomination not found");
     }
 
     return data.item;
   } catch (error) {
     return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to fetch nomination'
+      error instanceof Error ? error.message : "Failed to fetch nomination",
     );
   }
 });
 
 export const createNominationThunk = createAsyncThunk<
-  NominationFormType,
+  any,
   NominationFormType,
   { rejectValue: string }
->('nominations/create', async (payload, { rejectWithValue }) => {
+>("nominations/create", async (payload, { rejectWithValue }) => {
   try {
-    const response = await fetch('/api/nominations', {
-      method: 'POST',
+    const response = await fetch("/api/order", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
 
-    const data = await parseResponse<{ item?: NominationFormType }>(
-      response,
-      'Failed to create nomination'
-    );
+    // const data = await parseResponse<{
+    //   data?: NominationFormType;
+    //   success: boolean;
+    // }>(response, "Failed to create nomination");
 
-    if (!data.item) {
-      throw new Error('Unable to create nomination');
+    const req = await response.json();
+
+    if (req.success) {
+      return req.order;
+    } else {
+      throw new Error("Unable to create nomination");
     }
-
-    return data.item;
   } catch (error) {
     return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to create nomination'
+      error instanceof Error ? error.message : "Failed to create nomination",
     );
   }
 });
@@ -104,29 +113,29 @@ export const updateNominationThunk = createAsyncThunk<
   NominationFormType,
   NominationFormType,
   { rejectValue: string }
->('nominations/update', async (payload, { rejectWithValue }) => {
+>("nominations/update", async (payload, { rejectWithValue }) => {
   try {
-    const response = await fetch('/api/nominations', {
-      method: 'PUT',
+    const response = await fetch("/api/nominations", {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
 
     const data = await parseResponse<{ item?: NominationFormType }>(
       response,
-      'Failed to update nomination'
+      "Failed to update nomination",
     );
 
     if (!data.item) {
-      throw new Error('Unable to update nomination');
+      throw new Error("Unable to update nomination");
     }
 
     return data.item;
   } catch (error) {
     return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to update nomination'
+      error instanceof Error ? error.message : "Failed to update nomination",
     );
   }
 });
@@ -135,21 +144,24 @@ export const deleteNominationThunk = createAsyncThunk<
   string,
   string,
   { rejectValue: string }
->('nominations/delete', async (id, { rejectWithValue }) => {
+>("nominations/delete", async (id, { rejectWithValue }) => {
   try {
-    const response = await fetch(`/api/nominations?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(
+      `/api/nominations?id=${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    );
 
     const data = await parseResponse<{ deletedId?: string }>(
       response,
-      'Failed to delete nomination'
+      "Failed to delete nomination",
     );
 
     return data.deletedId ?? id;
   } catch (error) {
     return rejectWithValue(
-      error instanceof Error ? error.message : 'Failed to delete nomination'
+      error instanceof Error ? error.message : "Failed to delete nomination",
     );
   }
 });
