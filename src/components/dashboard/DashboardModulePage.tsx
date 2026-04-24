@@ -389,7 +389,7 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
         onDelete={handleDelete}
         onAddMore={openForm}
       />
-      <ShowNominationtable/>
+      {/* <ShowNominationtable/> */}
 
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}

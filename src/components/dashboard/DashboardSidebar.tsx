@@ -89,7 +89,7 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
                 >
                   <span className="flex items-center gap-3">
                     <LayoutGrid size={18} className={currentPath === '/dashboard/leads/inbox' ? 'text-gold-3' : 'text-primary-dark'} />
-                    <span className="text-sm font-semibold">Leads Inbox</span>
+                    <span className="text-sm font-semibold">Contact Form</span>
                   </span>
                 </Link>
 

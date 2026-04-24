@@ -1,6 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Eye, FileDown, Trash2 } from "lucide-react";
+import { 
+  Eye, 
+  FileDown, 
+  Trash2, 
+  Trophy, 
+  Award, 
+  Building2, 
+  User, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Globe, 
+  FileText, 
+  Check, 
+  Loader2,
+  Trash,
+  Download,
+  X,
+  CreditCard,
+  Building
+} from "lucide-react";
 import { downloadNominationPDF } from './downloadNominationPDF';
 import styles from './NominationForm.module.css';
 import { AppDispatch, RootState } from '@/src/hook/store';
@@ -13,7 +33,6 @@ import { academicAwards, entrepreneurAwards, riseAwards, startupAwards } from '.
 import Script from 'next/script';
 import { OrderType } from "../../orders/OrderType";
 
-
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
 const HANDLING_PER_CAT = 500;
@@ -24,9 +43,8 @@ interface NominationFormProps {
 
 const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => {
   const router = useRouter();
-  const currentNomination = useSelector(
-    (state: RootState) => state.nominations.currentNomination,
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const currentNomination = useSelector((state: RootState) => state.nominations.currentNomination);
   const isEditMode = !!currentNomination?._id;
 
   const [formData, setFormData] = useState({
@@ -50,65 +68,19 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     patentPolicyDocument: [] as File[],
     status: "pending",
   });
+
   const [selectedAwards, setSelectedAwards] = useState({
     academic: [] as string[],
     startup: [] as string[],
     rise: [] as string[],
     entrepreneur: [] as string[],
   });
+
   const [payableAmount, setPayableAmount] = useState(0);
-  const [toast, setToast] = useState({
-    show: false,
-    message: "",
-    isError: false,
-  });
+  const [toast, setToast] = useState({ show: false, message: "", isError: false });
   const [loading, setLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(""); // "submitting", "paying", "uploading"
-  const dispatch = useDispatch<AppDispatch>();
+  const [loadingStep, setLoadingStep] = useState(""); 
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    if (type === "file") {
-      const files = (e.target as HTMLInputElement).files;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: files ? Array.from(files) : [],
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    }
-  };
-
-  // Delete a file from a specific field
-  const handleDeleteFile = (field: keyof typeof formData, index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: (prev[field] as File[]).filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleAwardChange = (
-    category: keyof typeof selectedAwards,
-    award: string,
-    checked: boolean,
-  ) => {
-    setSelectedAwards((prev) => ({
-      ...prev,
-      [category]: checked
-        ? [...prev[category], award]
-        : prev[category].filter((a) => a !== award),
-    }));
-  };
-
-  // Pre-fill form when currentNomination is loaded from Redux
   useEffect(() => {
     if (currentNomination) {
       setFormData((prev) => ({
@@ -136,7 +108,6 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     }
   }, [currentNomination]);
 
-  // Recalculate payable amount whenever selected awards change
   useEffect(() => {
     const selectedCount = Object.values(selectedAwards).flat().length;
     if (selectedCount === 0) {
@@ -145,17 +116,40 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       const subtotal = selectedCount * BASE_FEE;
       const gst = subtotal * GST_RATE;
       const handling = selectedCount * HANDLING_PER_CAT;
-      const total = subtotal + gst + handling;
+      const total = Math.round(subtotal + gst + handling);
       setPayableAmount(total);
     }
   }, [selectedAwards]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    if (type === "file") {
+      const files = (e.target as HTMLInputElement).files;
+      setFormData(prev => ({ ...prev, [name]: files ? Array.from(files) : [] }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    }
+  };
+
+  const handleAwardChange = (category: keyof typeof selectedAwards, award: string, checked: boolean) => {
+    if (readOnly) return;
+    setSelectedAwards(prev => ({
+      ...prev,
+      [category]: checked ? [...prev[category], award] : prev[category].filter(a => a !== award)
+    }));
+  };
+
+  const handleDeleteFile = (field: keyof typeof formData, index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: (prev[field] as File[]).filter((_, i) => i !== index)
+    }));
+  };
+
   const showToast = (message: string, isError = false) => {
     setToast({ show: true, message, isError });
-    setTimeout(
-      () => setToast({ show: false, message: "", isError: false }),
-      3500,
-    );
+    setTimeout(() => setToast({ show: false, message: "", isError: false }), 3500);
   };
 
   const paymentHandler = (data: NominationFormType): Promise<{ success: boolean }> => {
@@ -166,7 +160,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         amount: `${payamount}`,
         currency: "INR",
         name: "Acadivate",
-        description: "Test Transaction",
+        description: "Award Nomination",
         image: "https://acadivate.com/logo.png",
         order_id: (data as any).order?.id,
         handler: async function (response: any) {
@@ -179,12 +173,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               formId: data._id,
               status: "success",
             };
-
             const res = await fetch("/api/orders", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify(orderData),
             });
             const result = await res.json();
@@ -192,58 +183,38 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               showToast("Payment successful");
               resolve({ success: true });
             } else {
-              console.error(result.error);
               showToast("Payment recorded but failed to update status", true);
               resolve({ success: false });
             }
           } catch (err) {
-            console.error(err);
             showToast("Failed to process payment data", true);
             resolve({ success: false });
           }
         },
-        modal: {
-          ondismiss: function () {
-            resolve({ success: false });
-          },
-        },
+        modal: { ondismiss: () => resolve({ success: false }) },
         prefill: {
           name: data.promoter,
           email: data.email,
           contact: data.mobile,
         },
-        notes: {
-          address: data.address,
-        },
-        theme: {
-          color: "#3399cc",
-        },
+        theme: { color: "#2563eb" },
       };
-
       if (!(window as any).Razorpay) {
         showToast("Razorpay SDK failed to load.", true);
         resolve({ success: false });
         return;
       }
-      
       const rzp1 = new (window as any).Razorpay(options);
-      rzp1.on("payment.failed", function (response: any) {
-        console.error(response.error.description);
-        showToast(`Payment failed: ${response.error.description}`, true);
-        resolve({ success: false });
-      });
       rzp1.open();
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (payableAmount === 0) {
-      showToast("Cannot proceed with zero fee (select categories)", true);
+      showToast("Select at least one award category", true);
       return;
     }
-
     setLoading(true);
     setLoadingStep("submitting");
     try {
@@ -274,24 +245,18 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
 
       let response: any;
       if (isEditMode) {
-        response = await dispatch(
-          updateNominationThunk({ ...formDataObj, _id: currentNomination._id }),
-        ).unwrap();
+        response = await dispatch(updateNominationThunk({ ...formDataObj, _id: currentNomination._id })).unwrap();
       } else {
-        response = await dispatch(
-          createNominationThunk(formDataObj),
-        ).unwrap();
+        response = await dispatch(createNominationThunk(formDataObj)).unwrap();
       }
 
       if (response._id) {
         let paymentSuccessful = true;
-        
         if (!isEditMode) {
           setLoadingStep("paying");
           const paymentResult = await paymentHandler(response);
           paymentSuccessful = paymentResult.success;
         }
-        
         if (paymentSuccessful) {
           setLoadingStep("uploading");
           const uploadResult = await uploadFiles({
@@ -301,77 +266,50 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
             patentPolicyDocument: formData.patentPolicyDocument,
             pathName: `/nomination-form/${response._id}`,
           });
-
           if (uploadResult.success) {
-            await dispatch(updateNominationThunk({
-              ...response,
-              ...uploadResult.data
-            })).unwrap();
-            showToast(isEditMode ? "Nomination updated successfully!" : "Nomination submitted successfully!");
+            await dispatch(updateNominationThunk({ ...response, ...uploadResult.data })).unwrap();
+            showToast(isEditMode ? "Updated successfully!" : "Submitted successfully!");
           } else {
-            showToast(isEditMode ? "Data updated, but file upload failed." : "Payment successful, but file upload failed. Please contact support.", true);
+            showToast("Data saved, but file upload failed.", true);
           }
         } else {
-          // Payment failed or dismissed, only relevant for new nominations
-          showToast("Payment was not completed.", true);
+          showToast("Payment not completed.", true);
         }
-
-        
-        setLoading(false);
-        setLoadingStep("");
-      } else {
-        showToast(`✗ Nomination creation failed!`, true);
         setLoading(false);
         setLoadingStep("");
       }
     } catch (error) {
-      showToast("✗ Something went wrong. Please try again.", true);
+      showToast("Error occurred. Please try again.", true);
       setLoading(false);
-      setLoadingStep("");
     }
-
   };
 
-  const uploadFiles = async (data: {
-    researchPublication: File[];
-    bookPublication: File[];
-    researchProject: File[];
-    patentPolicyDocument: File[];
-    pathName: string;
-  }) => {
-    const formData = new FormData();
-
-    // Append the pathName to the formData
-    formData.append("pathName", data.pathName);
-
-    // Loop through each category and append files to formData
+  const uploadFiles = async (data: any) => {
+    const fd = new FormData();
+    fd.append("pathName", data.pathName);
     Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        // Check if the value is an array of files
-        value.forEach((file: File) => {
-          formData.append(key, file); // same key, multiple files
-        });
-      }
+      if (Array.isArray(value)) value.forEach((file: File) => fd.append(key, file));
     });
-
-    const res = await fetch("/api/uploadfile", {
-      method: "POST",
-      body: formData,
-    });
-
-    const result = await res.json();
-    return result;
+    const res = await fetch("/api/uploadfile", { method: "POST", body: fd });
+    return await res.json();
   };
 
-  const renderAwardSection = (
-    title: string,
-    icon: string,
-    awards: string[],
-    category: keyof typeof selectedAwards,
-  ) => (
+  const handleDownloadPDF = async () => {
+    const { researchPublication, bookPublication, researchProject, patentPolicyDocument, ...rest } = formData;
+    await downloadNominationPDF({
+      ...rest,
+      academicAwards: selectedAwards.academic,
+      startupAwards: selectedAwards.startup,
+      riseAwards: selectedAwards.rise,
+      entrepreneurAwards: selectedAwards.entrepreneur,
+      totalAmount: payableAmount || formData.totalAmount,
+    });
+  };
+
+  const renderAwardSection = (title: string, icon: React.ReactNode, awards: string[], category: keyof typeof selectedAwards) => (
     <div className={styles["categories-section"]}>
       <div className={styles["section-title"]}>
-        <i className={`fas ${icon}`}></i> {title}
+        {icon} {title}
       </div>
       <div className={styles["cat-grid"]}>
         {awards.map((award) => (
@@ -379,684 +317,270 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
             <input
               type="checkbox"
               checked={selectedAwards[category].includes(award)}
-              onChange={(e) =>
-                handleAwardChange(category, award, e.target.checked)
-              }
+              onChange={(e) => handleAwardChange(category, award, e.target.checked)}
               disabled={readOnly}
+              id={`${category}-${award}`}
             />
-            <label>{award}</label>
+            <label htmlFor={`${category}-${award}`}>{award}</label>
           </div>
         ))}
       </div>
     </div>
   );
-  const handleClose = () => {
-    dispatch(setCurrentNomination(null))
-    router.back()
-  }
 
-  const handleAutoFill = () => {
-    setFormData((prev) => ({
-      ...prev,
-      orgName: "Acadivate Tech Solutions",
-      promoter: "John Doe",
-      ownership: "Pvt Limited",
-      address: "123 Innovation Drive, Tech Park, Mumbai 400001",
-      mobile: "9876543210",
-      state: "Maharashtra",
-      city: "Mumbai",
-      email: "test@acadivate.com",
-      website: "https://acadivate.com",
-      gstin: "27AAAAA0000A1Z5",
-      paymentMode: "Online Banking",
-      agreeTerms: true,
-    }));
+  const renderFileField = (label: string, field: keyof typeof formData) => (
+    <div className={styles["input-group"]}>
+      <label>{label} (PDF Only)</label>
+      <input
+        type="file"
+        name={field}
+        accept="application/pdf"
+        multiple
+        onChange={handleInputChange}
+        disabled={readOnly}
+      />
+      {(formData[field] as File[]).length > 0 && (
+        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {(formData[field] as File[]).map((file, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: '#f1f5f9', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '0.85rem', color: '#334155', maxWidth: '80%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Eye size={16} style={{ cursor: 'pointer', color: '#64748b' }} onClick={() => window.open(URL.createObjectURL(file))} />
+                {!readOnly && <Trash2 size={16} style={{ cursor: 'pointer', color: '#ef4444' }} onClick={() => handleDeleteFile(field, idx)} />}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
-    // Select one award from each category as sample
-    setSelectedAwards({
-      academic: [academicAwards[0]],
-      startup: [startupAwards[0]],
-      rise: [riseAwards[0]],
-      entrepreneur: [entrepreneurAwards[0]],
-    });
-  };
-
-  const handleDownloadPDF = async () => {
-    // Strip File[] fields – they're not serialisable and not needed in the PDF
-    const { researchPublication, bookPublication, researchProject, patentPolicyDocument, ...rest } = formData;
-    const pdfData = {
-      ...rest,
-      academicAwards: selectedAwards.academic,
-      startupAwards: selectedAwards.startup,
-      riseAwards: selectedAwards.rise,
-      entrepreneurAwards: selectedAwards.entrepreneur,
-      totalAmount: payableAmount || formData.totalAmount,
-    };
-    await downloadNominationPDF(pdfData);
-  };
   return (
     <>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-      />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className={styles.container}>
         <div className={styles.hero}>
           <div className={styles["hero-badge"]}>
-            <i className="fas fa-trophy"></i> Nominations Are Now Open
+            <Trophy size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} /> Nominations Are Open
           </div>
-          <h1>
-            <i className="fas fa-award"></i> Acadivate Award Registration
-          </h1>
-          <div className={styles.subhead}>
-            If you wish to nominate for awards, kindly fill in the form below.
-            Select one or more categories.
-          </div>
+          <h1><Award size={40} color="#2563eb" /> Award Registration</h1>
+          <p className={styles.subhead}>
+            Kindly fill in the form below to nominate for awards. Select one or more categories that best represent your achievement.
+          </p>
         </div>
 
         <div className={styles["form-card"]}>
           <div className={styles["form-header"]}>
-            <h2>
-              <i className="fas fa-pen-alt"></i> Nomination Form
-            </h2>
-            <p>
-              Please provide accurate details. Registration fee applies per
-              selected category.
-            </p>
-            
-            {/* {!readOnly && (
-              <button
-                type="button"
-                onClick={handleAutoFill}
-                className={styles["autofill-btn"]}
-                style={{
-                  marginTop: "1rem",
-                  padding: "0.5rem 1rem",
-                  fontSize: "0.8rem",
-                  background: "#eef2ff",
-                  border: "1px solid #c7d2fe",
-                  borderRadius: "6px",
-                  color: "#4338ca",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
-              </button>
-            )} */}
+            <h2><FileText /> Nomination Form</h2>
+            <p>Registration fee applies per selected category. Please provide accurate details.</p>
           </div>
+
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>
-              <div
-                className={`${styles["input-group"]} ${styles["full-width"]}`}
-              >
-                <label>
-                  <i className="fas fa-building"></i> Name of the Organizatio
-                </label>
+              <div className={`${styles["input-group"]} ${styles["full-width"]}`}>
+                <label><Building2 size={16} /> Name of the Organization</label>
                 <input
                   type="text"
                   name="orgName"
                   value={formData.orgName}
                   onChange={handleInputChange}
-                  placeholder="Enter Organization"
+                  placeholder="Enter Organization Name"
                   required
                   disabled={readOnly}
                 />
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-user-tie"></i> Name of the promoter
-                </label>
+                <label><User size={16} /> Name of the promoter</label>
                 <input
                   type="text"
                   name="promoter"
                   value={formData.promoter}
                   onChange={handleInputChange}
-                  placeholder="Enter Promoter"
+                  placeholder="Enter Promoter Name"
                   required
                   disabled={readOnly}
                 />
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-chart-line"></i> Ownership Pattern
-                </label>
+                <label><Globe size={16} /> Ownership Pattern</label>
                 <div className={styles["ownership-group"]}>
-                  {[
-                    "Academcian",
-                    "Scientist",
-                    "Reseach Scholar",
-                    "Proprietary",
-                    "Partnership",
-                    "Pvt Limited",
-                    "Public Limited",
-                    "NGOs",
-                    "Others",
-                  ].map((option) => (
-                    <label key={option}>
+                  {[ "Academcian", "Scientist", "Reseach Scholar", "Proprietary", "Partnership", "Pvt Limited", "Public Limited", "NGOs", "Others" ].map(opt => (
+                    <label key={opt}>
                       <input
                         type="radio"
                         name="ownership"
-                        value={option}
-                        checked={formData.ownership === option}
+                        value={opt}
+                        checked={formData.ownership === opt}
                         onChange={handleInputChange}
                         disabled={readOnly}
-                      />{" "}
-                      {option}
+                      /> {opt}
                     </label>
                   ))}
                 </div>
               </div>
-              <div
-                className={`${styles["input-group"]} ${styles["full-width"]}`}
-              >
-                <label>
-                  <i className="fas fa-map-marker-alt"></i> Address of
-                  Correspondence
-                </label>
+
+              <div className={`${styles["input-group"]} ${styles["full-width"]}`}>
+                <label><MapPin size={16} /> Address of Correspondence</label>
                 <textarea
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  placeholder="Full address"
+                  placeholder="Enter full correspondence address"
                   required
                   disabled={readOnly}
+                  rows={3}
                 ></textarea>
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-mobile-alt"></i> Mobile Number
-                </label>
+                <label><Phone size={16} /> Mobile Number</label>
                 <input
                   type="tel"
                   name="mobile"
                   value={formData.mobile}
                   onChange={handleInputChange}
-                  placeholder="Enter Mobile Number"
+                  placeholder="Enter mobile number"
                   required
                   disabled={readOnly}
                 />
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-globe"></i> State
-                </label>
-                <select
-                  name="state"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  required
-                  disabled={readOnly}
-                >
-                  <option value="" disabled>
-                    Select State
-                  </option>
-                  <option>Maharashtra</option>
-                  <option>Delhi</option>
-                  <option>Karnataka</option>
-                  <option>Tamil Nadu</option>
-                  <option>Gujarat</option>
-                  <option>West Bengal</option>
-                  <option>Uttar Pradesh</option>
-                  <option>Rajasthan</option>
-                  <option>Others</option>
-                </select>
-              </div>
-              <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-city"></i> City
-                </label>
-                <select
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
-                  disabled={readOnly}
-                >
-                  <option value="" disabled>
-                    Select City
-                  </option>
-                  <option>Mumbai</option>
-                  <option>Delhi</option>
-                  <option>Bengaluru</option>
-                  <option>Chennai</option>
-                  <option>Kolkata</option>
-                  <option>Hyderabad</option>
-                  <option>Pune</option>
-                  <option>Ahmedabad</option>
-                  <option>Others</option>
-                </select>
-              </div>
-              <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-envelope"></i> Email id
-                </label>
+                <label><Mail size={16} /> Email ID</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Enter Email"
+                  placeholder="Enter email address"
                   required
                   disabled={readOnly}
                 />
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-link"></i> Website URL
-                </label>
-                <input
-                  type="string"
-                  name="website"
-                  value={formData.website}
-                  onChange={handleInputChange}
-                  placeholder="Enter Website URL"
-                  disabled={readOnly}
-                />
+                <label><Globe size={16} /> State</label>
+                <select name="state" value={formData.state} onChange={handleInputChange} required disabled={readOnly}>
+                  <option value="" disabled>Select State</option>
+                  <option>Maharashtra</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>Others</option>
+                </select>
               </div>
+
               <div className={styles["input-group"]}>
-                <label>
-                  <i className="fas fa-file-invoice"></i> GSTIN
-                </label>
-                <input
-                  type="text"
-                  name="gstin"
-                  value={formData.gstin}
-                  onChange={handleInputChange}
-                  placeholder="Enter GSTIN"
-                  disabled={readOnly}
-                />
+                <label><Building size={16} /> City</label>
+                <select name="city" value={formData.city} onChange={handleInputChange} required disabled={readOnly}>
+                  <option value="" disabled>Select City</option>
+                  <option>Mumbai</option><option>Delhi</option><option>Bengaluru</option><option>Chennai</option><option>Hyderabad</option><option>Others</option>
+                </select>
               </div>
-              {/* PDF Attachment Fields */}
-              <div
-                className={styles["input-group"]}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <label>Research Publication (PDF, multiple allowed)</label>
-                <input
-                  type="file"
-                  name="researchPublication"
-                  accept="application/pdf"
-                  multiple
-                  onChange={handleInputChange}
-                  disabled={readOnly}
-                />
-                {formData.researchPublication.length > 0 && (
-                  <ul
-                    style={{
-                      margin: "0.5rem 0 0 0",
-                      padding: 0,
-                      listStyle: "none",
-                    }}
-                  >
-                    {formData.researchPublication.map((file, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                          marginBottom: "0.25rem",
-                          border: "1px solid #b3b3ff",
-                          borderRadius: "8px",
-                          padding: "0.3rem 0.7rem",
-                          background: "#f8faff",
-                        }}
-                      >
-                        <span
-                          style={{
-                            flex: 1,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {file.name}
-                        </span>
 
-                        <Eye
-                          size={18}
-                          color="#222"
-                          onClick={() =>
-                            window.open(URL.createObjectURL(file), "_blank")
-                          }
-                        />
-
-                        <Trash2
-                          size={18}
-                          color="red"
-                          onClick={() =>
-                            handleDeleteFile("researchPublication", idx)
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <div className={styles["input-group"]}>
+                <label><Globe size={16} /> Website URL</label>
+                <input type="text" name="website" value={formData.website} onChange={handleInputChange} placeholder="https://" disabled={readOnly} />
               </div>
-              <div
-                className={styles["input-group"]}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <label>Book Publication (PDF, multiple allowed)</label>
-                <input
-                  type="file"
-                  name="bookPublication"
-                  accept="application/pdf"
-                  multiple
-                  onChange={handleInputChange}
-                  disabled={readOnly}
-                />
-                {formData.bookPublication.length > 0 && (
-                  <ul
-                    style={{
-                      margin: "0.5rem 0 0 0",
-                      padding: 0,
-                      listStyle: "none",
-                    }}
-                  >
-                    {formData.bookPublication.map((file, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                          marginBottom: "0.25rem",
-                          border: "1px solid #b3b3ff",
-                          borderRadius: "8px",
-                          padding: "0.3rem 0.7rem",
-                          background: "#f8faff",
-                        }}
-                      >
-                        <span
-                          style={{
-                            flex: 1,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {file.name}
-                        </span>
 
-                        <Eye
-                          size={18}
-                          color="#222"
-                          onClick={() =>
-                            window.open(URL.createObjectURL(file), "_blank")
-                          }
-                        />
-
-                        <Trash2
-                          size={18}
-                          color="red"
-                          onClick={() =>
-                            handleDeleteFile("bookPublication", idx)
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              <div className={styles["input-group"]}>
+                <label><FileText size={16} /> GSTIN</label>
+                <input type="text" name="gstin" value={formData.gstin} onChange={handleInputChange} placeholder="Enter GSTIN" disabled={readOnly} />
               </div>
-              <div
-                className={styles["input-group"]}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <label>Research Project (PDF, multiple allowed)</label>
-                <input
-                  type="file"
-                  name="researchProject"
-                  accept="application/pdf"
-                  multiple
-                  onChange={handleInputChange}
-                  disabled={readOnly}
-                />
-                {formData.researchProject.length > 0 && (
-                  <ul
-                    style={{
-                      margin: "0.5rem 0 0 0",
-                      padding: 0,
-                      listStyle: "none",
-                    }}
-                  >
-                    {formData.researchProject.map((file, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                          marginBottom: "0.25rem",
-                          border: "1px solid #b3b3ff",
-                          borderRadius: "8px",
-                          padding: "0.3rem 0.7rem",
-                          background: "#f8faff",
-                        }}
-                      >
-                        <span
-                          style={{
-                            flex: 1,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {file.name}
-                        </span>
 
-                        <Eye
-                          size={18}
-                          color="#222"
-                          onClick={() =>
-                            window.open(URL.createObjectURL(file), "_blank")
-                          }
-                        />
-
-                        <Trash2
-                          size={18}
-                          color="red"
-                          onClick={() =>
-                            handleDeleteFile("researchProject", idx)
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div
-                className={styles["input-group"]}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <label>
-                  Patent and Policy Document Sanction/Complication (PDF,
-                  multiple allowed)
-                </label>
-                <input
-                  type="file"
-                  name="patentPolicyDocument"
-                  accept="application/pdf"
-                  multiple
-                  onChange={handleInputChange}
-                  disabled={readOnly}
-                />
-                {formData.patentPolicyDocument.length > 0 && (
-                  <ul
-                    style={{
-                      margin: "0.5rem 0 0 0",
-                      padding: 0,
-                      listStyle: "none",
-                    }}
-                  >
-                    {formData.patentPolicyDocument.map((file, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                          marginBottom: "0.25rem",
-                          border: "1px solid #b3b3ff",
-                          borderRadius: "8px",
-                          padding: "0.3rem 0.7rem",
-                          background: "#f8faff",
-                        }}
-                      >
-                        <span
-                          style={{
-                            flex: 1,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {file.name}
-                        </span>
-
-                        <Eye
-                          size={18}
-                          color="#222"
-                          onClick={() =>
-                            window.open(URL.createObjectURL(file), "_blank")
-                          }
-                        />
-
-                        <Trash2
-                          size={18}
-                          color="red"
-                          onClick={() =>
-                            handleDeleteFile("patentPolicyDocument", idx)
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              {renderFileField("Research Publication", "researchPublication")}
+              {renderFileField("Book Publication", "bookPublication")}
+              {renderFileField("Research Project", "researchProject")}
+              {renderFileField("Patent Policy", "patentPolicyDocument")}
             </div>
 
-            {renderAwardSection(
-              "Academic and Research Awards",
-              "fa-graduation-cap",
-              academicAwards,
-              "academic",
-            )}
-            {renderAwardSection(
-              "Start-up Awards",
-              "fa-rocket",
-              startupAwards,
-              "startup",
-            )}
-            {renderAwardSection(
-              "Rise Awards",
-              "fa-chart-line",
-              riseAwards,
-              "rise",
-            )}
-            {renderAwardSection(
-              "Entrepreneur Awards (Top Honours)",
-              "fa-crown",
-              entrepreneurAwards,
-              "entrepreneur",
-            )}
+            <hr style={{ margin: '2rem 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
+
+            {renderAwardSection("Academic Awards", <Trophy size={20} color="#fbbf24" />, academicAwards, "academic")}
+            {renderAwardSection("Startup Awards", <Globe size={20} color="#3b82f6" />, startupAwards, "startup")}
+            {renderAwardSection("Rise Awards", <Award size={20} color="#10b981" />, riseAwards, "rise")}
+            {renderAwardSection("Entrepreneur Awards", <User size={20} color="#8b5cf6" />, entrepreneurAwards, "entrepreneur")}
 
             <div className={styles["fee-summary"]}>
               <div className={styles["fee-block"]}>
                 <div className={styles["fee-item"]}>
-                  <strong>Registration Fees:</strong> INR 5500 (Exclusive GST
-                  18% per category + handling charges)
+                  <span>Categories Selected</span>
+                  <strong>{Object.values(selectedAwards).flat().length}</strong>
+                </div>
+                <div className={styles["fee-item"]}>
+                  <span>Fee per Category</span>
+                  <strong>₹{BASE_FEE}</strong>
+                </div>
+                <div className={styles["fee-item"]}>
+                  <span>GST (18%)</span>
+                  <strong>₹{Math.round(Object.values(selectedAwards).flat().length * BASE_FEE * GST_RATE)}</strong>
                 </div>
               </div>
               <div className={styles.payable}>
-                Payable Amount: INR {payableAmount.toLocaleString("en-IN")}
+                <span>Total Payable Amount</span>
+                <strong>₹{payableAmount}</strong>
               </div>
             </div>
 
-            <div className={`${styles["input-group"]} ${styles["full-width"]}`}>
-              <label>
-                <i className="fas fa-credit-card"></i> Mode of Payment
-              </label>
-              <div className={styles["mode-row"]}>
-                {[
-                  "Online Banking",
-                  "Credit/Debit Card",
-                  "UPI",
-                  "Bank Transfer",
-                ].map((mode) => (
-                  <label key={mode}>
-                    <input
-                      type="radio"
-                      name="paymentMode"
-                      value={mode}
-                      checked={formData.paymentMode === mode}
-                      onChange={handleInputChange}
-                      disabled={readOnly}
-                    />{" "}
-                    {mode}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.terms}>
+            <div style={{ margin: '1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <input
                 type="checkbox"
-                name="agreeTerms"
+                id="terms"
                 checked={formData.agreeTerms}
                 onChange={handleInputChange}
+                name="agreeTerms"
                 required
                 disabled={readOnly}
+                style={{ width: '18px', height: '18px', accentColor: '#2563eb' }}
               />
-              <label style={{ textTransform: "none", fontWeight: 500 }}>
-                I agree to Terms & Conditions.
+              <label htmlFor="terms" style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
+                I agree to the terms and conditions of Acadivate Awards.
               </label>
             </div>
 
-            <div className={styles['btn-row']}>
-              {!readOnly && (
-                <button type="submit" className={styles['btn-submit']} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin"></i> {
-                        loadingStep === "submitting" ? "Creating Nomination..." :
-                        loadingStep === "paying" ? "Waiting for Payment..." :
-                        loadingStep === "uploading" ? "Uploading Documents..." :
-                        "Processing..."
-                      }
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-paper-plane"></i> {isEditMode ? "Update Nomination" : "Submit Nomination"}
-                    </>
-
-                  )}
-                </button>
-
-              )}
-
-              <button type="button" className={styles['btn-pdf']} onClick={handleDownloadPDF}>
-                <FileDown size={18} /> Download PDF
+            <div className={styles["btn-row"]}>
+              <button type="submit" className={styles["btn-submit"]} disabled={loading || readOnly}>
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} /> 
+                    {loadingStep === "paying" ? "Awaiting Payment..." : "Processing..."}
+                  </>
+                ) : (
+                  <>Complete Registration <Check size={20} /></>
+                )}
               </button>
 
-              <button type="button" className={styles['btn-close']} onClick={handleClose}>
-                <i className="fas fa-times-circle"></i> Close
+              <button type="button" onClick={handleDownloadPDF} className={styles["btn-pdf"]}>
+                <Download size={18} /> Download Form PDF
+              </button>
+
+              <button type="button" onClick={() => { dispatch(setCurrentNomination(null)); router.back(); }} className={styles["btn-close"]}>
+                Close
               </button>
             </div>
           </form>
         </div>
-
-        {toast.show && (
-          <div
-            className={`${styles["success-toast"]} ${toast.show ? styles.show : ""}`}
-            style={{ background: toast.isError ? "#c73e2f" : "#2b6e3c" }}
-          >
-            <i className="fas fa-check-circle"></i> <span>{toast.message}</span>
-          </div>
-        )}
       </div>
+
+      {toast.show && (
+        <div 
+          style={{
+            position: 'fixed', bottom: '2rem', right: '2rem', 
+            background: toast.isError ? '#ef4444' : '#1e293b',
+            color: 'white', padding: '1rem 1.5rem', borderRadius: '12px',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            zIndex: 1000, display: 'flex', alignItems: 'center', gap: '0.75rem',
+            fontWeight: 600, animation: 'slideIn 0.3s ease'
+          }}
+        >
+          {toast.isError ? <X size={20} /> : <Check size={20} color="#10b981" />}
+          {toast.message}
+        </div>
+      )}
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
     </>
   );
 };
