@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
       rankings,
       leads,
       categories,
-      users
+      users,
+      orders,
+      successfulPayments
     ] = await Promise.all([
       db.collection('events').countDocuments(),
       db.collection('awards').countDocuments(),
@@ -23,6 +25,8 @@ export async function GET(req: NextRequest) {
       db.collection('leads').countDocuments(),
       db.collection('categories').countDocuments(),
       db.collection('users').countDocuments(),
+      db.collection('orders').countDocuments(),
+      db.collection('orders').countDocuments({ status: 'success' }),
     ]);
 
     const stats = {
@@ -33,6 +37,8 @@ export async function GET(req: NextRequest) {
       leads,
       categories,
       registrations: users, // Map users collection to registrations module ID
+      orders,
+      payments: successfulPayments
     };
 
     return NextResponse.json({ success: true, stats });

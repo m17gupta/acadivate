@@ -115,7 +115,7 @@ export const createNominationThunk = createAsyncThunk<
 
 export const updateNominationThunk = createAsyncThunk<
   NominationFormType,
-  NominationFormType,
+  Partial<NominationFormType>,
   { rejectValue: string }
 >("nominations/update", async (payload, { rejectWithValue }) => {
   try {

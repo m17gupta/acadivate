@@ -80,6 +80,7 @@ const FileManager = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-bg-soft border-b border-border-light">
+                <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Sr.No</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Nomination ID</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Org Name</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Promoter</th>
@@ -101,6 +102,14 @@ const FileManager = () => {
               ) : allNomination.length > 0 ? (
                 allNomination.map((nom, idx) => (
                   <tr key={`${nom._id}-${idx}`} className="hover:bg-bg-soft/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-pale text-primary">
+                         
+                        </div>
+                        <div className="font-bold text-navy truncate max-w-[150px]" title={`${idx+1}`}>{idx+1}</div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-pale text-primary">

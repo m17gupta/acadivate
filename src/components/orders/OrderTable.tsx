@@ -9,7 +9,7 @@ import { CreditCard, Loader2 } from 'lucide-react';
 const OrderTable = ({ allOrders, loading }: { allOrders: any[], loading: boolean }) => {
   const { user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === "admin";
-
+   const {allNomination}= useSelector((state: RootState)=>state.nominations)
   const formatDate = (dateString: string) => {
     if (!dateString) return '—';
     try {
@@ -62,6 +62,7 @@ const OrderTable = ({ allOrders, loading }: { allOrders: any[], loading: boolean
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-bg-soft border-b border-border-light">
+                <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Sr.No.</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Payment ID</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Order ID</th>
                 <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-text-subtle">Amount</th>
@@ -79,8 +80,18 @@ const OrderTable = ({ allOrders, loading }: { allOrders: any[], loading: boolean
                   </td>
                 </tr>
               ) : allOrders.length > 0 ? (
-                allOrders.map((order, idx) => (
+                allOrders.map((order, idx) => {
+                   const paymentMode = allNomination.find((item)=>item?._id===order?.formId)?.paymentMode
+                  return(
                   <tr key={order._id || idx} className="hover:bg-bg-soft/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-pale text-primary">
+                        {idx+1}
+                        </div>
+                        
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-pale text-primary">
@@ -96,7 +107,7 @@ const OrderTable = ({ allOrders, loading }: { allOrders: any[], loading: boolean
                       <div className="font-bold text-navy">₹{(order.amount || 0).toLocaleString()}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-text-muted text-sm uppercase">{order.paymentMethod || '—'}</div>
+                      <div className="text-text-muted text-sm uppercase">{paymentMode || '—'}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={cn(
@@ -111,7 +122,7 @@ const OrderTable = ({ allOrders, loading }: { allOrders: any[], loading: boolean
                       <div className="text-text-muted text-xs">{formatDate(order.createdAt)}</div>
                     </td>
                   </tr>
-                ))
+                )})
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-20 text-center">

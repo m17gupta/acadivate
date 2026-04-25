@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const ordersCollection = await getCollection("orders");
     const updatedOrder = await ordersCollection.updateOne(
       { id: orderId },
-      { $set: { paymentStatus: "success", paymentId } },
+      { $set: { status: "success", paymentId } },
     );
 
     // 🔥 Update your DB here
