@@ -40,11 +40,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Return success (excluding sensitive data)
-    // console.log("useess", user)
+    console.log("useess", user)
     const { password: _, ...userWithoutPassword } = user;
     return NextResponse.json({
       message: "Login successful",
       user: {
+        userId: userWithoutPassword._id,
         userName: userWithoutPassword.userName,
         role: userWithoutPassword.role,
       },

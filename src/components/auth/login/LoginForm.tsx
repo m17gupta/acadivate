@@ -109,11 +109,16 @@ function LoginForm({isadmin}:props) {
         })
       ).unwrap();
        console.log("response login",response)
+       debugger
       if (response.status === 200) {
         toast.success('Successfully logged in!', {
           description: `Welcome back, ${response.user?.userName ?? 'user'}`,
-        });
-        router.push("/") 
+        });  
+        if(response.user?.role== "admin"){
+          router.push("/") 
+        }else{
+          router.push("/dashboard/userAccount")
+        } 
       } else {
         toast.error('Login failed', {
           description: 'Unknown error occurred',

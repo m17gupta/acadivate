@@ -3,7 +3,8 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { 
-  ArrowRight, LogOut, Settings, Bell, ChevronUp, User, LayoutGrid
+  ArrowRight, LogOut, Settings, Bell, ChevronUp, User, LayoutGrid,
+  CreditCard, FileText, CalendarRange, BadgeCheck
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { dashboardNavItems } from './dashboardModules';
@@ -34,8 +35,18 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push('/login');
+    router.push('/');
   };
+
+  const isAdmin = isMounted && (user?.role === 'admin' || user?.role === 'SUPERADMIN');
+
+  const nonAdminNavItems = [
+    { label: 'Events', href: '/dashboard/events', icon: CalendarRange },
+    { label: 'Nomination', href: '/dashboard/nominations', icon: BadgeCheck },
+    { label: 'Profile', href: '/dashboard/userAccount', icon: User },
+    { label: 'Payments', href: '/dashboard/payments', icon: CreditCard },
+    { label: 'Files', href: '/dashboard/files', icon: FileText },
+  ];
 
   return (
     <aside className="sticky top-0 hidden h-screen w-72 flex-col border-r border-border-light bg-white lg:flex shrink-0 overflow-visible">
@@ -62,38 +73,42 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
                 Content Modules
               </p>
               <div className="space-y-2">
-                <Link
-                  href="/dashboard"
-                  className={cn(
-                    'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all',
-                    currentPath === '/dashboard'
-                      ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary text-white shadow-sh-md'
-                      : 'text-navy hover:bg-bg-soft'
-                  )}
-                >
-                  <span className="flex items-center gap-3">
-                    <LayoutGrid size={18} className={currentPath === '/dashboard' ? 'text-gold-3' : 'text-primary-dark'} />
-                    <span className="text-sm font-semibold">Dashboard</span>
-                  </span>
-                </Link>
+                {isAdmin && (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all',
+                        currentPath === '/dashboard'
+                          ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary text-white shadow-sh-md'
+                          : 'text-navy hover:bg-bg-soft'
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <LayoutGrid size={18} className={currentPath === '/dashboard' ? 'text-gold-3' : 'text-primary-dark'} />
+                        <span className="text-sm font-semibold">Dashboard</span>
+                      </span>
+                    </Link>
 
-                {/* Leads Inbox - Integrated into Content Modules */}
-                <Link
-                  href="/dashboard/leads/inbox"
-                  className={cn(
-                    'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all',
-                    currentPath === '/dashboard/leads/inbox'
-                      ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary text-white shadow-sh-md'
-                      : 'text-navy hover:bg-bg-soft'
-                  )}
-                >
-                  <span className="flex items-center gap-3">
-                    <LayoutGrid size={18} className={currentPath === '/dashboard/leads/inbox' ? 'text-gold-3' : 'text-primary-dark'} />
-                    <span className="text-sm font-semibold">Contact Form</span>
-                  </span>
-                </Link>
+                    {/* Leads Inbox - Integrated into Content Modules */}
+                    <Link
+                      href="/dashboard/leads/inbox"
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all',
+                        currentPath === '/dashboard/leads/inbox'
+                          ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary text-white shadow-sh-md'
+                          : 'text-navy hover:bg-bg-soft'
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <LayoutGrid size={18} className={currentPath === '/dashboard/leads/inbox' ? 'text-gold-3' : 'text-primary-dark'} />
+                        <span className="text-sm font-semibold">Contact Form</span>
+                      </span>
+                    </Link>
+                  </>
+                )}
 
-                {dashboardNavItems.map((link) => {
+                {(isAdmin ? dashboardNavItems : nonAdminNavItems).map((link) => {
                   const active = isActive(link.href);
  
                   return (

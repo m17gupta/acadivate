@@ -95,39 +95,39 @@ export const nominationsModule: DashboardModuleConfig = {
   ],
   tableTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.85fr)',
   initialRows: [
-    {
-      id: '660000000000000000000011',
-      values: {
-        nomineeName: 'Dr. Ananya Sharma',
-        award: 'Academic Excellence Awards 2025',
-        category: 'Research',
-        submittedOn: '2025-10-12',
-        status: 'Under Review',
-        note: 'Requested supporting documents from the department.',
-      },
-    },
-    {
-      id: '660000000000000000000012',
-      values: {
-        nomineeName: 'Prof. Omar Al Hadi',
-        award: 'Lifetime Achievement Awards',
-        category: 'Leadership',
-        submittedOn: '2025-11-04',
-        status: 'Shortlisted',
-        note: 'Approved by the first review panel.',
-      },
-    },
-    {
-      id: '660000000000000000000013',
-      values: {
-        nomineeName: 'Dr. Mei Lin',
-        award: 'Young Researcher Awards',
-        category: 'Innovation',
-        submittedOn: '2025-12-01',
-        status: 'New',
-        note: 'Awaiting committee review.',
-      },
-    },
+    // {
+    //   id: '660000000000000000000011',
+    //   values: {
+    //     nomineeName: 'Dr. Ananya Sharma',
+    //     award: 'Academic Excellence Awards 2025',
+    //     category: 'Research',
+    //     submittedOn: '2025-10-12',
+    //     status: 'Under Review',
+    //     note: 'Requested supporting documents from the department.',
+    //   },
+    // },
+    // {
+    //   id: '660000000000000000000012',
+    //   values: {
+    //     nomineeName: 'Prof. Omar Al Hadi',
+    //     award: 'Lifetime Achievement Awards',
+    //     category: 'Leadership',
+    //     submittedOn: '2025-11-04',
+    //     status: 'Shortlisted',
+    //     note: 'Approved by the first review panel.',
+    //   },
+    // },
+    // {
+    //   id: '660000000000000000000013',
+    //   values: {
+    //     nomineeName: 'Dr. Mei Lin',
+    //     award: 'Young Researcher Awards',
+    //     category: 'Innovation',
+    //     submittedOn: '2025-12-01',
+    //     status: 'New',
+    //     note: 'Awaiting committee review.',
+    //   },
+    // },
   ],
   statusToneMap: {
     New: 'neutral',

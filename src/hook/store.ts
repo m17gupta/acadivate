@@ -11,6 +11,7 @@ import categoryReducer from './categories/categorySlice';
 import registrationReducer from './registrations/registrationSlice';
 import sliderReducer from './sliders/sliderSlice';
 import dashboardStatsReducer from './dashboard/dashboardStatsSlice';
+import orderReducer from './orders/orderSlice';
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     registrations: registrationReducer,
     sliders: sliderReducer,
     dashboardStats: dashboardStatsReducer,
+    orders: orderReducer,
   },
 });
 

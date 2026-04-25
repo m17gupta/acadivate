@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Image as ImageIcon, PencilLine, Plus, RotateCcw, Trash2, Upload } from 'lucide-react';
+import { Image as ImageIcon, PencilLine, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '../ui/Button';
@@ -34,15 +34,14 @@ import {
 } from './dashboardModuleRegistry';
 import GetAllNomination from '../forms/Nomination/GetAllNomination';
 import ShowNominationtable from '../forms/Nomination/ShowNominationtable';
+import DashBoardHeader from './header/DashBoardHeader';
+import DashboardSummary from './header/DashboardSummary';
 
 
 
-const summaryToneDotClasses: Record<DashboardStatusTone, string> = {
-  neutral: 'bg-primary-dark',
-  success: 'bg-sage',
-  warning: 'bg-gold',
-  danger: 'bg-crimson',
-};
+
+
+
 
 export const accentClasses: Record<DashboardAccent, string> = {
   primary: 'from-primary-deep via-primary-dark to-primary',
@@ -81,6 +80,7 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
     (state: RootState) => selectDashboardModuleSnapshot(state, moduleId),
     shallowEqual
   );
+  const user= useSelector((state:RootState)=>state.auth.user)
   const records = moduleSnapshot.records.map((record) => moduleCrud.mapRecordToRow(record));
   const summaryCards = config.buildSummary(records);
   const scrollToForm = () => {
@@ -299,86 +299,38 @@ export function DashboardModulePage({ moduleId }: { moduleId: DashboardModuleId 
             `bg-linear-to-r ${accentClasses[config.accent]}`
           )}
         >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/75">
-                Dedicated module
-              </p>
-              <h1 className="mt-2 flex items-center gap-3 text-3xl font-black tracking-tight lg:text-4xl">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white">
-                  <config.icon size={22} />
-                </span>
-                {config.title}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/78 lg:text-base">
-                {config.subtitle}
-              </p>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/72">
-                {config.intro}
-              </p>
-            </div>
+          <DashBoardHeader
+            config={config}
+            records={records}
+            openForm={openForm}
+            isFormOpen={isFormOpen}
+            formId={formId}
+          />
 
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-white">
-                {records.length} records
-              </span>
-              <Button
-                type="button"
-                variant="gold"
-                size="sm"
-                className="rounded-xl bg-white text-navy hover:bg-gold-pale"
-                onClick={openForm}
-                aria-expanded={isFormOpen}
-                aria-controls={formId}
-              >
-                <Plus size={14} />
-                {config.actionLabel}
-              </Button>
-            </div>
-          </div>
         </div>
 
-        <div className="grid gap-4 px-6 py-6 lg:grid-cols-4 lg:px-8">
-          {summaryCards.map((summary) => (
-            <div
-              key={summary.label}
-              className="rounded-[1.5rem] border border-border-light bg-bg-soft/70 px-4 py-4 shadow-sh-xs"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-subtle">
-                  {summary.label}
-                </p>
-                <span
-                  className={cn(
-                    'h-2.5 w-2.5 rounded-full',
-                    summaryToneDotClasses[summary.tone]
-                  )}
-                />
-              </div>
-              <div className="mt-3 flex items-end gap-3">
-                <span className="text-3xl font-black text-navy">{summary.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DashboardSummary summaryCards={summaryCards} />
+
       </article>
 
-      <DashboardModuleForm
-        config={config}
-        formId={formId}
-        formRef={formRef}
-        draft={draft}
-        editingId={editingId}
-        isOpen={isFormOpen}
-        fileInputRefs={fileInputRefs}
-        onToggleOpen={() => setIsFormOpen((current) => !current)}
-        onReset={resetForm}
-        onFieldChange={handleFieldChange}
-        onFileChange={handleFileChange}
-        onClearFileField={clearFileField}
-        onSubmit={handleSubmit}
-        onUpdate={handleUpdate}
-      />
+      {config.fields.length > 0 && (
+        <DashboardModuleForm
+          config={config}
+          formId={formId}
+          formRef={formRef}
+          draft={draft}
+          editingId={editingId}
+          isOpen={isFormOpen}
+          fileInputRefs={fileInputRefs}
+          onToggleOpen={() => setIsFormOpen((current) => !current)}
+          onReset={resetForm}
+          onFieldChange={handleFieldChange}
+          onFileChange={handleFileChange}
+          onClearFileField={clearFileField}
+          onSubmit={handleSubmit}
+          onUpdate={handleUpdate}
+        />
+      )}
 
       <DashboardModuleList
         config={config}

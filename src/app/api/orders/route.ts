@@ -67,3 +67,37 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const role = searchParams.get('role');
+    const idsString = searchParams.get('ids');
+    const ids = idsString ? idsString.split(',') : [];
+
+    const db = await getDb();
+    const orderCollection = db.collection('orders');
+
+    let query = {};
+    if (role !== 'admin') {
+      // For non-admins, filter by nomination IDs (formId)
+      query = { formId: { $in: ids } };
+    }
+
+    const orders = await orderCollection
+      .find(query)
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json({
+      success: true,
+      items: orders,
+    });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch orders' },
+      { status: 500 }
+    );
+  }
+}

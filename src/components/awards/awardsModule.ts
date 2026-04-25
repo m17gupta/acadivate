@@ -70,39 +70,39 @@ export const awardsModule: DashboardModuleConfig = {
   tableTemplateColumns:
     'minmax(0, 1.6fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.85fr)',
   initialRows: [
-    {
-      id: '660000000000000000000021',
-      values: {
-        title: 'Academic Excellence Awards 2025',
-        cycle: '2025',
-        category: 'Institutional',
-        nominationDeadline: '2025-11-20',
-        status: 'Review',
-        imageUrl: ['/images/awards/excellence.jpg'],
-      },
-    },
-    {
-      id: '660000000000000000000022',
-      values: {
-        title: 'Lifetime Achievement Awards',
-        cycle: '2026',
-        category: 'Recognition',
-        nominationDeadline: '2026-03-15',
-        status: 'Published',
-        imageUrl: ['/images/awards/lifetime.jpg'],
-      },
-    },
-    {
-      id: '660000000000000000000023',
-      values: {
-        title: 'Young Researcher Awards',
-        cycle: '2026',
-        category: 'Innovation',
-        nominationDeadline: '2026-06-10',
-        status: 'Open',
-        imageUrl: ['/images/awards/young-researcher.jpg'],
-      },
-    },
+    // {
+    //   id: '660000000000000000000021',
+    //   values: {
+    //     title: 'Academic Excellence Awards 2025',
+    //     cycle: '2025',
+    //     category: 'Institutional',
+    //     nominationDeadline: '2025-11-20',
+    //     status: 'Review',
+    //     imageUrl: ['/images/awards/excellence.jpg'],
+    //   },
+    // },
+    // {
+    //   id: '660000000000000000000022',
+    //   values: {
+    //     title: 'Lifetime Achievement Awards',
+    //     cycle: '2026',
+    //     category: 'Recognition',
+    //     nominationDeadline: '2026-03-15',
+    //     status: 'Published',
+    //     imageUrl: ['/images/awards/lifetime.jpg'],
+    //   },
+    // },
+    // {
+    //   id: '660000000000000000000023',
+    //   values: {
+    //     title: 'Young Researcher Awards',
+    //     cycle: '2026',
+    //     category: 'Innovation',
+    //     nominationDeadline: '2026-06-10',
+    //     status: 'Open',
+    //     imageUrl: ['/images/awards/young-researcher.jpg'],
+    //   },
+    // },
   ],
   statusToneMap: {
     Draft: 'neutral',

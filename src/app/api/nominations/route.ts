@@ -20,9 +20,12 @@ function getObjectId(id: string) {
 
 async function GET(req: NextRequest) {
   try {
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     const slug = searchParams.get('slug');
+    const userId = searchParams.get('userId');
+    const role = searchParams.get('role');
     const collection = await getCollection();
 
     if (id) {
@@ -57,7 +60,12 @@ async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, item });
     }
 
-    const items = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    let query = {};
+    if (role !== 'admin' && userId) {
+      query = { submittedById: userId };
+    }
+
+    const items = await collection.find(query).sort({ createdAt: -1 }).toArray();
     return NextResponse.json({ success: true, items });
   } catch (error) {
     console.error('Error fetching nominations:', error);

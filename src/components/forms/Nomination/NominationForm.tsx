@@ -31,7 +31,8 @@ import { useRouter } from 'next/navigation';
 import { setCurrentNomination } from '@/src/hook/nominations/nominationSlice';
 import { academicAwards, entrepreneurAwards, riseAwards, startupAwards } from './util';
 import Script from 'next/script';
-import { OrderType } from "../../orders/OrderType";
+import { OrderType } from '@/src/hook/orders/orderType';
+import { createOrderThunk } from '@/src/hook/orders/orderThunk';
 
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
@@ -46,7 +47,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   const dispatch = useDispatch<AppDispatch>();
   const currentNomination = useSelector((state: RootState) => state.nominations.currentNomination);
   const isEditMode = !!currentNomination?._id;
-
+   const user=useSelector((state: RootState)=>state.auth?.user);
   const [formData, setFormData] = useState({
     orgName: "",
     promoter: "",
@@ -173,12 +174,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               formId: data._id,
               status: "success",
             };
-            const res = await fetch("/api/orders", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(orderData),
-            });
-            const result = await res.json();
+            const result = await saveOrderData(orderData);
+
+            console.log(" order created successfully result--->",result)
             if (result.success) {
               showToast("Payment successful");
               resolve({ success: true });
@@ -207,6 +205,16 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       const rzp1 = new (window as any).Razorpay(options);
       rzp1.open();
     });
+  };
+
+  const saveOrderData = async (orderData: OrderType) => {
+    try {
+      const response = await dispatch(createOrderThunk(orderData)).unwrap();
+      return { success: true, item: response };
+    } catch (err) {
+      console.error("Error saving order data:", err);
+      return { success: false };
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,6 +249,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         patentPolicyDocument: [],
         status: isEditMode ? currentNomination?.status : "pending",
         totalAmount: payableAmount,
+        submittedById:user?.userId
       };
 
       let response: any;
@@ -249,6 +258,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       } else {
         response = await dispatch(createNominationThunk(formDataObj)).unwrap();
       }
+      console.log("response--->",response)
 
       if (response._id) {
         let paymentSuccessful = true;
@@ -266,37 +276,18 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
             patentPolicyDocument: formData.patentPolicyDocument,
             pathName: `/nomination-form/${response._id}`,
           });
+          console.log("uploadResult--->",uploadResult)
           if (uploadResult.success) {
             const updatedNomination = { ...response, ...uploadResult.data };
-            await dispatch(updateNominationThunk(updatedNomination)).unwrap();
-            
+            console.log("updatedNomination",updatedNomination)
+           const responseUpdate=  await dispatch(updateNominationThunk(updatedNomination)).unwrap();
+            console.log("responseUpdate",responseUpdate)
             // Send Email Notification
-            setLoadingStep("sending_email");
-            try {
-              const emailRes = await fetch("/api/send-email", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  ...updatedNomination,
-                  academicAwards: selectedAwards.academic,
-                  startupAwards: selectedAwards.startup,
-                  riseAwards: selectedAwards.rise,
-                  entrepreneurAwards: selectedAwards.entrepreneur,
-                }),
-              });
-              const emailData = await emailRes.json();
-              if (emailData.success) {
-                console.log("Email sent successfully");
-              } else {
-                console.error("Email API returned error:", emailData.error);
-                showToast("Nomination saved, but email notification failed.", true);
-              }
-            } catch (emailError) {
-              console.error("Failed to send notification email:", emailError);
-              showToast("Network error while sending email notification.", true);
-            }
-
+           const responseMail= await sendEmailNotification(updatedNomination);
+             console.log("responseMail",responseMail)
             showToast(isEditMode ? "Updated successfully!" : "Submitted successfully!");
+
+            router.back()
           } else {
             showToast("Data saved, but file upload failed.", true);
           }
@@ -313,13 +304,44 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   };
 
   const uploadFiles = async (data: any) => {
+    debugger
     const fd = new FormData();
     fd.append("pathName", data.pathName);
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) value.forEach((file: File) => fd.append(key, file));
     });
     const res = await fetch("/api/uploadfile", { method: "POST", body: fd });
-    return await res.json();
+    const resposneUploadd= await res.json();
+    console.log("resposneUploadd",resposneUploadd)
+    return resposneUploadd;
+  };
+
+  const sendEmailNotification = async (updatedNomination: any) => {
+    debugger
+    setLoadingStep("sending_email");
+    try {
+      const emailRes = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...updatedNomination,
+          academicAwards: selectedAwards.academic,
+          startupAwards: selectedAwards.startup,
+          riseAwards: selectedAwards.rise,
+          entrepreneurAwards: selectedAwards.entrepreneur,
+        }),
+      });
+      const emailData = await emailRes.json();
+      if (emailData.success) {
+        console.log("Email sent successfully");
+      } else {
+        console.error("Email API returned error:", emailData.error);
+        showToast("Nomination saved, but email notification failed.", true);
+      }
+    } catch (emailError) {
+      console.error("Failed to send notification email:", emailError);
+      showToast("Network error while sending email notification.", true);
+    }
   };
 
   const handleDownloadPDF = async () => {
@@ -383,6 +405,24 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     </div>
   );
 
+
+  const handleAutoFill = () => {
+    setFormData((prev) => ({
+      ...prev,
+      orgName: "Acadivate Tech Solutions",
+      promoter: "John Doe",
+      ownership: "Pvt Limited",
+      address: "123 Innovation Drive, Tech Park, Mumbai 400001",
+      mobile: "9876543210",
+      state: "Maharashtra",
+      city: "Mumbai",
+      email: "test@acadivate.com",
+      website: "https://acadivate.com",
+      gstin: "27AAAAA0000A1Z5",
+      paymentMode: "Online Banking",
+      agreeTerms: true,
+    }));
+  }
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -402,6 +442,26 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
             <h2><FileText /> Nomination Form</h2>
             <p>Registration fee applies per selected category. Please provide accurate details.</p>
           </div>
+                    <button
+                type="button"
+                onClick={handleAutoFill}
+                className={styles["autofill-btn"]}
+                style={{
+                  marginTop: "1rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.8rem",
+                  background: "#eef2ff",
+                  border: "1px solid #c7d2fe",
+                  borderRadius: "6px",
+                  color: "#4338ca",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
+              </button>
 
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>

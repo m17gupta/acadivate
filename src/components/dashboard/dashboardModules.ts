@@ -7,6 +7,7 @@ import { rankingsModule } from '../rankings/rankingsModule';
 import { leadsModule } from '../leads/leadsModule';
 import { categoriesModule } from '../categories/categoriesModule';
 import { registrationsModule } from '../registrations/registrationsModule';
+import { paymentsModule } from '../orders/paymentsModule';
 // import { slidersModule } from '../sliders/slidersModule';
 // import { formsModule } from '../forms/formsModule';
 
@@ -18,6 +19,7 @@ export {
   leadsModule,
   categoriesModule,
   registrationsModule,
+  paymentsModule,
   // slidersModule,
 };
 
@@ -30,6 +32,7 @@ export const dashboardModuleList = [
   leadsModule,
   categoriesModule,
   registrationsModule,
+  paymentsModule,
   // slidersModule,
 ];
 
@@ -49,6 +52,7 @@ export const dashboardRouteSearchPlaceholders: Record<string, string> = {
   '/dashboard/leads': leadsModule.searchPlaceholder,
   '/dashboard/categories': categoriesModule.searchPlaceholder,
   '/dashboard/registrations': registrationsModule.searchPlaceholder,
+  '/dashboard/payments': paymentsModule.searchPlaceholder,
   // '/dashboard/sliders': slidersModule.searchPlaceholder,
   // '/dashboard/forms': formsModule.searchPlaceholder,
 };
@@ -84,6 +88,10 @@ export function resolveDashboardSearchPlaceholder(pathname?: string | null) {
 
   if (pathname.startsWith('/dashboard/registrations')) {
     return registrationsModule.searchPlaceholder;
+  }
+
+  if (pathname.startsWith('/dashboard/payments')) {
+    return paymentsModule.searchPlaceholder;
   }
 
   // if (pathname.startsWith('/dashboard/sliders')) {

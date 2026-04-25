@@ -54,6 +54,10 @@ import {
   fetchSlidersThunk,
   updateSliderThunk,
 } from '@/src/hook/sliders/sliderThunk';
+import {
+  createOrderThunk,
+  fetchOrdersThunk,
+} from '@/src/hook/orders/orderThunk';
 
 type AnyRecord = {
   _id?: string;
@@ -208,6 +212,18 @@ function mapRegistrationRecordToRow(record: AnyRecord): DashboardModuleRow {
   };
 }
 
+function mapOrderRecordToRow(record: AnyRecord): DashboardModuleRow {
+  return {
+    id: String(record._id ?? record.paymentId ?? 'payment'),
+    values: {
+      paymentId: String(record.paymentId ?? ''),
+      orderId: String(record.orderId ?? ''),
+      amount: String(record.amount ?? '0'),
+      status: String(record.status ?? 'pending'),
+    },
+  };
+}
+
 function mapSliderRecordToRow(record: AnyRecord): DashboardModuleRow {
   return {
     id: String(record._id ?? record.title ?? 'slider'),
@@ -255,6 +271,11 @@ export function selectDashboardModuleSnapshot(
       return {
         records: state.sliders.allSlider,
         isFetched: state.sliders.isFetchedSlider,
+      };
+    case 'payments':
+      return {
+        records: state.orders.allOrders,
+        isFetched: state.orders.isFetchedOrder,
       };
     default:
       return { records: [], isFetched: false };
@@ -326,6 +347,14 @@ export function getDashboardModuleCrud(moduleId: DashboardModuleId): DashboardMo
         updateThunk: updateSliderThunk as AnyThunk,
         deleteThunk: deleteSliderThunk as AnyThunk,
         mapRecordToRow: mapSliderRecordToRow,
+      };
+    case 'payments':
+      return {
+        fetchAllThunk: fetchOrdersThunk as AnyThunk,
+        createThunk: createOrderThunk as AnyThunk,
+        updateThunk: (() => null) as AnyThunk,
+        deleteThunk: (() => null) as AnyThunk,
+        mapRecordToRow: mapOrderRecordToRow,
       };
     default:
       return {

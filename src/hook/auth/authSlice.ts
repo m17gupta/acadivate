@@ -5,6 +5,7 @@ interface User {
   userName?: string;
   password?: string;
   role?: string;
+  userId?: string;
 }
 
 interface AuthState {

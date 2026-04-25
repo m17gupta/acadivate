@@ -32,13 +32,21 @@ async function parseResponse<T>(
 
 export const fetchNominationsThunk = createAsyncThunk<
   NominationRecord[],
-  void,
+  { userId?: string; role?: string } | void,
   { rejectValue: string }
->("nominations/fetchAll", async (_, { rejectWithValue }) => {
+>("nominations/fetchAll", async (params, { rejectWithValue }) => {
   try {
-    const response = await fetch("/api/nominations");
- 
- const data = await response.json();
+    let url = "/api/nominations";
+    if (params) {
+      const { userId, role } = params as { userId?: string; role?: string };
+      const searchParams = new URLSearchParams();
+      if (userId) searchParams.append("userId", userId);
+      if (role) searchParams.append("role", role);
+      const queryString = searchParams.toString();
+      if (queryString) url += `?${queryString}`;
+    }
+    const response = await fetch(url);
+    const data = await response.json();
 
     return data.items ?? [];
   } catch (error) {

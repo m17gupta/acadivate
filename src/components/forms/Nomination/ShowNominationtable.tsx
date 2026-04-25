@@ -13,9 +13,11 @@ import { useRouter } from "next/navigation"
 
 
 const ShowNominationtable = () => {
-
+   
     const dispatch = useDispatch<AppDispatch>()
     const { allNomination, isFetchedNomination } = useSelector((state: RootState) => state.nominations)
+
+    const {user}=useSelector((state: RootState)=>state.auth);
    const router = useRouter()
     const handleView = (nomination: any) => {
         dispatch(setCurrentNomination(nomination))
@@ -127,13 +129,13 @@ const ShowNominationtable = () => {
                                                 >
                                                     <Eye size={16} />
                                                 </button>
-                                                <button 
+                                              {   user?.role=="admin"&& <button 
                                                     onClick={() => handleEdit(nomination)}
                                                     className="p-2 text-navy hover:bg-bg-soft rounded-lg transition-colors"
                                                     title="Edit"
                                                 >
                                                     <Pencil size={16} />
-                                                </button>
+                                                </button>}
                                                 <button 
                                                     onClick={() => handleDownloadPDF(nomination)}
                                                     className="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
@@ -141,13 +143,13 @@ const ShowNominationtable = () => {
                                                 >
                                                     <FileDown size={16} />
                                                 </button>
-                                                <button 
+                                            { user?.role=="admin"&& <button 
                                                     onClick={() => nomination._id && handleDelete(nomination._id)}
                                                     className="p-2 text-crimson hover:bg-crimson-2/30 rounded-lg transition-colors"
                                                     title="Delete"
                                                 >
                                                     <Trash2 size={16} />
-                                                </button>
+                                                </button>}
                                             </div>
                                         </td>
                                     </tr>
