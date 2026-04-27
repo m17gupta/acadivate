@@ -10,14 +10,7 @@ import {
   dashboardModuleList,
   type DashboardAccent,
 } from './dashboardModules';
-
-const accentClasses: Record<DashboardAccent, string> = {
-  primary: 'from-primary-deep via-primary-dark to-primary',
-  gold: 'from-gold via-gold-2 to-gold-3',
-  sage: 'from-sage via-primary-dark to-primary',
-  crimson: 'from-crimson via-[#cf4d4d] to-[#8f1b1b]',
-  blue: 'from-navy via-navy/90 to-primary',
-};
+import { accentClasses } from './dashboardTypes';
 
 const helperNotes = [
   'Each module now has its own create, edit, and delete workflow.',

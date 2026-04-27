@@ -1,5 +1,12 @@
 export type AwardStatus = 'Draft' | 'Open' | 'Review' | 'Published' | 'Archived';
 
+export interface AwardItem {
+  name: string;
+  slug: string;
+  price: number;
+  active: boolean;
+}
+
 export interface AwardRecord {
   _id?: string;
   title: string;
@@ -7,7 +14,9 @@ export interface AwardRecord {
   category: string;
   nominationDeadline: string;
   status: AwardStatus;
-  imageUrl?: string;
+  active: boolean;
+  items: AwardItem[];
+  imageUrl?: string | string[];
   createdAt?: string;
   updatedAt?: string;
 }

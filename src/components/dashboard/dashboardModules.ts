@@ -2,6 +2,7 @@ export * from './dashboardTypes';
 
 import { eventsModule } from '../events/eventsModule';
 import { awardsModule } from '../awards/awardsModule';
+import { awardsListModule } from '../awards/awardsListModule';
 import { nominationsModule } from '../nominations/nominationsModule';
 import { rankingsModule } from '../rankings/rankingsModule';
 import { leadsModule } from '../leads/leadsModule';
@@ -15,6 +16,7 @@ import { filesModule } from '../files/filesModule';
 export {
   eventsModule,
   awardsModule,
+  awardsListModule,
   nominationsModule,
   rankingsModule,
   leadsModule,
@@ -29,6 +31,7 @@ export {
 export const dashboardModuleList = [
   eventsModule,
   awardsModule,
+  awardsListModule,
   nominationsModule,
   // formsModule,
   rankingsModule,
@@ -40,17 +43,48 @@ export const dashboardModuleList = [
   // slidersModule,
 ];
 
-export const dashboardNavItems = dashboardModuleList.map((module) => ({
-  label: module.title,
-  href: module.route,
-  icon: module.icon,
-  badge: 'CRUD',
-}));
+export const dashboardNavItems = [
+  {
+    label: 'Events',
+    href: eventsModule.route,
+    icon: eventsModule.icon,
+  },
+  {
+    label: 'Awards',
+    icon: awardsModule.icon,
+    subItems: [
+      { label: 'Awards List', href: awardsListModule.route },
+      { label: 'Award Category', href: awardsModule.route },
+      { label: 'Nominations', href: nominationsModule.route },
+    ],
+  },
+  {
+    label: 'Rankings',
+    href: rankingsModule.route,
+    icon: rankingsModule.icon,
+  },
+  {
+    label: 'Leads',
+    href: leadsModule.route,
+    icon: leadsModule.icon,
+  },
+  {
+    label: 'Categories',
+    href: categoriesModule.route,
+    icon: categoriesModule.icon,
+  },
+  {
+    label: 'Registrations',
+    href: registrationsModule.route,
+    icon: registrationsModule.icon,
+  },
+];
 
 export const dashboardRouteSearchPlaceholders: Record<string, string> = {
   '/dashboard': 'Search modules, records, and workflows...',
   '/dashboard/events': eventsModule.searchPlaceholder,
   '/dashboard/awards': awardsModule.searchPlaceholder,
+  '/dashboard/awards-list': awardsListModule.searchPlaceholder,
   '/dashboard/nominations': nominationsModule.searchPlaceholder,
   '/dashboard/rankings': rankingsModule.searchPlaceholder,
   '/dashboard/leads': leadsModule.searchPlaceholder,
@@ -73,6 +107,10 @@ export function resolveDashboardSearchPlaceholder(pathname?: string | null) {
 
   if (pathname.startsWith('/dashboard/awards')) {
     return awardsModule.searchPlaceholder;
+  }
+
+  if (pathname.startsWith('/dashboard/awards-list')) {
+    return awardsListModule.searchPlaceholder;
   }
 
   if (pathname.startsWith('/dashboard/nominations')) {

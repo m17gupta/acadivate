@@ -12,6 +12,75 @@ function getObjectId(id: string) {
   return ObjectId.isValid(id) ? new ObjectId(id) : null;
 }
 
+function processEventData(data: any) {
+  const processed = { ...data };
+
+  const processValues = (target: any) => {
+    // Convert date fields to Date objects
+    const dateFields = [
+      "startDate",
+      "endDate",
+      "registrationDeadline",
+      "saleStartDate",
+      "saleEndDate",
+    ];
+
+    dateFields.forEach((field) => {
+      if (target[field] && typeof target[field] === "string") {
+        const date = new Date(target[field]);
+        if (!isNaN(date.getTime())) {
+          target[field] = date;
+        }
+      }
+    });
+
+    // Handle start/end date-time combination
+    if (target.startDate && target.startTime) {
+      const combinedStart = new Date(
+        `${target.startDate}T${target.startTime}`
+      );
+      if (!isNaN(combinedStart.getTime())) {
+        target.startDateTime = combinedStart;
+      }
+    }
+    if (target.endDate && target.endTime) {
+      const combinedEnd = new Date(`${target.endDate}T${target.endTime}`);
+      if (!isNaN(combinedEnd.getTime())) {
+        target.endDateTime = combinedEnd;
+      }
+    }
+
+    // Handle related award reference
+    if (target.relatedAward && typeof target.relatedAward === "string") {
+      const awardId = getObjectId(target.relatedAward);
+      if (awardId) {
+        target.relatedAward = awardId;
+      }
+    }
+  };
+
+  // Process root level
+  processValues(processed);
+
+  // Process nested sections
+  Object.keys(processed).forEach((key) => {
+    const value = processed[key];
+    if (value && typeof value === "object" && "label" in value) {
+      processValues(value);
+    }
+  });
+
+  // Ensure _id is an ObjectId if present at root
+  if (processed._id && typeof processed._id === "string") {
+    const objectId = getObjectId(processed._id);
+    if (objectId) {
+      processed._id = objectId;
+    }
+  }
+
+  return processed;
+}
+
 async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -54,27 +123,35 @@ async function POST(req: NextRequest) {
   try {
     const collection = await getCollection();
     const payload = await req.json();
-    const now = new Date().toISOString();
+    const processedData = processEventData(payload);
+    
+    const now = new Date();
     const document = {
-      ...payload,
-      createdAt: payload.createdAt ?? now,
+      ...processedData,
+      createdAt: processedData.createdAt || now,
       updatedAt: now,
     };
-     //  check for existing data based on _id
-     const existingEvent = await collection.findOne({ _id: document._id });
-     if(existingEvent){
-        // update it
-        const result = await collection.updateOne({ _id: document._id }, { $set: document });
-        const item = await collection.findOne({ _id: document._id });
-        return NextResponse.json({ success: true, item }, { status: 200 });
-     }
+
+    if (document._id) {
+      const result = await collection.updateOne(
+        { _id: document._id },
+        { $set: document },
+        { upsert: true }
+      );
+      const item = await collection.findOne({ _id: document._id });
+      return NextResponse.json({ success: true, item }, { status: 200 });
+    }
+
     const result = await collection.insertOne(document);
     const item = await collection.findOne({ _id: result.insertedId });
 
     return NextResponse.json({ success: true, item }, { status: 201 });
   } catch (error) {
-    console.error('Error creating event:', error);
-    return NextResponse.json({ success: false, error: 'Failed to create event' }, { status: 500 });
+    console.error("Error creating event:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to create event" },
+      { status: 500 }
+    );
   }
 }
 
@@ -86,20 +163,28 @@ async function PUT(req: NextRequest) {
     const documentId = _id || id;
 
     if (!documentId) {
-      return NextResponse.json({ success: false, error: 'Event ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Event ID is required" },
+        { status: 400 }
+      );
     }
 
     const objectId = getObjectId(documentId);
     if (!objectId) {
-      return NextResponse.json({ success: false, error: 'Event ID is invalid' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Event ID is invalid" },
+        { status: 400 }
+      );
     }
+
+    const processedUpdate = processEventData(updateData);
 
     const result = await collection.updateOne(
       { _id: objectId },
       {
         $set: {
-          ...updateData,
-          updatedAt: new Date().toISOString(),
+          ...processedUpdate,
+          updatedAt: new Date(),
         },
       }
     );

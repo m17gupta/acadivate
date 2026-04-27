@@ -1,39 +1,47 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { 
-  Eye, 
-  FileDown, 
-  Trash2, 
-  Trophy, 
-  Award, 
-  Building2, 
-  User, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Globe, 
-  FileText, 
-  Check, 
+import {
+  Eye,
+  FileDown,
+  Trash2,
+  Trophy,
+  Award,
+  Building2,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  FileText,
+  Check,
   Loader2,
   Trash,
   Download,
   X,
   CreditCard,
-  Building
+  Building,
 } from "lucide-react";
-import { downloadNominationPDF } from './downloadNominationPDF';
-import { downloadFile } from '@/src/hook/files/fileUtil';
-import styles from './NominationForm.module.css';
-import { AppDispatch, RootState } from '@/src/hook/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { createNominationThunk, updateNominationThunk } from '@/src/hook/nominations/nominationThunk';
-import { NominationFormType } from '@/src/hook/nominations/nominationType';
-import { useRouter } from 'next/navigation';
-import { setCurrentNomination } from '@/src/hook/nominations/nominationSlice';
-import { academicAwards, entrepreneurAwards, riseAwards, startupAwards } from './util';
-import Script from 'next/script';
-import { OrderType } from '@/src/hook/orders/orderType';
-import { createOrderThunk } from '@/src/hook/orders/orderThunk';
+import { downloadNominationPDF } from "./downloadNominationPDF";
+import { downloadFile } from "@/src/hook/files/fileUtil";
+import styles from "./NominationForm.module.css";
+import { AppDispatch, RootState } from "@/src/hook/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createNominationThunk,
+  updateNominationThunk,
+} from "@/src/hook/nominations/nominationThunk";
+import { NominationFormType } from "@/src/hook/nominations/nominationType";
+import { useRouter } from "next/navigation";
+import { setCurrentNomination } from "@/src/hook/nominations/nominationSlice";
+import {
+  academicAwards,
+  entrepreneurAwards,
+  riseAwards,
+  startupAwards,
+} from "./util";
+import Script from "next/script";
+import { OrderType } from "@/src/hook/orders/orderType";
+import { createOrderThunk } from "@/src/hook/orders/orderThunk";
 
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
@@ -43,12 +51,16 @@ interface NominationFormProps {
   readOnly?: boolean;
 }
 
-const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => {
+const NominationForm: React.FC<NominationFormProps> = ({
+  readOnly = false,
+}) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const currentNomination = useSelector((state: RootState) => state.nominations.currentNomination);
+  const currentNomination = useSelector(
+    (state: RootState) => state.nominations.currentNomination,
+  );
   const isEditMode = !!currentNomination?._id;
-   const user=useSelector((state: RootState)=>state.auth?.user);
+  const user = useSelector((state: RootState) => state.auth?.user);
   const [formData, setFormData] = useState({
     orgName: "",
     promoter: "",
@@ -79,9 +91,74 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   });
 
   const [payableAmount, setPayableAmount] = useState(0);
-  const [toast, setToast] = useState({ show: false, message: "", isError: false });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    isError: false,
+  });
   const [loading, setLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(""); 
+  const [loadingStep, setLoadingStep] = useState("");
+
+  const [dynamicCategories, setDynamicCategories] = useState<any[]>([]);
+  const [isDynamic, setIsDynamic] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryId = params.get("id");
+
+    if (queryId) {
+      const fetchAward = async () => {
+        try {
+          const res = await fetch(`/api/awards?id=${queryId}`);
+          const data = await res.json();
+          if (data.success && data.item?.selectedAwards) {
+            const parsedCategories = data.item.selectedAwards.map(
+              (cat: any) => {
+                const title = cat.title || "Other Awards";
+                let key = "academic";
+                const lowerTitle = title.toLowerCase();
+                if (lowerTitle.includes("startup")) key = "startup";
+                else if (lowerTitle.includes("rise")) key = "rise";
+                else if (lowerTitle.includes("entrepreneur"))
+                  key = "entrepreneur";
+
+                let icon = <Trophy size={20} color="#fbbf24" />;
+                if (key === "startup")
+                  icon = <Globe size={20} color="#3b82f6" />;
+                if (key === "rise") icon = <Award size={20} color="#10b981" />;
+                if (key === "entrepreneur")
+                  icon = <User size={20} color="#8b5cf6" />;
+
+                const validItems =
+                  cat.items
+                    ?.filter((i: any) => typeof i === "object" && i.name)
+                    .map((i: any) => i.name) || [];
+                const stringItems =
+                  validItems.length > 0
+                    ? validItems
+                    : cat.items?.filter((i: any) => typeof i === "string") ||
+                      [];
+
+                // eliminate duplicates
+                const uniqueAwards = Array.from(
+                  new Set(stringItems as string[]),
+                );
+
+                return { title, key, icon, awards: uniqueAwards };
+              },
+            );
+            setDynamicCategories(parsedCategories);
+            setIsDynamic(true);
+          }
+        } catch (err) {
+          console.error("Error fetching dynamic awards:", err);
+        }
+      };
+      fetchAward();
+    }
+  }, []);
+
+  console.log(dynamicCategories);
 
   useEffect(() => {
     if (currentNomination) {
@@ -127,38 +204,59 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     }
   }, [selectedAwards]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     if (type === "file") {
       const files = (e.target as HTMLInputElement).files;
-      setFormData(prev => ({ ...prev, [name]: files ? Array.from(files) : [] }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files ? Array.from(files) : [],
+      }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
     }
   };
 
-  const handleAwardChange = (category: keyof typeof selectedAwards, award: string, checked: boolean) => {
+  const handleAwardChange = (
+    category: keyof typeof selectedAwards,
+    award: string,
+    checked: boolean,
+  ) => {
     if (readOnly) return;
-    setSelectedAwards(prev => ({
+    setSelectedAwards((prev) => ({
       ...prev,
-      [category]: checked ? [...prev[category], award] : prev[category].filter(a => a !== award)
+      [category]: checked
+        ? [...prev[category], award]
+        : prev[category].filter((a) => a !== award),
     }));
   };
 
   const handleDeleteFile = (field: keyof typeof formData, index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: (prev[field] as any[]).filter((_, i) => i !== index)
+      [field]: (prev[field] as any[]).filter((_, i) => i !== index),
     }));
   };
 
   const showToast = (message: string, isError = false) => {
     setToast({ show: true, message, isError });
-    setTimeout(() => setToast({ show: false, message: "", isError: false }), 3500);
+    setTimeout(
+      () => setToast({ show: false, message: "", isError: false }),
+      3500,
+    );
   };
 
-  const paymentHandler = (data: NominationFormType): Promise<{ success: boolean }> => {
+  const paymentHandler = (
+    data: NominationFormType,
+  ): Promise<{ success: boolean }> => {
     return new Promise((resolve) => {
       const payamount = data?.totalAmount ? data.totalAmount * 100 : 6990;
       let options: any = {
@@ -179,11 +277,11 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               formId: data._id,
               status: "success",
             };
-            console.log(" paymemnnt done--->",response)
-            console.log(" order data--->",orderData)
+            console.log(" paymemnnt done--->", response);
+            console.log(" order data--->", orderData);
             const result = await saveOrderData(orderData);
 
-            console.log(" result---> save order data",result)
+            console.log(" result---> save order data", result);
             if (result.success) {
               showToast("Payment successful");
               resolve({ success: true });
@@ -217,7 +315,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   const saveOrderData = async (orderData: OrderType) => {
     try {
       const response = await dispatch(createOrderThunk(orderData)).unwrap();
-      console.log("resposne---> create order data",response)
+      console.log("resposne---> create order data", response);
       return { success: true, item: response };
     } catch (err) {
       console.error("Error saving order data:", err);
@@ -251,66 +349,91 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         startupAwards: selectedAwards.startup,
         riseAwards: selectedAwards.rise,
         entrepreneurAwards: selectedAwards.entrepreneur,
-        researchPublication: formData.researchPublication.filter(f => typeof f === 'string') as string[],
-        bookPublication: formData.bookPublication.filter(f => typeof f === 'string') as string[],
-        researchProject: formData.researchProject.filter(f => typeof f === 'string') as string[],
-        patentPolicyDocument: formData.patentPolicyDocument.filter(f => typeof f === 'string') as string[],
+        researchPublication: formData.researchPublication.filter(
+          (f) => typeof f === "string",
+        ) as string[],
+        bookPublication: formData.bookPublication.filter(
+          (f) => typeof f === "string",
+        ) as string[],
+        researchProject: formData.researchProject.filter(
+          (f) => typeof f === "string",
+        ) as string[],
+        patentPolicyDocument: formData.patentPolicyDocument.filter(
+          (f) => typeof f === "string",
+        ) as string[],
         status: isEditMode ? currentNomination?.status : "pending",
         totalAmount: payableAmount,
-        submittedById:user?.userId
+        submittedById: user?.userId,
       };
 
       let response: any;
       if (isEditMode) {
-        response = await dispatch(updateNominationThunk({ ...formDataObj, _id: currentNomination._id })).unwrap();
+        response = await dispatch(
+          updateNominationThunk({ ...formDataObj, _id: currentNomination._id }),
+        ).unwrap();
       } else {
         response = await dispatch(createNominationThunk(formDataObj)).unwrap();
       }
-      console.log("response--->create nomination",response)
+      console.log("response--->create nomination", response);
 
       if (response._id) {
         let paymentSuccessful = true;
         if (!isEditMode) {
           setLoadingStep("paying");
-          console.log("response--->pay ment started")
+          console.log("response--->pay ment started");
           const paymentResult = await paymentHandler(response);
-          console.log("response--->pay ment completed")
+          console.log("response--->pay ment completed");
           paymentSuccessful = paymentResult.success;
         }
         if (paymentSuccessful) {
           setLoadingStep("uploading");
-       
+
           const uploadResult = await uploadFiles({
-            researchPublication: formData.researchPublication.filter(f => f instanceof File) as File[],
-            bookPublication: formData.bookPublication.filter(f => f instanceof File) as File[],
-            researchProject: formData.researchProject.filter(f => f instanceof File) as File[],
-            patentPolicyDocument: formData.patentPolicyDocument.filter(f => f instanceof File) as File[],
+            researchPublication: formData.researchPublication.filter(
+              (f) => f instanceof File,
+            ) as File[],
+            bookPublication: formData.bookPublication.filter(
+              (f) => f instanceof File,
+            ) as File[],
+            researchProject: formData.researchProject.filter(
+              (f) => f instanceof File,
+            ) as File[],
+            patentPolicyDocument: formData.patentPolicyDocument.filter(
+              (f) => f instanceof File,
+            ) as File[],
             pathName: `/nomination-form/${response._id}`,
           });
-       
+
           if (uploadResult.success) {
             // Merge existing strings with new uploaded URLs
             const mergedFiles: any = {};
-            ['researchPublication', 'bookPublication', 'researchProject', 'patentPolicyDocument'].forEach(key => {
+            [
+              "researchPublication",
+              "bookPublication",
+              "researchProject",
+              "patentPolicyDocument",
+            ].forEach((key) => {
               const fieldValue = formData[key as keyof typeof formData];
-              const existing = Array.isArray(fieldValue) ? fieldValue.filter(f => typeof f === 'string') : [];
+              const existing = Array.isArray(fieldValue)
+                ? fieldValue.filter((f) => typeof f === "string")
+                : [];
               const newlyUploaded = uploadResult.data[key] || [];
               mergedFiles[key] = [...existing, ...newlyUploaded];
             });
 
             const updatedNomination = { ...response, ...mergedFiles };
-         
-            
-          
-            const responseUpdate = await dispatch(updateNominationThunk(updatedNomination)).unwrap();
-          
+
+            const responseUpdate = await dispatch(
+              updateNominationThunk(updatedNomination),
+            ).unwrap();
 
             // Send Email Notification
-      
+
             const responseMail = await sendEmailNotification(updatedNomination);
-       
-            
-            showToast(isEditMode ? "Updated successfully!" : "Submitted successfully!");
+
+            showToast(
+              isEditMode ? "Updated successfully!" : "Submitted successfully!",
+            );
             router.back();
           } else {
             showToast("Data saved, but file upload failed.", true);
@@ -332,16 +455,16 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     const fd = new FormData();
     fd.append("pathName", data.pathName);
     Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) value.forEach((file: File) => fd.append(key, file));
+      if (Array.isArray(value))
+        value.forEach((file: File) => fd.append(key, file));
     });
     const res = await fetch("/api/uploadfile", { method: "POST", body: fd });
-    const resposneUploadd= await res.json();
-  
+    const resposneUploadd = await res.json();
+
     return resposneUploadd;
   };
 
   const sendEmailNotification = async (updatedNomination: any) => {
- 
     setLoadingStep("sending_email");
     try {
       const emailRes = await fetch("/api/send-email", {
@@ -357,9 +480,7 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       });
       const emailData = await emailRes.json();
       if (emailData.success) {
-      
       } else {
-      
         showToast("Nomination saved, but email notification failed.", true);
       }
     } catch (emailError) {
@@ -369,7 +490,13 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
   };
 
   const handleDownloadPDF = async () => {
-    const { researchPublication, bookPublication, researchProject, patentPolicyDocument, ...rest } = formData;
+    const {
+      researchPublication,
+      bookPublication,
+      researchProject,
+      patentPolicyDocument,
+      ...rest
+    } = formData;
     await downloadNominationPDF({
       ...rest,
       academicAwards: selectedAwards.academic,
@@ -380,7 +507,12 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     });
   };
 
-  const renderAwardSection = (title: string, icon: React.ReactNode, awards: string[], category: keyof typeof selectedAwards) => (
+  const renderAwardSection = (
+    title: string,
+    icon: React.ReactNode,
+    awards: string[],
+    category: keyof typeof selectedAwards,
+  ) => (
     <div className={styles["categories-section"]}>
       <div className={styles["section-title"]}>
         {icon} {title}
@@ -391,7 +523,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
             <input
               type="checkbox"
               checked={selectedAwards[category].includes(award)}
-              onChange={(e) => handleAwardChange(category, award, e.target.checked)}
+              onChange={(e) =>
+                handleAwardChange(category, award, e.target.checked)
+              }
               disabled={readOnly}
               id={`${category}-${award}`}
             />
@@ -402,10 +536,24 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     </div>
   );
 
-  const NominationFileItem = ({ file, idx, field, label }: { file: File | string, idx: number, field: keyof typeof formData, label: string }) => {
-    const isExisting = typeof file === 'string';
-    const fileName = isExisting ? (file as string).split('/').pop() : (file as File).name;
-    const fileUrl = isExisting ? (file as string) : URL.createObjectURL(file as File);
+  const NominationFileItem = ({
+    file,
+    idx,
+    field,
+    label,
+  }: {
+    file: File | string;
+    idx: number;
+    field: keyof typeof formData;
+    label: string;
+  }) => {
+    const isExisting = typeof file === "string";
+    const fileName = isExisting
+      ? (file as string).split("/").pop()
+      : (file as File).name;
+    const fileUrl = isExisting
+      ? (file as string)
+      : URL.createObjectURL(file as File);
     const [downloading, setDownloading] = useState(false);
 
     const onDownload = async () => {
@@ -420,29 +568,54 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
     };
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: '#f1f5f9', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-        <span style={{ fontSize: '0.85rem', color: '#334155', maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.5rem 0.75rem",
+          background: "#f1f5f9",
+          borderRadius: "6px",
+          border: "1px solid #e2e8f0",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "0.85rem",
+            color: "#334155",
+            maxWidth: "70%",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
           {fileName}
         </span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: "flex", gap: "8px" }}>
           {isExisting ? (
             downloading ? (
               <Loader2 size={16} className="animate-spin text-primary" />
             ) : (
-              <Download 
-                size={16} 
-                style={{ cursor: 'pointer', color: '#2563eb' }} 
-                onClick={onDownload} 
+              <Download
+                size={16}
+                style={{ cursor: "pointer", color: "#2563eb" }}
+                onClick={onDownload}
               />
             )
           ) : (
-            <Eye 
-              size={16} 
-              style={{ cursor: 'pointer', color: '#64748b' }} 
-              onClick={() => window.open(fileUrl)} 
+            <Eye
+              size={16}
+              style={{ cursor: "pointer", color: "#64748b" }}
+              onClick={() => window.open(fileUrl)}
             />
           )}
-          {!readOnly && <Trash2 size={16} style={{ cursor: 'pointer', color: '#ef4444' }} onClick={() => handleDeleteFile(field, idx)} />}
+          {!readOnly && (
+            <Trash2
+              size={16}
+              style={{ cursor: "pointer", color: "#ef4444" }}
+              onClick={() => handleDeleteFile(field, idx)}
+            />
+          )}
         </div>
       </div>
     );
@@ -460,15 +633,27 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
         disabled={readOnly}
       />
       {(formData[field] as (File | string)[]).length > 0 && (
-        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div
+          style={{
+            marginTop: "0.75rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+          }}
+        >
           {(formData[field] as (File | string)[]).map((file, idx) => (
-            <NominationFileItem key={idx} file={file} idx={idx} field={field} label={label} />
+            <NominationFileItem
+              key={idx}
+              file={file}
+              idx={idx}
+              field={field}
+              label={label}
+            />
           ))}
         </div>
       )}
     </div>
   );
-
 
   const handleAutoFill = () => {
     setFormData((prev) => ({
@@ -486,51 +671,67 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       paymentMode: "Online Banking",
       agreeTerms: true,
     }));
-  }
+  };
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className={styles.container}>
         <div className={styles.hero}>
           <div className={styles["hero-badge"]}>
-            <Trophy size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} /> Nominations Are Open
+            <Trophy
+              size={14}
+              style={{ verticalAlign: "middle", marginRight: "6px" }}
+            />{" "}
+            Nominations Are Open
           </div>
-          <h1><Award size={40} color="#2563eb" /> Award Registration</h1>
+          <h1>
+            <Award size={40} color="#2563eb" /> Award Registration
+          </h1>
           <p className={styles.subhead}>
-            Kindly fill in the form below to nominate for awards. Select one or more categories that best represent your achievement.
+            Kindly fill in the form below to nominate for awards. Select one or
+            more categories that best represent your achievement.
           </p>
         </div>
 
         <div className={styles["form-card"]}>
           <div className={styles["form-header"]}>
-            <h2><FileText /> Nomination Form</h2>
-            <p>Registration fee applies per selected category. Please provide accurate details.</p>
+            <h2>
+              <FileText /> Nomination Form
+            </h2>
+            <p>
+              Registration fee applies per selected category. Please provide
+              accurate details.
+            </p>
           </div>
-                    <button
-                type="button"
-                onClick={handleAutoFill}
-                className={styles["autofill-btn"]}
-                style={{
-                  marginTop: "1rem",
-                  padding: "0.5rem 1rem",
-                  fontSize: "0.8rem",
-                  background: "#eef2ff",
-                  border: "1px solid #c7d2fe",
-                  borderRadius: "6px",
-                  color: "#4338ca",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
-              </button>
+          <button
+            type="button"
+            onClick={handleAutoFill}
+            className={styles["autofill-btn"]}
+            style={{
+              marginTop: "1rem",
+              padding: "0.5rem 1rem",
+              fontSize: "0.8rem",
+              background: "#eef2ff",
+              border: "1px solid #c7d2fe",
+              borderRadius: "6px",
+              color: "#4338ca",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <i className="fas fa-magic"></i> Auto Fill (Dev Mode)
+          </button>
 
           <form onSubmit={handleSubmit}>
             <div className={styles["form-grid"]}>
-              <div className={`${styles["input-group"]} ${styles["full-width"]}`}>
-                <label><Building2 size={16} /> Name of the Organization</label>
+              <div
+                className={`${styles["input-group"]} ${styles["full-width"]}`}
+              >
+                <label>
+                  <Building2 size={16} /> Name of the Organization
+                </label>
                 <input
                   type="text"
                   name="orgName"
@@ -543,7 +744,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
 
               <div className={styles["input-group"]}>
-                <label><User size={16} /> Name of the promoter</label>
+                <label>
+                  <User size={16} /> Name of the promoter
+                </label>
                 <input
                   type="text"
                   name="promoter"
@@ -556,9 +759,21 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Globe size={16} /> Ownership Pattern</label>
+                <label>
+                  <Globe size={16} /> Ownership Pattern
+                </label>
                 <div className={styles["ownership-group"]}>
-                  {[ "Academcian", "Scientist", "Reseach Scholar", "Proprietary", "Partnership", "Pvt Limited", "Public Limited", "NGOs", "Others" ].map(opt => (
+                  {[
+                    "Academcian",
+                    "Scientist",
+                    "Reseach Scholar",
+                    "Proprietary",
+                    "Partnership",
+                    "Pvt Limited",
+                    "Public Limited",
+                    "NGOs",
+                    "Others",
+                  ].map((opt) => (
                     <label key={opt}>
                       <input
                         type="radio"
@@ -567,14 +782,19 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                         checked={formData.ownership === opt}
                         onChange={handleInputChange}
                         disabled={readOnly}
-                      /> {opt}
+                      />{" "}
+                      {opt}
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className={`${styles["input-group"]} ${styles["full-width"]}`}>
-                <label><MapPin size={16} /> Address of Correspondence</label>
+              <div
+                className={`${styles["input-group"]} ${styles["full-width"]}`}
+              >
+                <label>
+                  <MapPin size={16} /> Address of Correspondence
+                </label>
                 <textarea
                   name="address"
                   value={formData.address}
@@ -587,7 +807,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Phone size={16} /> Mobile Number</label>
+                <label>
+                  <Phone size={16} /> Mobile Number
+                </label>
                 <input
                   type="tel"
                   name="mobile"
@@ -600,7 +822,9 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Mail size={16} /> Email ID</label>
+                <label>
+                  <Mail size={16} /> Email ID
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -613,29 +837,77 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Globe size={16} /> State</label>
-                <select name="state" value={formData.state} onChange={handleInputChange} required disabled={readOnly}>
-                  <option value="" disabled>Select State</option>
-                  <option>Maharashtra</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>Others</option>
+                <label>
+                  <Globe size={16} /> State
+                </label>
+                <select
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  required
+                  disabled={readOnly}
+                >
+                  <option value="" disabled>
+                    Select State
+                  </option>
+                  <option>Maharashtra</option>
+                  <option>Delhi</option>
+                  <option>Karnataka</option>
+                  <option>Tamil Nadu</option>
+                  <option>Gujarat</option>
+                  <option>Others</option>
                 </select>
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Building size={16} /> City</label>
-                <select name="city" value={formData.city} onChange={handleInputChange} required disabled={readOnly}>
-                  <option value="" disabled>Select City</option>
-                  <option>Mumbai</option><option>Delhi</option><option>Bengaluru</option><option>Chennai</option><option>Hyderabad</option><option>Others</option>
+                <label>
+                  <Building size={16} /> City
+                </label>
+                <select
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  required
+                  disabled={readOnly}
+                >
+                  <option value="" disabled>
+                    Select City
+                  </option>
+                  <option>Mumbai</option>
+                  <option>Delhi</option>
+                  <option>Bengaluru</option>
+                  <option>Chennai</option>
+                  <option>Hyderabad</option>
+                  <option>Others</option>
                 </select>
               </div>
 
               <div className={styles["input-group"]}>
-                <label><Globe size={16} /> Website URL</label>
-                <input type="text" name="website" value={formData.website} onChange={handleInputChange} placeholder="https://" disabled={readOnly} />
+                <label>
+                  <Globe size={16} /> Website URL
+                </label>
+                <input
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleInputChange}
+                  placeholder="https://"
+                  disabled={readOnly}
+                />
               </div>
 
               <div className={styles["input-group"]}>
-                <label><FileText size={16} /> GSTIN</label>
-                <input type="text" name="gstin" value={formData.gstin} onChange={handleInputChange} placeholder="Enter GSTIN" disabled={readOnly} />
+                <label>
+                  <FileText size={16} /> GSTIN
+                </label>
+                <input
+                  type="text"
+                  name="gstin"
+                  value={formData.gstin}
+                  onChange={handleInputChange}
+                  placeholder="Enter GSTIN"
+                  disabled={readOnly}
+                />
               </div>
 
               {renderFileField("Research Publication", "researchPublication")}
@@ -644,12 +916,53 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               {renderFileField("Patent Policy", "patentPolicyDocument")}
             </div>
 
-            <hr style={{ margin: '2rem 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
+            <hr
+              style={{
+                margin: "2rem 0",
+                border: "none",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            />
 
-            {renderAwardSection("Academic Awards", <Trophy size={20} color="#fbbf24" />, academicAwards, "academic")}
-            {renderAwardSection("Startup Awards", <Globe size={20} color="#3b82f6" />, startupAwards, "startup")}
-            {renderAwardSection("Rise Awards", <Award size={20} color="#10b981" />, riseAwards, "rise")}
-            {renderAwardSection("Entrepreneur Awards", <User size={20} color="#8b5cf6" />, entrepreneurAwards, "entrepreneur")}
+            {isDynamic ? (
+              dynamicCategories.map((cat, idx) => (
+                <React.Fragment key={idx}>
+                  {renderAwardSection(
+                    cat.title,
+                    cat.icon,
+                    cat.awards,
+                    cat.key as keyof typeof selectedAwards,
+                  )}
+                </React.Fragment>
+              ))
+            ) : (
+              <>
+                {renderAwardSection(
+                  "Academic Awards",
+                  <Trophy size={20} color="#fbbf24" />,
+                  academicAwards,
+                  "academic",
+                )}
+                {renderAwardSection(
+                  "Startup Awards",
+                  <Globe size={20} color="#3b82f6" />,
+                  startupAwards,
+                  "startup",
+                )}
+                {renderAwardSection(
+                  "Rise Awards",
+                  <Award size={20} color="#10b981" />,
+                  riseAwards,
+                  "rise",
+                )}
+                {renderAwardSection(
+                  "Entrepreneur Awards",
+                  <User size={20} color="#8b5cf6" />,
+                  entrepreneurAwards,
+                  "entrepreneur",
+                )}
+              </>
+            )}
 
             <div className={styles["fee-summary"]}>
               <div className={styles["fee-block"]}>
@@ -663,7 +976,14 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                 </div>
                 <div className={styles["fee-item"]}>
                   <span>GST (18%)</span>
-                  <strong>₹{Math.round(Object.values(selectedAwards).flat().length * BASE_FEE * GST_RATE)}</strong>
+                  <strong>
+                    ₹
+                    {Math.round(
+                      Object.values(selectedAwards).flat().length *
+                        BASE_FEE *
+                        GST_RATE,
+                    )}
+                  </strong>
                 </div>
               </div>
               <div className={styles.payable}>
@@ -672,7 +992,14 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
               </div>
             </div>
 
-            <div style={{ margin: '1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div
+              style={{
+                margin: "1.5rem 0",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+              }}
+            >
               <input
                 type="checkbox"
                 id="terms"
@@ -681,30 +1008,60 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
                 name="agreeTerms"
                 required
                 disabled={readOnly}
-                style={{ width: '18px', height: '18px', accentColor: '#2563eb' }}
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  accentColor: "#2563eb",
+                }}
               />
-              <label htmlFor="terms" style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
+              <label
+                htmlFor="terms"
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#475569",
+                  fontWeight: 600,
+                }}
+              >
                 I agree to the terms and conditions of Acadivate Awards.
               </label>
             </div>
 
             <div className={styles["btn-row"]}>
-              <button type="submit" className={styles["btn-submit"]} disabled={loading || readOnly}>
+              <button
+                type="submit"
+                className={styles["btn-submit"]}
+                disabled={loading || readOnly}
+              >
                 {loading ? (
                   <>
-                    <Loader2 className="animate-spin" size={20} /> 
-                    {loadingStep === "paying" ? "Awaiting Payment..." : "Processing..."}
+                    <Loader2 className="animate-spin" size={20} />
+                    {loadingStep === "paying"
+                      ? "Awaiting Payment..."
+                      : "Processing..."}
                   </>
                 ) : (
-                  <>Complete Registration <Check size={20} /></>
+                  <>
+                    Complete Registration <Check size={20} />
+                  </>
                 )}
               </button>
 
-              <button type="button" onClick={handleDownloadPDF} className={styles["btn-pdf"]}>
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                className={styles["btn-pdf"]}
+              >
                 <Download size={18} /> Download Form PDF
               </button>
 
-              <button type="button" onClick={() => { dispatch(setCurrentNomination(null)); router.back(); }} className={styles["btn-close"]}>
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch(setCurrentNomination(null));
+                  router.back();
+                }}
+                className={styles["btn-close"]}
+              >
                 Close
               </button>
             </div>
@@ -713,17 +1070,29 @@ const NominationForm: React.FC<NominationFormProps> = ({ readOnly = false }) => 
       </div>
 
       {toast.show && (
-        <div 
+        <div
           style={{
-            position: 'fixed', bottom: '2rem', right: '2rem', 
-            background: toast.isError ? '#ef4444' : '#1e293b',
-            color: 'white', padding: '1rem 1.5rem', borderRadius: '12px',
-            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-            zIndex: 1000, display: 'flex', alignItems: 'center', gap: '0.75rem',
-            fontWeight: 600, animation: 'slideIn 0.3s ease'
+            position: "fixed",
+            bottom: "2rem",
+            right: "2rem",
+            background: toast.isError ? "#ef4444" : "#1e293b",
+            color: "white",
+            padding: "1rem 1.5rem",
+            borderRadius: "12px",
+            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            fontWeight: 600,
+            animation: "slideIn 0.3s ease",
           }}
         >
-          {toast.isError ? <X size={20} /> : <Check size={20} color="#10b981" />}
+          {toast.isError ? (
+            <X size={20} />
+          ) : (
+            <Check size={20} color="#10b981" />
+          )}
           {toast.message}
         </div>
       )}

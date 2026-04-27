@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { 
-  ArrowRight, LogOut, Settings, Bell, ChevronUp, User, LayoutGrid,
+  ArrowRight, LogOut, Settings, Bell, ChevronUp, ChevronDown, User, LayoutGrid,
   CreditCard, FileText, CalendarRange, BadgeCheck
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -15,6 +15,9 @@ import { useRouter } from 'next/navigation';
 export function DashboardSidebar({ currentPath }: { currentPath: string }) {
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
+  const [expandedMenus, setExpandedMenus] = React.useState<Record<string, boolean>>({
+    Awards: true
+  });
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -31,6 +34,17 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
     if (href === '/dashboard/leads' && currentPath === '/dashboard/leads/inbox') return false;
     
     return currentPath.startsWith(`${href}/`);
+  };
+
+  const isParentActive = (link: any) => {
+    if (link.subItems) {
+      return link.subItems.some((sub: any) => isActive(sub.href));
+    }
+    return isActive(link.href || '');
+  };
+
+  const toggleMenu = (label: string) => {
+    setExpandedMenus(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
   const handleLogout = () => {
@@ -156,10 +170,58 @@ export function DashboardSidebar({ currentPath }: { currentPath: string }) {
 
                 {(isAdmin 
                   ? dashboardNavItems.filter(item => item.href !== '/dashboard/payments' && item.href !== '/dashboard/files') 
-                  : nonAdminNavItems
-                ).map((link) => {
-                  const active = isActive(link.href);
+                  : (nonAdminNavItems as any)
+                ).map((link: any) => {
+                  const active = isParentActive(link);
+                  const isExpanded = expandedMenus[link.label];
  
+                  if (link.subItems) {
+                    return (
+                      <div key={link.label} className="space-y-1">
+                        <button
+                          onClick={() => toggleMenu(link.label)}
+                          className={cn(
+                            'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all',
+                            active && !isExpanded
+                              ? 'bg-linear-to-r from-primary-deep via-primary-dark to-primary text-white shadow-sh-md'
+                              : 'text-navy hover:bg-bg-soft'
+                          )}
+                        >
+                          <span className="flex items-center gap-3">
+                            <link.icon size={18} className={active && !isExpanded ? 'text-gold-3' : 'text-primary-dark'} />
+                            <span className="text-sm font-semibold">{link.label}</span>
+                          </span>
+                          <ChevronDown 
+                            size={16} 
+                            className={cn("transition-transform duration-200", isExpanded ? "rotate-180" : "")} 
+                          />
+                        </button>
+                        
+                        {isExpanded && (
+                          <div className="ml-4 space-y-1 pl-4 border-l border-border-light">
+                            {link.subItems.map((sub: any) => {
+                              const subActive = isActive(sub.href);
+                              return (
+                                <Link
+                                  key={sub.label}
+                                  href={sub.href}
+                                  className={cn(
+                                    'flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left transition-all',
+                                    subActive
+                                      ? 'text-primary font-bold bg-primary/5'
+                                      : 'text-text-muted hover:text-navy hover:bg-bg-soft'
+                                  )}
+                                >
+                                  <span className="text-sm">{sub.label}</span>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
                     <Link
                       key={link.label}
