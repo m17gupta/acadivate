@@ -106,7 +106,7 @@ export async function POST(request: Request) {
               ${!isContactForm ? `
               <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold;">Location</td>
-                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;">${data.city}, ${data.state}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;">${data.city}, ${data.state}, ${data.country || 'N/A'}</td>
               </tr>
               <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold;">Total Paid</td>

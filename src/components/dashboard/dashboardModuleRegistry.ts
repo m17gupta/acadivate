@@ -66,7 +66,7 @@ import {
 } from "@/src/hook/orders/orderThunk";
 
 type AnyRecord = {
-  _id?: string;
+  _id?: string | { $oid: string };
   [key: string]: unknown;
 };
 
@@ -134,7 +134,7 @@ function firstStringValue(record: AnyRecord, keys: string[]) {
 
 function mapEventRecordToRow(record: AnyRecord): DashboardModuleRow {
   const normalized = normalizeRecord(record);
-  const event = normalized as unknown as EventRecord;
+  const event = normalized as any;
 
   return {
     id: String(event._id ?? event.slug ?? event.title ?? "event"),

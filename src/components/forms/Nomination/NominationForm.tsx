@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import {
   Eye,
   FileDown,
@@ -33,15 +33,17 @@ import {
 import { NominationFormType } from "@/src/hook/nominations/nominationType";
 import { useRouter } from "next/navigation";
 import { setCurrentNomination } from "@/src/hook/nominations/nominationSlice";
-import {
-  academicAwards,
-  entrepreneurAwards,
-  riseAwards,
-  startupAwards,
-} from "./util";
+// import {
+//   academicAwards,
+//   entrepreneurAwards,
+//   riseAwards,
+//   startupAwards,
+// } from "./util";
 import Script from "next/script";
 import { OrderType } from "@/src/hook/orders/orderType";
 import { createOrderThunk } from "@/src/hook/orders/orderThunk";
+import GetNominationAwards from "./GetNominationAwards";
+import GetEventBySlug from "../../events/GetEventBySlug";
 
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
@@ -59,6 +61,9 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const currentNomination = useSelector(
     (state: RootState) => state.nominations.currentNomination,
   );
+  const currentAwardCategory = useSelector(
+    (state: RootState) => state.awardCategories.currentAwardCategory,
+  );
 
   const isEditMode = !!currentNomination?._id;
   const user = useSelector((state: RootState) => state.auth?.user);
@@ -70,6 +75,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
     mobile: "",
     state: "",
     city: "",
+    country: "",
     email: "",
     website: "",
     gstin: "",
@@ -84,11 +90,11 @@ const NominationForm: React.FC<NominationFormProps> = ({
     status: "pending",
   });
 
-  const [selectedAwards, setSelectedAwards] = useState({
-    academic: [] as string[],
-    startup: [] as string[],
-    rise: [] as string[],
-    entrepreneur: [] as string[],
+  const [selectedAwards, setSelectedAwards] = useState<Record<string, string[]>>({
+    academic: [],
+    startup: [],
+    rise: [],
+    entrepreneur: [],
   });
 
   const [payableAmount, setPayableAmount] = useState(0);
@@ -105,67 +111,17 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const [isDynamic, setIsDynamic] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const queryId = params.get("id");
-
-    if (queryId) {
-      const fetchAward = async () => {
-        try {
-          const res = await fetch(`/api/awards-list?id=${queryId}`);
-          const data = await res.json();
-          console.log(data);
-          if (data.success && data.item?.selectedAwards) {
-            const parsedCategories = data.item.selectedAwards.map(
-              (cat: any) => {
-                const title = cat.title || "Other Awards";
-                let key = "academic";
-                const lowerTitle = title.toLowerCase();
-                if (lowerTitle.includes("startup")) key = "startup";
-                else if (lowerTitle.includes("rise")) key = "rise";
-                else if (lowerTitle.includes("entrepreneur"))
-                  key = "entrepreneur";
-
-                let icon = <Trophy size={20} color="#fbbf24" />;
-                if (key === "startup")
-                  icon = <Globe size={20} color="#3b82f6" />;
-                if (key === "rise") icon = <Award size={20} color="#10b981" />;
-                if (key === "entrepreneur")
-                  icon = <User size={20} color="#8b5cf6" />;
-
-                const validItems =
-                  cat.items
-                    ?.filter((i: any) => typeof i === "object" && i.name)
-                    .map((i: any) => i.name) || [];
-                const stringItems =
-                  validItems.length > 0
-                    ? validItems
-                    : cat.items?.filter((i: any) => typeof i === "string") ||
-                      [];
-
-                // eliminate duplicates
-                const uniqueAwards = Array.from(
-                  new Set(stringItems as string[]),
-                );
-
-                return { title, key, icon, awards: uniqueAwards };
-              },
-            );
-            setDynamicCategories(parsedCategories);
-            setIsDynamic(true);
-          }
-        } catch (err) {
-          console.error("Error fetching dynamic awards:", err);
-        }
-      };
-      fetchAward();
+    if (currentAwardCategory?.selectedAwards) {
+      setDynamicCategories(currentAwardCategory?.selectedAwards)
+      setIsDynamic(true);
     }
-  }, []);
+  }, [currentAwardCategory]);
 
 
   useEffect(() => {
     if (currentNomination) {
       setFormData((prev) => ({
-        ...prev,
+        ...prev,  
         orgName: currentNomination.orgName ?? "",
         promoter: currentNomination.promoter ?? "",
         ownership: currentNomination.ownership ?? "",
@@ -173,6 +129,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
         mobile: currentNomination.mobile ?? "",
         state: currentNomination.state ?? "",
         city: currentNomination.city ?? "",
+        country: currentNomination.country ?? "",
         email: currentNomination.email ?? "",
         website: currentNomination.website ?? "",
         gstin: currentNomination.gstin ?? "",
@@ -228,7 +185,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   };
 
   const handleAwardChange = (
-    category: keyof typeof selectedAwards,
+    category: string,
     award: string,
     checked: boolean,
   ) => {
@@ -236,8 +193,8 @@ const NominationForm: React.FC<NominationFormProps> = ({
     setSelectedAwards((prev) => ({
       ...prev,
       [category]: checked
-        ? [...prev[category], award]
-        : prev[category].filter((a) => a !== award),
+        ? [...(prev[category] || []), award]
+        : (prev[category] || []).filter((a) => a !== award),
     }));
   };
 
@@ -279,11 +236,9 @@ const NominationForm: React.FC<NominationFormProps> = ({
               formId: data._id,
               status: "success",
             };
-            console.log(" paymemnnt done--->", response);
-            console.log(" order data--->", orderData);
+      
             const result = await saveOrderData(orderData);
 
-            console.log(" result---> save order data", result);
             if (result.success) {
               showToast("Payment successful");
               resolve({ success: true });
@@ -317,7 +272,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const saveOrderData = async (orderData: OrderType) => {
     try {
       const response = await dispatch(createOrderThunk(orderData)).unwrap();
-      console.log("resposne---> create order data", response);
+  
       return { success: true, item: response };
     } catch (err) {
       console.error("Error saving order data:", err);
@@ -342,6 +297,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
         mobile: formData.mobile,
         state: formData.state,
         city: formData.city,
+        country: formData.country,
         email: formData.email,
         website: formData.website,
         agreeTerms: formData.agreeTerms,
@@ -376,7 +332,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
       } else {
         response = await dispatch(createNominationThunk(formDataObj)).unwrap();
       }
-      console.log("response--->create nomination", response);
+ 
 
       if (response._id) {
         let paymentSuccessful = true;
@@ -512,28 +468,32 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const renderAwardSection = (
     title: string,
     icon: React.ReactNode,
-    awards: string[],
-    category: keyof typeof selectedAwards,
+    awards: (string | any)[],
+    category: string,
   ) => (
     <div className={styles["categories-section"]}>
       <div className={styles["section-title"]}>
         {icon} {title}
       </div>
       <div className={styles["cat-grid"]}>
-        {awards.map((award) => (
-          <div key={award} className={styles["cat-item"]}>
-            <input
-              type="checkbox"
-              checked={selectedAwards[category].includes(award)}
-              onChange={(e) =>
-                handleAwardChange(category, award, e.target.checked)
-              }
-              disabled={readOnly}
-              id={`${category}-${award}`}
-            />
-            <label htmlFor={`${category}-${award}`}>{award}</label>
-          </div>
-        ))}
+        {awards?.map((awardItem) => {
+          const awardName =
+            typeof awardItem === "string" ? awardItem : awardItem.name;
+          return (
+            <div key={awardName} className={styles["cat-item"]}>
+              <input
+                type="checkbox"
+                checked={selectedAwards[category]?.includes(awardName) || false}
+                onChange={(e) =>
+                  handleAwardChange(category, awardName, e.target.checked)
+                }
+                disabled={readOnly}
+                id={`${category}-${awardName}`}
+              />
+              <label htmlFor={`${category}-${awardName}`}>{awardName}</label>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -667,6 +627,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
       mobile: "9876543210",
       state: "Maharashtra",
       city: "Mumbai",
+      country: "India",
       email: "test@acadivate.com",
       website: "https://acadivate.com",
       gstin: "27AAAAA0000A1Z5",
@@ -676,6 +637,10 @@ const NominationForm: React.FC<NominationFormProps> = ({
   };
   return (
     <>
+      <Suspense fallback={null}>
+        <GetNominationAwards />
+        <GetEventBySlug/>
+      </Suspense>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className={styles.container}>
         <div className={styles.hero}>
@@ -852,11 +817,16 @@ const NominationForm: React.FC<NominationFormProps> = ({
                   <option value="" disabled>
                     Select State
                   </option>
-                  <option>Maharashtra</option>
+                   <option>Maharashtra</option>
                   <option>Delhi</option>
                   <option>Karnataka</option>
                   <option>Tamil Nadu</option>
                   <option>Gujarat</option>
+                  <option>West Bengal</option>
+                  <option>Rajasthan</option>
+                  <option>Uttar Pradesh</option>
+                  <option>Punjab</option>
+                  <option>Haryana</option>
                   <option>Others</option>
                 </select>
               </div>
@@ -880,8 +850,29 @@ const NominationForm: React.FC<NominationFormProps> = ({
                   <option>Bengaluru</option>
                   <option>Chennai</option>
                   <option>Hyderabad</option>
+                  <option>Pune</option>
+                  <option>Kolkata</option>
+                  <option>Ahmedabad</option>
+                  <option>Jaipur</option>
+                  <option>Lucknow</option>
+                  <option>Chandigarh</option>
                   <option>Others</option>
                 </select>
+              </div>
+
+              <div className={styles["input-group"]}>
+                <label>
+                  <Globe size={16} /> Country
+                </label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  placeholder="Enter Country"
+                  required
+                  disabled={readOnly}
+                />
               </div>
 
               <div className={styles["input-group"]}>
@@ -932,38 +923,40 @@ const NominationForm: React.FC<NominationFormProps> = ({
                   {renderAwardSection(
                     cat.title,
                     cat.icon,
-                    cat.awards,
+                    cat.items,
                     cat.key as keyof typeof selectedAwards,
                   )}
                 </React.Fragment>
               ))
             ) : (
-              <>
-                {renderAwardSection(
-                  "Academic Awards",
-                  <Trophy size={20} color="#fbbf24" />,
-                  academicAwards,
-                  "academic",
-                )}
-                {renderAwardSection(
-                  "Startup Awards",
-                  <Globe size={20} color="#3b82f6" />,
-                  startupAwards,
-                  "startup",
-                )}
-                {renderAwardSection(
-                  "Rise Awards",
-                  <Award size={20} color="#10b981" />,
-                  riseAwards,
-                  "rise",
-                )}
-                {renderAwardSection(
-                  "Entrepreneur Awards",
-                  <User size={20} color="#8b5cf6" />,
-                  entrepreneurAwards,
-                  "entrepreneur",
-                )}
-              </>
+            <Loader2/>
+              
+              // <>
+              //   {renderAwardSection(
+              //     "Academic Awards",
+              //     <Trophy size={20} color="#fbbf24" />,
+              //     academicAwards,
+              //     "academic",
+              //   )}
+              //   {renderAwardSection(
+              //     "Startup Awards",
+              //     <Globe size={20} color="#3b82f6" />,
+              //     startupAwards,
+              //     "startup",
+              //   )}
+              //   {renderAwardSection(
+              //     "Rise Awards",
+              //     <Award size={20} color="#10b981" />,
+              //     riseAwards,
+              //     "rise",
+              //   )}
+              //   {renderAwardSection(
+              //     "Entrepreneur Awards",
+              //     <User size={20} color="#8b5cf6" />,
+              //     entrepreneurAwards,
+              //     "entrepreneur",
+              //   )}
+              // </>
             )}
 
             <div className={styles["fee-summary"]}>

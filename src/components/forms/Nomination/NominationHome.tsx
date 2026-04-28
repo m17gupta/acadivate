@@ -15,6 +15,7 @@ import { Button } from "../../ui/Button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import DashBoardHeader from "../../dashboard/header/DashBoardHeader"
+import GetNominationAwards from "./GetNominationAwards"
 export default function NominationHome() {
     const moduleId = 'nominations';
 const config = dashboardModuleList.find((module) => module.id === moduleId) ?? dashboardModuleList[0];
@@ -26,6 +27,7 @@ const handleOpenNominationForm=()=>{
 }
     return (
         <>
+        <GetNominationAwards/>
              <GetAllNomination />
     <section className="space-y-6">
       <article

@@ -130,8 +130,9 @@ export async function downloadNominationPDF(data: NominationFormType, filename?:
   formField('Correspondence Address', data.address || '', CONTENT_W, MARGIN);
   y += 18;
 
-  formField('State', data.state || '', halfW, MARGIN);
-  formField('City', data.city || '', halfW, MARGIN + halfW + 6);
+  formField('State', data.state || '', (CONTENT_W / 3) - 4, MARGIN);
+  formField('City', data.city || '', (CONTENT_W / 3) - 4, MARGIN + (CONTENT_W / 3) + 2);
+  formField('Country', data.country || '', (CONTENT_W / 3) - 4, MARGIN + 2 * (CONTENT_W / 3) + 4);
   y += 18;
 
   // ---------- SECTION 2: CONTACT ----------

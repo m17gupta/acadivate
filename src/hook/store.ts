@@ -14,6 +14,7 @@ import sliderReducer from './sliders/sliderSlice';
 import dashboardStatsReducer from './dashboard/dashboardStatsSlice';
 import orderReducer from './orders/orderSlice';
 import fileReducer from './files/fileSlice';
+import awardCategoriesReducer from './awardCategories/AwardCategoriesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
     dashboardStats: dashboardStatsReducer,
     orders: orderReducer,
     files: fileReducer,
+    awardCategories: awardCategoriesReducer,
   },
 });
 

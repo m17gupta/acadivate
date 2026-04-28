@@ -1,5 +1,6 @@
-import { Events } from '@/src/components/sections/Events';
+import { ShowEvents } from '@/src/components/events/ShowEvents';
 
 export default function Page() {
-  return <Events includeHiddenEvents />;
+
+  return <ShowEvents  />;
 }

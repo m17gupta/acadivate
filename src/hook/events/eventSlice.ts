@@ -4,6 +4,7 @@ import {
   createEventThunk,
   deleteEventThunk,
   fetchEventThunk,
+  fetchEventBySlugThunk,
   fetchEventsThunk,
   updateEventThunk,
 } from './eventThunk';
@@ -24,23 +25,28 @@ const initialState: EventState = {
   error: null,
 };
 
+function extractId(id: string | { $oid: string } | undefined): string | undefined {
+  if (!id) return undefined;
+  return typeof id === 'string' ? id : id.$oid;
+}
+
 function upsertEvent(list: EventRecord[], nextEvent: EventRecord) {
-  const nextId = nextEvent._id;
+  const nextId = extractId(nextEvent._id);
 
   if (!nextId) {
     return [nextEvent, ...list];
   }
 
-  const existingIndex = list.findIndex((item) => item._id === nextId);
+  const existingIndex = list.findIndex((item) => extractId(item._id) === nextId);
   if (existingIndex === -1) {
     return [nextEvent, ...list];
   }
 
-  return list.map((item) => (item._id === nextId ? nextEvent : item));
+  return list.map((item) => (extractId(item._id) === nextId ? nextEvent : item));
 }
 
 function removeEvent(list: EventRecord[], id: string) {
-  return list.filter((item) => item._id !== id);
+  return list.filter((item) => extractId(item._id) !== id);
 }
 
 export const eventSlice = createSlice({
@@ -92,6 +98,21 @@ export const eventSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchEventThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || action.error.message || 'Failed to fetch event';
+      })
+      .addCase(fetchEventBySlugThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchEventBySlugThunk.fulfilled, (state, action) => {
+        state.currentEvent = action.payload;
+        state.allEvent = upsertEvent(state.allEvent, action.payload);
+        state.isFetchedEvent = true;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchEventBySlugThunk.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || action.error.message || 'Failed to fetch event';
       })

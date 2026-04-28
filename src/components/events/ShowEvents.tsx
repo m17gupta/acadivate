@@ -14,6 +14,13 @@ import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { cn } from "@/src/lib/utils";
 import { Button } from "../ui/Button";
+import { GetAllEvents } from "./GetAllEvents";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/src/hook/store";
+import { setCurrentEvent } from "@/src/hook/events/eventSlice";
+import { useRouter } from "next/navigation";
+import { setCurrentAwardCategory } from "@/src/hook/awardCategories/AwardCategoriesSlice";
+
 
 const HIDDEN_EVENT_SLUGS = new Set([
   "awards-2025",
@@ -30,23 +37,20 @@ const FILTERS = [
   { id: "workshop", label: "Workshops" },
 ];
 
-type EventsProps = {
-  includeHiddenEvents?: boolean;
-};
 
-export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
+export const ShowEvents = () => {
   const [events, setEvents] = React.useState<any[]>([]);
-  const [loading, setLoading] = React.useState(true);
   const [filter, setFilter] = React.useState("all");
+  const dispatch = useDispatch();
+  const { allEvent, isFetchedEvent } = useSelector((state: RootState) => state.events)
 
+  const  {allAwardCategories}=useSelector((state:RootState)=>state.awardCategories)
+    const router= useRouter()
   React.useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch("/api/events");
-        const data = await response.json();
-        if (data.success) {
+
+        if (allEvent && allEvent.length > 0 && allAwardCategories && allAwardCategories.length > 0) {
           // Filter only published events and map to frontend structure
-          const mappedEvents = data.items
+          const mappedEvents = allEvent
             .filter((item: any) => {
               const status = item?.basic?.status || item?.status;
               return status === "Published";
@@ -54,12 +58,15 @@ export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
             .filter((item: any) => {
               const title = item?.basic?.title || item?.title;
               return (
-                includeHiddenEvents ||
                 (!HIDDEN_EVENT_SLUGS.has(item.slug) &&
                   !HIDDEN_EVENT_TITLES.has(title))
               );
             })
+           
             .map((item: any) => {
+              const relatedAward = item?.basic?.relatedAward || item?.relatedAward;
+              const relatedWaradData= allAwardCategories.find((item: any) => item?._id?.toString() === relatedAward?.toString())
+             debugger
               const startDateStr = item?.datetime?.startDate || item?.eventDate;
               const eventDate = startDateStr
                 ? new Date(startDateStr)
@@ -115,37 +122,31 @@ export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
                 location: locationStr,
                 image: image,
                 tags: tags,
+                relatedWaradData:relatedWaradData
               };
             });
           setEvents(mappedEvents);
         }
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchEvents();
-  }, []);
+
+  }, [allEvent,allAwardCategories]);
 
   const filteredEvents = events.filter(
     (ev) => filter === "all" || ev.type === filter,
   );
 
-  if (loading) {
-    return (
-      <div className="py-24 bg-app-bg flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <section
-      data-annotate-id="home-events-section"
-      className="py-24 bg-app-bg relative overflow-hidden"
-    >
+    <>
+      <GetAllEvents />
+      {!isFetchedEvent ? (
+        <div className="py-24 bg-app-bg flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <section
+          data-annotate-id="home-events-section"
+          className="py-24 bg-app-bg relative overflow-hidden"
+        >
       {/* Decorative background */}
       <div
         className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[0.03]"
@@ -250,11 +251,29 @@ export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
                             </span>
                           ))}
                         </div>
-                        <Link href={`/events/${ev.slug || ev.id}`}>
+                        {/* <Link href={`/events/${ev.slug}`}> */}
                           <Button
                             variant="primary"
                             size="sm"
                             className="rounded-xl px-5 py-2.5 shadow-sh-sm group/btn"
+                            onClick={() => {
+                              console.log("allEvent", ev)
+                                const currentEvent =allEvent.find((item: any) => item._id === ev.id);
+                                console.log("currentEvent", currentEvent)
+                                console.log("relaewtete", ev.relatedAwardData)
+                                debugger;
+                                if(currentEvent && ev.relatedWaradData){
+                                     dispatch(setCurrentEvent(currentEvent));
+                                      dispatch(setCurrentAwardCategory(ev.relatedWaradData))
+                                    
+                                }
+                                else{
+                                 dispatch(setCurrentEvent(ev));
+                                 
+                                }
+                                router.push(`/events/${ev.slug}`);
+                             
+                            }}
                           >
                             More Details{" "}
                             <ArrowRight
@@ -262,7 +281,7 @@ export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
                               className="group-hover/btn:translate-x-1 transition-transform"
                             />
                           </Button>
-                        </Link>
+                        {/* </Link> */}
                       </div>
                     </div>
                   </motion.div>
@@ -352,6 +371,8 @@ export const Events = ({ includeHiddenEvents = false }: EventsProps) => {
         </div>
       </div>
     </section>
+      )}
+    </>
   );
 };
 

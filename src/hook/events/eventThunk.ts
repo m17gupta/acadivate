@@ -53,6 +53,28 @@ export const fetchEventThunk = createAsyncThunk<
     if (!data.item) {
       throw new Error('Event not found');
     }
+  console.log("data.item====",data)
+    return data.item;
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch event');
+  }
+});
+
+export const fetchEventBySlugThunk = createAsyncThunk<
+  EventRecord,
+  string,
+  { rejectValue: string }
+>('events/fetchBySlug', async (slug, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`/api/events?slug=${encodeURIComponent(slug)}`);
+    const data = await parseResponse<{ item?: EventRecord }>(
+      response,
+      'Failed to fetch event'
+    );
+
+    if (!data.item) {
+      throw new Error('Event not found');
+    }
 
     return data.item;
   } catch (error) {

@@ -328,28 +328,6 @@ export function DashboardModuleForm({
               <span className="text-sm font-bold text-navy">
                 {field.placeholder || `Manage ${field.label}`}
               </span>
-              <Button
-                type="button"
-                variant="gold"
-                size="sm"
-                onClick={() => {
-                  const currentItems = (draft[field.key] as any[]) || [];
-                  const newItem = field.subFields?.reduce((acc, sub) => {
-                    acc[sub.key] =
-                      sub.type === "checkbox"
-                        ? false
-                        : sub.type === "number"
-                          ? 0
-                          : "";
-                    return acc;
-                  }, {} as any);
-                  onFieldChange(field.key, [...currentItems, newItem]);
-                }}
-                className="h-8 rounded-lg"
-              >
-                <Plus size={14} />
-                Add Item
-              </Button>
             </div>
 
             <div className="space-y-3">
@@ -464,6 +442,31 @@ export function DashboardModuleForm({
                   No items added yet. Click "Add Item" to begin.
                 </div>
               )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                type="button"
+                variant="gold"
+                size="sm"
+                onClick={() => {
+                  const currentItems = (draft[field.key] as any[]) || [];
+                  const newItem = field.subFields?.reduce((acc, sub) => {
+                    acc[sub.key] =
+                      sub.type === "checkbox"
+                        ? false
+                        : sub.type === "number"
+                          ? 0
+                          : "";
+                    return acc;
+                  }, {} as any);
+                  onFieldChange(field.key, [...currentItems, newItem]);
+                }}
+                className="h-9 rounded-xl shadow-sh-sm px-6"
+              >
+                <Plus size={16} />
+                Add Item
+              </Button>
             </div>
           </div>
         ) : field.type === "capsule-select" ? (

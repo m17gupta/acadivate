@@ -108,6 +108,9 @@ export function getDemoValue(field: DashboardModuleField): any {
   switch (field.type) {
     case "text":
     case "email":
+      if (field.key === "slug") {
+        return slugifyValue(`Demo ${field.label}`);
+      }
       return field.key === "email" ? "demo@example.com" : `Demo ${field.label}`;
     case "textarea":
       return `This is some demo content for ${field.label}. It helps in visualizing the layout and spacing of the form components.`;

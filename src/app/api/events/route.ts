@@ -87,7 +87,8 @@ async function GET(req: NextRequest) {
     const id = searchParams.get('id');
     const slug = searchParams.get('slug');
     const collection = await getCollection();
-
+     console.log("slug ----->", slug)
+     console.log("id ----->", id)
     if (id) {
       const objectId = getObjectId(id);
       if (!objectId) {
@@ -98,7 +99,7 @@ async function GET(req: NextRequest) {
       if (!item) {
         return NextResponse.json({ success: false, error: 'Event not found' }, { status: 404 });
       }
-
+    console.log("item ----->", item)
       return NextResponse.json({ success: true, item });
     }
 
@@ -112,6 +113,7 @@ async function GET(req: NextRequest) {
     }
 
     const items = await collection.find({}).sort({ createdAt: -1 }).toArray();
+
     return NextResponse.json({ success: true, items });
   } catch (error) {
     console.error('Error fetching events:', error);

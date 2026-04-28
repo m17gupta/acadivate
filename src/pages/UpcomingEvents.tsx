@@ -207,7 +207,7 @@ export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsPr
                                 </span>
                               ))}
                             </div>
-                            <Link href={`/events/${ev.id}`}>
+                            <Link href={`/events/${ev.slug || ev.id}`}>
                               <Button variant="primary" size="sm" className="rounded-xl px-5 py-2.5 shadow-sh-sm group/btn">
                                 More Details <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                               </Button>

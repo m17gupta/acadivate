@@ -91,6 +91,8 @@ export function DashboardModulePage({
   const records = moduleSnapshot.records.map((record) =>
     moduleCrud.mapRecordToRow(record),
   );
+
+  console.log(" recorsfd",records)
   const summaryCards = config.buildSummary(records);
   const scrollToForm = () => {
     if (typeof window === "undefined") {
@@ -146,7 +148,9 @@ export function DashboardModulePage({
     }
 
     setDraft((previous) => {
-      const nextDraft = { ...previous, [key]: value };
+      const nextValue = value;
+
+      const nextDraft = { ...previous, [key]: nextValue };
 
       if (
         hasSlugField &&
@@ -164,12 +168,22 @@ export function DashboardModulePage({
   const handleAutoFill = () => {
     setDraft((previous) => {
       const nextDraft = { ...previous };
+      let filledSlug = false;
+
       config.fields.forEach((field) => {
         const demoValue = getDemoValue(field);
         if (demoValue !== undefined) {
           nextDraft[field.key] = demoValue;
+          if (field.key === "slug") {
+            filledSlug = true;
+          }
         }
       });
+
+      if (filledSlug) {
+        slugManuallyEditedRef.current = true;
+      }
+
       return nextDraft;
     });
     toast.info("Form filled with demo data", {
@@ -310,7 +324,7 @@ export function DashboardModulePage({
   const handleEdit = (row: DashboardModuleRow) => {
     setDraft({ ...buildEmptyDraft(config.fields), ...row.values });
     setEditingId(row.id);
-    slugManuallyEditedRef.current = false;
+    slugManuallyEditedRef.current = true;
     openForm();
   };
 

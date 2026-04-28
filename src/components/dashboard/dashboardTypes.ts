@@ -52,7 +52,7 @@ export type DashboardModuleField = {
 
 export type DashboardModuleRow = {
   id: string;
-  values: Record<string, string | string[]>;
+  values: Record<string, any>;
 };
 
 export type DashboardSummaryCard = {

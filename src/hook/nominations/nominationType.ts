@@ -14,6 +14,7 @@ export interface NominationFormType {
   mobile?: string;
   state?: string;
   city?: string;
+  country?: string;
   email?: string;
   website?: string;
   gstin?: string;

@@ -72,7 +72,10 @@ export function DashboardModuleList({
 
             <div className="divide-y divide-border-light">
               {records.length ? (
-                records.map((row) => (
+                records.map((row) =>{
+                
+                     
+                  return(
                   <div
                     key={row.id}
                     className={cn(
@@ -111,7 +114,7 @@ export function DashboardModuleList({
                     <div className="flex items-center gap-2">
                       {config.id === 'events' && (
                         <Link
-                          href={`/dashboard/events/${row.id}`}
+                          href={`/events/${row?.values?.slug ?? row.id}`}
                           title="View"
                           className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-xl border border-border-light bg-bg-soft text-navy transition hover:border-primary hover:text-primary"
                         >
@@ -136,7 +139,7 @@ export function DashboardModuleList({
                       </button>}
                     </div>
                   </div>
-                ))
+                )})
               ) : (
                 <div className="px-5 py-10 text-center">
                   <p className="text-sm font-semibold text-navy">No records yet.</p>

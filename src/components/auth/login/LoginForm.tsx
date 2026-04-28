@@ -13,10 +13,10 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const adminEmail = 'admin@acadivate.com';
 const adminPassword = '123456';
 
-type props={
-  isadmin?:boolean
+type props = {
+  isadmin?: boolean
 }
-function LoginForm({isadmin}:props) {
+function LoginForm({ isadmin }: props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -108,17 +108,17 @@ function LoginForm({isadmin}:props) {
           password: credentials.password,
         })
       ).unwrap();
-       console.log("response login",response)
-       debugger
+      console.log("response login", response)
+
       if (response.status === 200) {
         toast.success('Successfully logged in!', {
           description: `Welcome back, ${response.user?.userName ?? 'user'}`,
-        });  
-        if(response.user?.role== "admin"){
-          router.push("/") 
-        }else{
+        });
+        if (response.user?.role == "admin") {
+          router.push("/")
+        } else {
           router.push("/dashboard/userAccount")
-        } 
+        }
       } else {
         toast.error('Login failed', {
           description: 'Unknown error occurred',
@@ -207,8 +207,8 @@ function LoginForm({isadmin}:props) {
           </div> */}
 
           <div>
-            <img src="/assets/Image/Acadivate logo-transpernt.png" width="150" height="120" alt="Logo"/>
-            </div>
+            <img src="/assets/Image/Acadivate logo-transpernt.png" width="150" height="120" alt="Logo" />
+          </div>
 
         </div>
 
@@ -349,49 +349,49 @@ function LoginForm({isadmin}:props) {
                 )}
               </Button>
             </form>
-{isadmin &&
-            <div className="mt-7 border-t border-border-light pt-6">
-              <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
-                <p className="text-center text-sm font-semibold text-navy">
-                  Test Mode: Magic Login
-                </p>
+            {isadmin &&
+              <div className="mt-7 border-t border-border-light pt-6">
+                <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
+                  <p className="text-center text-sm font-semibold text-navy">
+                    Test Mode: Magic Login
+                  </p>
 
-                <div className="mt-4 flex flex-col items-center gap-3">
-                  <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
-                    <span className="inline-flex items-center justify-center rounded-xl border border-border-light bg-white px-4 py-2 text-sm font-medium text-navy shadow-sh-xs">
-                      Bot Check: {num1} + {num2} = ?
-                    </span>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      placeholder="Answer"
-                      disabled={pending}
-                      value={botAnswer}
-                      onChange={(event) => setBotAnswer(event.target.value)}
-                      className="h-9 w-full rounded-xl border border-border-light bg-white px-3 text-center text-sm text-navy outline-none transition-all focus:border-primary sm:w-24"
-                    />
+                  <div className="mt-4 flex flex-col items-center gap-3">
+                    <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+                      <span className="inline-flex items-center justify-center rounded-xl border border-border-light bg-white px-4 py-2 text-sm font-medium text-navy shadow-sh-xs">
+                        Bot Check: {num1} + {num2} = ?
+                      </span>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        placeholder="Answer"
+                        disabled={pending}
+                        value={botAnswer}
+                        onChange={(event) => setBotAnswer(event.target.value)}
+                        className="h-9 w-full rounded-xl border border-border-light bg-white px-3 text-center text-sm text-navy outline-none transition-all focus:border-primary sm:w-24"
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!isHuman || pending}
+                      onClick={handleMagicLogin}
+                      className="h-10 w-full rounded-2xl border-primary/30 bg-white text-primary hover:bg-primary/10 hover:text-primary"
+                    >
+                      {pending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : null}
+                      ✨ Magic Login (Admin)
+                    </Button>
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={!isHuman || pending}
-                    onClick={handleMagicLogin}
-                    className="h-10 w-full rounded-2xl border-primary/30 bg-white text-primary hover:bg-primary/10 hover:text-primary"
-                  >
-                    {pending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : null}
-                    ✨ Magic Login (Admin)
-                  </Button>
                 </div>
-              </div>
 
-              <p className="mt-5 text-center text-xs leading-5 text-text-muted">
-                This portal is for authorised Acadivate agents and
-                administrators only. Unauthorised access attempts are logged.
-              </p>
-            </div>}
+                <p className="mt-5 text-center text-xs leading-5 text-text-muted">
+                  This portal is for authorised Acadivate agents and
+                  administrators only. Unauthorised access attempts are logged.
+                </p>
+              </div>}
           </div>
         </div>
 

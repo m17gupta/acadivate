@@ -25,7 +25,7 @@ export const EventTabs = ({ event, title }: EventTabsProps) => {
               <h3 className="text-2xl font-bold text-navy">About the Event</h3>
             </div>
             <div className="prose prose-lg text-text-muted max-w-none prose-p:leading-relaxed">
-              <div dangerouslySetInnerHTML={{ __html: event?.basic?.description || event?.description || `Join us for ${title}. Detailed agenda, speaker lineup, and venue information will be updated as the event approaches. Prepare to engage with global leaders and peers in an immersive, collaborative experience designed to foster innovation and academic excellence.` }} />
+              <div dangerouslySetInnerHTML={{ __html: event?.basic?.description || `Join us for ${title}. Detailed agenda, speaker lineup, and venue information will be updated as the event approaches. Prepare to engage with global leaders and peers in an immersive, collaborative experience designed to foster innovation and academic excellence.` }} />
             </div>
           </>
         );

@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '@/src/hook/hooks';
 import { RootState } from '../hook/store';
 import GetAllHomepage from '@/src/components/homePage/GetAllHomepage';
 import { useEffect } from 'react';
+import { GetAllEvents } from '../components/events/GetAllEvents';
 
 export const Home = () => {
 
@@ -25,6 +26,7 @@ export const Home = () => {
     <>
      {/* { isAuthenticated && <AnnotatorPlugin />} */}
      <GetAllHomepage />
+      <GetAllEvents/>
       <Hero />
       
       <Features />
