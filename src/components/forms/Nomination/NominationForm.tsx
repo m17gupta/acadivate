@@ -59,6 +59,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const currentNomination = useSelector(
     (state: RootState) => state.nominations.currentNomination,
   );
+
   const isEditMode = !!currentNomination?._id;
   const user = useSelector((state: RootState) => state.auth?.user);
   const [formData, setFormData] = useState({
@@ -100,6 +101,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const [loadingStep, setLoadingStep] = useState("");
 
   const [dynamicCategories, setDynamicCategories] = useState<any[]>([]);
+
   const [isDynamic, setIsDynamic] = useState(false);
 
   useEffect(() => {
@@ -109,8 +111,9 @@ const NominationForm: React.FC<NominationFormProps> = ({
     if (queryId) {
       const fetchAward = async () => {
         try {
-          const res = await fetch(`/api/awards?id=${queryId}`);
+          const res = await fetch(`/api/awards-list?id=${queryId}`);
           const data = await res.json();
+          console.log(data);
           if (data.success && data.item?.selectedAwards) {
             const parsedCategories = data.item.selectedAwards.map(
               (cat: any) => {
@@ -158,7 +161,6 @@ const NominationForm: React.FC<NominationFormProps> = ({
     }
   }, []);
 
-  console.log(dynamicCategories);
 
   useEffect(() => {
     if (currentNomination) {

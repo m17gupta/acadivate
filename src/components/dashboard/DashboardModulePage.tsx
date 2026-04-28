@@ -61,7 +61,6 @@ export function DashboardModulePage({
     buildEmptyDraft(config.fields),
   );
 
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const formRef = useRef<HTMLElement | null>(null);
@@ -178,6 +177,8 @@ export function DashboardModulePage({
     });
   };
 
+  console.log(draft);
+
   const clearFileField = (key: string) => {
     const field = config.fields.find((item) => item.key === key);
     handleFieldChange(key, field?.type === "file" && field?.multiple ? [] : "");
@@ -245,7 +246,7 @@ export function DashboardModulePage({
     event.preventDefault();
 
     try {
-      const finalPayload = config.sections 
+      const finalPayload = config.sections
         ? nestDraftBySections(draft, config.sections)
         : draft;
 
@@ -278,7 +279,7 @@ export function DashboardModulePage({
     }
 
     try {
-      const nestedDraft = config.sections 
+      const nestedDraft = config.sections
         ? nestDraftBySections(draft, config.sections)
         : draft;
 
@@ -350,17 +351,17 @@ export function DashboardModulePage({
   function nestDraftBySections(draft: Record<string, any>, sections: any[]) {
     const nested: Record<string, any> = {};
     const rootFields = ["_id", "slug", "createdAt", "updatedAt"];
-    
-    rootFields.forEach(key => {
+
+    rootFields.forEach((key) => {
       if (draft[key] !== undefined) nested[key] = draft[key];
     });
 
-    sections.forEach(section => {
+    sections.forEach((section) => {
       const sectionId = section.id || slugifyValue(section.title);
       const sectionData: Record<string, any> = {
         label: section.title,
       };
-      
+
       let hasData = false;
       section.fields.forEach((field: any) => {
         if (draft[field.key] !== undefined && draft[field.key] !== "") {
@@ -368,12 +369,12 @@ export function DashboardModulePage({
           hasData = true;
         }
       });
-      
+
       if (hasData) {
         nested[sectionId] = sectionData;
       }
     });
-    
+
     return nested;
   }
 

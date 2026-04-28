@@ -1,7 +1,7 @@
-import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
-import NominationHome from '@/src/components/forms/Nomination/NominationHome';
+import NominationHome from "@/src/components/forms/Nomination/NominationHome";
 
 export default function Page() {
   return (
@@ -12,7 +12,7 @@ export default function Page() {
         </div>
       }
     >
-   <NominationHome/>
+      <NominationHome />
     </Suspense>
   );
 }

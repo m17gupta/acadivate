@@ -85,6 +85,10 @@ export function DashboardModuleForm({
     }));
   };
 
+  const nominationawardsSnapshot = useAppSelector((state) =>
+    selectDashboardModuleSnapshot(state, "awards-list"),
+  );
+
   const awardsSnapshot = useAppSelector((state) =>
     selectDashboardModuleSnapshot(state, "awards"),
   );
@@ -112,6 +116,7 @@ export function DashboardModuleForm({
   const renderField = (field: DashboardModuleField) => {
     if (!isFieldVisible(field)) return null;
     const fileValues = getFileValues(draft[field.key]);
+    console.log(awardsSnapshot);
     return (
       <div
         key={field.key}
@@ -133,27 +138,25 @@ export function DashboardModuleForm({
             className="h-11 w-full rounded-2xl border border-border-light bg-bg-soft px-4 text-sm text-navy outline-none transition focus:border-primary"
           >
             <option value="">{field.placeholder}</option>
-            {field.sourceModule === "awards" ? (
-              awardsSnapshot.records.map((record: any) => {
-                const awardTitle =
-                  record.title ||
-                  record.values?.title ||
-                  record.name ||
-                  record.values?.name ||
-                  "Untitled Award";
-                return (
-                  <option key={record._id} value={record._id}>
-                    {awardTitle}
+            {field.sourceModule === "awards"
+              ? nominationawardsSnapshot.records.map((record: any) => {
+                  const awardTitle =
+                    record.title ||
+                    record.values?.title ||
+                    record.name ||
+                    record.values?.name ||
+                    "Untitled Award";
+                  return (
+                    <option key={record._id} value={record._id}>
+                      {awardTitle}
+                    </option>
+                  );
+                })
+              : field.options?.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
-                );
-              })
-            ) : (
-              field.options?.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))
-            )}
+                ))}
           </select>
         ) : field.type === "file" ? (
           <div className="rounded-2xl border border-dashed border-border-light bg-bg-soft/60 p-4">
@@ -469,7 +472,7 @@ export function DashboardModuleForm({
               {awardsSnapshot.records.map((record: any) => {
                 const title =
                   record.title ||
-                  record.values.title ||
+                  record.values?.title ||
                   record.values.category ||
                   "Untitled";
 
