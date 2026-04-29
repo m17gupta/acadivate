@@ -145,6 +145,7 @@ function mapEventRecordToRow(record: AnyRecord): DashboardModuleRow {
       status: event.status ?? "Draft",
       bannerImage: event.bannerImage || "",
       thumbnailImage: event.thumbnailImage || "",
+      brochure: event.brochure || "",
       gallery: Array.isArray(event.gallery) ? event.gallery : [],
       agenda: Array.isArray(event.agenda) ? event.agenda : [],
       speakers: Array.isArray(event.speakers) ? event.speakers : [],

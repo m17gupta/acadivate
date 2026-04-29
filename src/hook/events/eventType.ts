@@ -52,6 +52,12 @@ export interface EventTicketInfo {
   refundPolicy?: string;
 }
 
+export interface FormField {
+  fieldLabel?: string;
+  fieldType?: string;
+  required?: boolean;
+}
+
 export interface EventAttendeesInfo {
   label?: string;
   customRegistrationForm?: {
@@ -90,6 +96,8 @@ export interface EventMediaInfo {
   label?: string;
   bannerImage?: string;
   thumbnailImage?: string;
+  gallery?: string[];
+  brochure?: string;
   theme?: string;
 }
 

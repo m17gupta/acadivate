@@ -76,6 +76,7 @@ export function DashboardModulePage({
     null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const hasSlugField = config.fields.some((field) => field.key === "slug");
   const dispatch = useDispatch<AppDispatch>();
@@ -219,7 +220,9 @@ export function DashboardModulePage({
       return;
     }
 
-    if (selectedFiles.some((file) => !file.type.startsWith("image/"))) {
+    const isImageOnly = !field.accept || field.accept.startsWith("image/");
+
+    if (isImageOnly && selectedFiles.some((file) => !file.type.startsWith("image/"))) {
       toast.error("Please choose an image file.");
       return;
     }
@@ -258,6 +261,7 @@ export function DashboardModulePage({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const finalPayload = config.sections
@@ -282,6 +286,8 @@ export function DashboardModulePage({
             error instanceof Error ? error.message : "Please try again.",
         },
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -292,6 +298,7 @@ export function DashboardModulePage({
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const nestedDraft = config.sections
         ? nestDraftBySections(draft, config.sections)
@@ -318,6 +325,8 @@ export function DashboardModulePage({
             error instanceof Error ? error.message : "Please try again.",
         },
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -436,6 +445,7 @@ export function DashboardModulePage({
             onClearFileField={clearFileField}
             onSubmit={handleSubmit}
             onUpdate={handleUpdate}
+            isSubmitting={isSubmitting}
           />
         )}
 

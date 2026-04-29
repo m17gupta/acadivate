@@ -64,7 +64,9 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const currentAwardCategory = useSelector(
     (state: RootState) => state.awardCategories.currentAwardCategory,
   );
-
+  const {currentEvent} = useSelector(
+    (state: RootState) => state.events,
+  );
   const isEditMode = !!currentNomination?._id;
   const user = useSelector((state: RootState) => state.auth?.user);
   const [formData, setFormData] = useState({
@@ -88,6 +90,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
     researchProject: [] as (File | string)[],
     patentPolicyDocument: [] as (File | string)[],
     status: "pending",
+    eventName: currentEvent?.basic?.title || "",
   });
 
   const [selectedAwards, setSelectedAwards] = useState<Record<string, string[]>>({
@@ -140,6 +143,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
         researchProject: currentNomination.researchProject ?? [],
         patentPolicyDocument: currentNomination.patentPolicyDocument ?? [],
         status: currentNomination.status ?? "pending",
+        eventName: currentNomination.eventName ?? "",
       }));
       setSelectedAwards({
         academic: currentNomination.academicAwards ?? [],
@@ -322,6 +326,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
         status: isEditMode ? currentNomination?.status : "pending",
         totalAmount: payableAmount,
         submittedById: user?.userId,
+        eventName: formData.eventName,
       };
 
       let response: any;
@@ -633,6 +638,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
       gstin: "27AAAAA0000A1Z5",
       paymentMode: "Online Banking",
       agreeTerms: true,
+      eventName: currentEvent?.basic?.title || "",
     }));
   };
   return (
