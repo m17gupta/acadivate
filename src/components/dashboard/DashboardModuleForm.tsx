@@ -9,6 +9,8 @@ import {
   Sparkles,
   Trash2,
   Upload,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import { FormEvent, MutableRefObject, useState } from "react";
 import { Button } from "../ui/Button";
@@ -46,6 +48,7 @@ type DashboardModuleFormProps = {
   onAutoFill?: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onUpdate: (event: FormEvent<HTMLFormElement>) => void;
+  isSubmitting?: boolean;
 };
 
 export function DashboardModuleForm({
@@ -60,10 +63,11 @@ export function DashboardModuleForm({
   onReset,
   onFieldChange,
   onAutoFill,
-  onFileChange,
   onClearFileField,
+  onFileChange,
   onSubmit,
   onUpdate,
+  isSubmitting,
 }: DashboardModuleFormProps) {
   const singularTitle = getSingularTitle(config.title);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -231,16 +235,26 @@ export function DashboardModuleForm({
                 ) : (
                   <div className="flex h-32 w-full max-w-[11rem] items-center justify-center overflow-hidden rounded-2xl border border-border-light bg-white">
                     {fileValues[0] ? (
-                      <img
-                        src={fileValues[0]}
-                        alt={`${field.label} preview`}
-                        className="h-full w-full object-cover"
-                      />
+                      fileValues[0].startsWith("data:image/") ||
+                      /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileValues[0]) ? (
+                        <img
+                          src={fileValues[0]}
+                          alt={`${field.label} preview`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 px-4 text-center text-primary">
+                          <FileText size={40} />
+                          <span className="text-[10px] font-bold uppercase tracking-[0.18em]">
+                            PDF / Document
+                          </span>
+                        </div>
+                      )
                     ) : (
                       <div className="flex flex-col items-center gap-2 px-4 text-center text-text-subtle">
                         <ImageIcon size={28} />
                         <span className="text-[11px] font-bold uppercase tracking-[0.18em]">
-                          No image selected
+                          No file selected
                         </span>
                       </div>
                     )}
@@ -254,8 +268,10 @@ export function DashboardModuleForm({
                     {field.label}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-text-muted">
-                    Click to import a JPG, PNG, or WEBP image. The imported file
-                    stays in this session only.
+                    {field.accept?.includes("pdf")
+                      ? "Click to import a PDF brochure."
+                      : "Click to import a JPG, PNG, or WEBP image."}{" "}
+                    The imported file stays in this session only.
                   </p>
                 </div>
 
@@ -270,11 +286,11 @@ export function DashboardModuleForm({
                     <Upload size={14} />
                     {field.multiple
                       ? fileValues.length
-                        ? "Add more images"
-                        : "Import images"
+                        ? "Add more"
+                        : "Import files"
                       : fileValues.length
-                        ? "Replace image"
-                        : "Import image"}
+                        ? "Replace"
+                        : "Import"}
                   </Button>
                   {fileValues.length ? (
                     <Button
@@ -723,11 +739,25 @@ export function DashboardModuleForm({
           )}
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button type="submit" variant="gold" className="rounded-2xl">
-              <Plus size={14} />
-              {editingId ? `Update ${config.title}` : `Create ${config.title}`}
+            <Button
+              type="submit"
+              variant="gold"
+              className="rounded-2xl"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Plus size={14} />
+              )}
+              {editingId ? `Update ${singularTitle}` : `Create ${singularTitle}`}
             </Button>
-            <Button type="button" variant="ghost" onClick={onReset}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onReset}
+              disabled={isSubmitting}
+            >
               <RotateCcw size={14} />
               Reset form
             </Button>

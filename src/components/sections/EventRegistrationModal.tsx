@@ -2,12 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, ChevronRight, CheckCircle2 } from 'lucide-react';
-
-type FormField = {
-  fieldLabel: string;
-  fieldType: string;
-  required: boolean;
-};
+import { FormField } from '@/src/hook/events/eventType';
 
 type EventRegistrationModalProps = {
   customForm?: FormField[];
@@ -29,7 +24,7 @@ export const EventRegistrationModal = ({ customForm = [], eventTitle }: EventReg
   };
 
   // If no custom form is defined, provide some default fields
-  const fieldsToRender = customForm.length > 0 
+  const fieldsToRender = (customForm && customForm.length > 0)
     ? customForm 
     : [
         { fieldLabel: 'Full Name', fieldType: 'Text', required: true },
@@ -84,18 +79,18 @@ export const EventRegistrationModal = ({ customForm = [], eventTitle }: EventReg
                       <label className="block text-sm font-bold text-navy">
                         {field.fieldLabel} {field.required && <span className="text-red-500">*</span>}
                       </label>
-                      {field.fieldType.toLowerCase() === 'textarea' ? (
+                      {field.fieldType?.toLowerCase() === 'textarea' ? (
                         <textarea 
                           required={field.required}
                           className="w-full bg-app-bg border border-border-light rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors min-h-[100px]"
-                          placeholder={`Enter ${field.fieldLabel.toLowerCase()}`}
+                          placeholder={`Enter ${(field.fieldLabel || '').toLowerCase()}`}
                         />
                       ) : (
                         <input 
-                          type={field.fieldType.toLowerCase() === 'email' ? 'email' : 'text'}
+                          type={field.fieldType?.toLowerCase() === 'email' ? 'email' : 'text'}
                           required={field.required}
                           className="w-full bg-app-bg border border-border-light rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                          placeholder={`Enter ${field.fieldLabel.toLowerCase()}`}
+                          placeholder={`Enter ${(field.fieldLabel || '').toLowerCase()}`}
                         />
                       )}
                     </div>

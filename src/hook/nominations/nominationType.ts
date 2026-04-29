@@ -33,8 +33,9 @@ export interface NominationFormType {
   entrepreneurAwards?: string[];
   createdAt?: string;
   updatedAt?: string;
-  submittedById?:string
+  submittedById?:string;
   id?: string;
+  eventName?: string;
 }
 export interface NominationRecord {
   _id?: string;

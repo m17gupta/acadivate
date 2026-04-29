@@ -42,13 +42,28 @@ const ShowEventBySlug = () => {
     }
   }, [slug, dispatch]) // Only depend on slug and dispatch to avoid infinite loops or missing updates
   // get Associatred category nominator get Nominattion and 
-  //  useEffect(()=>{
-  //    if(currentEvent?.basic?.relatedAward &&
-  //     currentEvent?.basic?.relatedAward?.toString()
-  //    )
-  //   //  const ids=currentEvent?.basic?.relatedAward?.toString() as string;
-  //   // dispatch(fetchAwardCategoryThunk(ids))
-  //  },[currentEvent])
+   useEffect(()=>{
+    debugger
+     if(currentEvent?.basic?.relatedAward &&
+      currentEvent?.basic?.relatedAward?.toString() &&
+      currentAwardCategory== null
+     )
+   
+
+   dispatch(fetchAwardCategoryThunk(currentEvent?.basic?.relatedAward))
+   },[currentEvent,currentAwardCategory])
+
+  const handleDownloadBrochure = () => {
+    const brochureUrl = currentEvent?.media?.brochure;
+    if (brochureUrl) {
+      const link = document.createElement("a");
+      link.href = brochureUrl;
+      link.download = `${title.replace(/\s+/g, "-")}-brochure.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
 
   if ((!currentEvent)) {
@@ -138,7 +153,7 @@ const ShowEventBySlug = () => {
 
   return (
     <>
-      {/* <GetEventBySlug /> */}
+      <GetEventBySlug />
       <main className="bg-app-bg pb-24">
         {/* Image Gallery Header */}
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -283,7 +298,7 @@ const ShowEventBySlug = () => {
                 </div>
 
                 {/* Action Buttons */}
-                {/* <div className="space-y-4 mb-8">
+                <div className="space-y-4 mb-8">
                   <EventRegistrationModal
                     customForm={currentEvent?.attendees?.customRegistrationForm}
                     eventTitle={title}
@@ -295,10 +310,12 @@ const ShowEventBySlug = () => {
                   <Button
                     variant="gold"
                     className="w-full py-4 rounded-xl shadow-sh-md"
+                    onClick={handleDownloadBrochure}
+                    disabled={!currentEvent?.media?.brochure}
                   >
                     Download Brochure <FileCheck size={16} />
                   </Button>
-                </div> */}
+                </div>
 
                 {/* Conditional Nomination Button */}
                 {currentAwardCategory && (

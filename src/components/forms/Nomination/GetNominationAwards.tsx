@@ -14,7 +14,7 @@ const GetNominationAwards = () => {
   );
   const searchParams = useSearchParams();
   const awardId = searchParams?.get("id");
-
+   console.log("awardId",awardId)
   useEffect(() => {
     if (!isFetched && !isApiCall.current && awardId) {
       isApiCall.current = true;

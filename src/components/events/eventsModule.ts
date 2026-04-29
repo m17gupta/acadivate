@@ -430,6 +430,14 @@ const mediaFields: DashboardModuleField[] = [
     accept: "image/*",
   },
   {
+    key: "brochure",
+    label: "Event Brochure",
+    type: "file",
+    placeholder: "Upload event brochure (PDF)",
+    accept: "application/pdf",
+    span: 2,
+  },
+  {
     key: "gallery",
     label: "Gallery Images",
     type: "file",
