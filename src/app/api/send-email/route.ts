@@ -69,7 +69,7 @@ export async function POST(request: Request) {
               </div>
 
               <div style="text-align: center; margin: 40px 0;">
-                <a href="https://acadivate.com/login" style="background-color: #2563eb; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">Login to Portal</a>
+                <a href="https://acadivate.com/auth/signin" style="background-color: #2563eb; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">Login to Portal</a>
               </div>
 
               <p style="font-size: 14px; color: #64748b; margin-top: 30px;">
