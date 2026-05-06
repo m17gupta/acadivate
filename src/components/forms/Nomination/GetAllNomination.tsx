@@ -12,7 +12,7 @@ const GetAllNomination = () => {
 
     useEffect(() => {
         if (!isFetchedNomination && !isLoading && user) {
-            dispatch(fetchNominationsThunk({ userId: user.userId, role: user.role }))
+            dispatch(fetchNominationsThunk({ userId: user.userId, role: user.role, emailId: user.email }))
         }
     }, [isFetchedNomination, isLoading, user, dispatch])
 

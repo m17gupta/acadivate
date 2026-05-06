@@ -32,16 +32,17 @@ async function parseResponse<T>(
 
 export const fetchNominationsThunk = createAsyncThunk<
   NominationRecord[],
-  { userId?: string; role?: string } | void,
+  { userId?: string; role?: string; emailId?: string } | void,
   { rejectValue: string }
 >("nominations/fetchAll", async (params, { rejectWithValue }) => {
   try {
     let url = "/api/nominations";
     if (params) {
-      const { userId, role } = params as { userId?: string; role?: string };
+      const { userId, role, emailId } = params as { userId?: string; role?: string; emailId?: string };
       const searchParams = new URLSearchParams();
       if (userId) searchParams.append("userId", userId);
       if (role) searchParams.append("role", role);
+      if (emailId) searchParams.append("emailId", emailId);
       const queryString = searchParams.toString();
       if (queryString) url += `?${queryString}`;
     }

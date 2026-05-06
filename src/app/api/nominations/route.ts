@@ -28,6 +28,7 @@ async function GET(req: NextRequest) {
     const slug = searchParams.get('slug');
     const userId = searchParams.get('userId');
     const role = searchParams.get('role');
+    const emailId = searchParams.get('emailId');
     const collection = await getCollection();
 
     if (id) {
@@ -63,8 +64,17 @@ async function GET(req: NextRequest) {
     }
 
     let query = {};
-    if (role !== 'admin' && userId) {
-      query = { submittedById: userId };
+    if (role !== 'admin') {
+      const orFilters: any[] = [];
+      if (emailId) orFilters.push({ email: emailId });
+      if (userId) orFilters.push({ submittedById: userId });
+
+      if (orFilters.length > 0) {
+        query = { $or: orFilters };
+      } else {
+        // If neither emailId nor userId is provided for a non-admin, return nothing
+        return NextResponse.json({ success: true, items: [] });
+      }
     }
 
     const items = await collection.find(query).sort({ createdAt: -1 }).toArray();
