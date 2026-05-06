@@ -45,7 +45,7 @@ export const fetchNominationsThunk = createAsyncThunk<
       const queryString = searchParams.toString();
       if (queryString) url += `?${queryString}`;
     }
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: "no-store" });
     const data = await response.json();
 
     return data.items ?? [];
@@ -64,6 +64,7 @@ export const fetchNominationThunk = createAsyncThunk<
   try {
     const response = await fetch(
       `/api/nominations?id=${encodeURIComponent(id)}`,
+      { cache: "no-store" }
     );
     const data = await parseResponse<{ item?: NominationFormType }>(
       response,

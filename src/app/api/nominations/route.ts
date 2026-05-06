@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = "force-dynamic";
+
 import { ObjectId } from 'mongodb';
 import clientPromise from '@/src/lib/mongodb';
 import Razorpay from "razorpay";

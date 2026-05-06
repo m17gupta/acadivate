@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation"
 const ShowNominationtable = () => {
    
     const dispatch = useDispatch<AppDispatch>()
-    const { allNomination, isFetchedNomination } = useSelector((state: RootState) => state.nominations)
+    const { allNomination, isFetchedNomination, isLoading } = useSelector((state: RootState) => state.nominations)
 
     const {user}=useSelector((state: RootState)=>state.auth);
    const router = useRouter()
@@ -284,7 +284,7 @@ const ShowNominationtable = () => {
                             ) : (
                                 <tr>
                                     <td colSpan={user?.role === "admin" ? 7 : 6} className="px-6 py-20 text-center">
-                                        {isFetchedNomination ? (
+                                        {isLoading || !isFetchedNomination ? (
                                             <p className="text-sm text-text-muted italic">Loading nominations...</p>
                                         ) : (
                                             <>
