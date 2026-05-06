@@ -33,7 +33,7 @@ const ShowEventBySlug = () => {
   const isApiCall = React.useRef<boolean>(false)
   const { currentEvent, isLoading } = useSelector((state: RootState) => state.events)
 
-    const {currentAwardCategory}=useSelector((state:RootState)=>state.awardCategories)
+  const { currentAwardCategory } = useSelector((state: RootState) => state.awardCategories)
 
   React.useEffect(() => {
 
@@ -42,16 +42,16 @@ const ShowEventBySlug = () => {
     }
   }, [slug, dispatch]) // Only depend on slug and dispatch to avoid infinite loops or missing updates
   // get Associatred category nominator get Nominattion and 
-   useEffect(()=>{
-    debugger
-     if(currentEvent?.basic?.relatedAward &&
-      currentEvent?.basic?.relatedAward?.toString() &&
-      currentAwardCategory== null
-     )
-   
+  useEffect(() => {
 
-   dispatch(fetchAwardCategoryThunk(currentEvent?.basic?.relatedAward))
-   },[currentEvent,currentAwardCategory])
+    if (currentEvent?.basic?.relatedAward &&
+      currentEvent?.basic?.relatedAward?.toString() &&
+      currentAwardCategory == null
+    )
+
+
+      dispatch(fetchAwardCategoryThunk(currentEvent?.basic?.relatedAward))
+  }, [currentEvent, currentAwardCategory])
 
   const handleDownloadBrochure = () => {
     const brochureUrl = currentEvent?.media?.brochure;

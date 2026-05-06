@@ -21,7 +21,7 @@ import {
   CreditCard,
   Building,
 } from "lucide-react";
-import { downloadNominationPDF } from "./downloadNominationPDF";
+import { downloadNominationPDF, generateNominationPDF } from "./downloadNominationPDF";
 import { downloadFile } from "@/src/hook/files/fileUtil";
 import styles from "./NominationForm.module.css";
 import { AppDispatch, RootState } from "@/src/hook/store";
@@ -44,6 +44,7 @@ import { OrderType } from "@/src/hook/orders/orderType";
 import { createOrderThunk } from "@/src/hook/orders/orderThunk";
 import GetNominationAwards from "./GetNominationAwards";
 import GetEventBySlug from "../../events/GetEventBySlug";
+import { data } from "framer-motion/client";
 
 const BASE_FEE = 5500;
 const GST_RATE = 0.18;
@@ -64,7 +65,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const currentAwardCategory = useSelector(
     (state: RootState) => state.awardCategories.currentAwardCategory,
   );
-  const {currentEvent} = useSelector(
+  const { currentEvent } = useSelector(
     (state: RootState) => state.events,
   );
   const isEditMode = !!currentNomination?._id;
@@ -124,7 +125,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   useEffect(() => {
     if (currentNomination) {
       setFormData((prev) => ({
-        ...prev,  
+        ...prev,
         orgName: currentNomination.orgName ?? "",
         promoter: currentNomination.promoter ?? "",
         ownership: currentNomination.ownership ?? "",
@@ -217,6 +218,59 @@ const NominationForm: React.FC<NominationFormProps> = ({
     );
   };
 
+  const handleRegistrationSubmit = async () => {
+    try {
+      const response = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData?.promoter,
+          phoneNumber: formData.mobile,
+          email: formData.email,
+          role: formData?.ownership,
+          password: "123456789",
+          status: "Pending",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Send registration email
+        await fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "registration",
+            email: formData.email,
+            password: "123456789",
+            fullName: formData.promoter,
+            alreadyExists: data.alreadyExists,
+          }),
+        });
+
+        if (data.alreadyExists) {
+          showToast(
+            "User already registered. Login details sent to your email.",
+            false,
+          );
+        } else {
+          showToast(
+            "Account created successfully! Credentials sent to your email.",
+            false,
+          );
+        }
+        return true;
+      } else {
+        showToast(data.error || "Failed to create account", true);
+        return false;
+      }
+    } catch (error) {
+      console.error("Registration Error:", error);
+      showToast("Failed to create account", true);
+      return false;
+    }
+  };
   const paymentHandler = (
     data: NominationFormType,
   ): Promise<{ success: boolean }> => {
@@ -240,7 +294,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
               formId: data._id,
               status: "success",
             };
-      
+
             const result = await saveOrderData(orderData);
 
             if (result.success) {
@@ -276,7 +330,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const saveOrderData = async (orderData: OrderType) => {
     try {
       const response = await dispatch(createOrderThunk(orderData)).unwrap();
-  
+
       return { success: true, item: response };
     } catch (err) {
       console.error("Error saving order data:", err);
@@ -293,6 +347,13 @@ const NominationForm: React.FC<NominationFormProps> = ({
     setLoading(true);
     setLoadingStep("submitting");
     try {
+      if (!isEditMode) {
+        const registrationSuccess = await handleRegistrationSubmit();
+        if (!registrationSuccess) {
+          setLoading(false);
+          return;
+        }
+      }
       const formDataObj: NominationFormType = {
         orgName: formData.orgName,
         promoter: formData.promoter,
@@ -337,15 +398,15 @@ const NominationForm: React.FC<NominationFormProps> = ({
       } else {
         response = await dispatch(createNominationThunk(formDataObj)).unwrap();
       }
- 
+
 
       if (response._id) {
         let paymentSuccessful = true;
         if (!isEditMode) {
           setLoadingStep("paying");
-          console.log("response--->pay ment started");
+
           const paymentResult = await paymentHandler(response);
-          console.log("response--->pay ment completed");
+
           paymentSuccessful = paymentResult.success;
         }
         if (paymentSuccessful) {
@@ -430,6 +491,18 @@ const NominationForm: React.FC<NominationFormProps> = ({
   const sendEmailNotification = async (updatedNomination: any) => {
     setLoadingStep("sending_email");
     try {
+      // Generate PDF for attachment
+      const doc = await generateNominationPDF({
+        ...updatedNomination,
+        academicAwards: selectedAwards.academic,
+        startupAwards: selectedAwards.startup,
+        riseAwards: selectedAwards.rise,
+        entrepreneurAwards: selectedAwards.entrepreneur,
+      });
+      
+      const pdfBase64 = doc.output("datauristring").split(",")[1];
+      const safeName = (updatedNomination.orgName || "submission").replace(/\s+/g, "_").toLowerCase();
+
       const emailRes = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -439,6 +512,8 @@ const NominationForm: React.FC<NominationFormProps> = ({
           startupAwards: selectedAwards.startup,
           riseAwards: selectedAwards.rise,
           entrepreneurAwards: selectedAwards.entrepreneur,
+          pdfAttachment: pdfBase64,
+          pdfFileName: `Nomination_Form_${safeName}.pdf`,
         }),
       });
       const emailData = await emailRes.json();
@@ -645,7 +720,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
     <>
       <Suspense fallback={null}>
         <GetNominationAwards />
-        <GetEventBySlug/>
+        <GetEventBySlug />
       </Suspense>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className={styles.container}>
@@ -823,7 +898,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
                   <option value="" disabled>
                     Select State
                   </option>
-                   <option>Maharashtra</option>
+                  <option>Maharashtra</option>
                   <option>Delhi</option>
                   <option>Karnataka</option>
                   <option>Tamil Nadu</option>
@@ -935,8 +1010,8 @@ const NominationForm: React.FC<NominationFormProps> = ({
                 </React.Fragment>
               ))
             ) : (
-            <Loader2/>
-              
+              <Loader2 />
+
               // <>
               //   {renderAwardSection(
               //     "Academic Awards",
@@ -981,8 +1056,8 @@ const NominationForm: React.FC<NominationFormProps> = ({
                     ₹
                     {Math.round(
                       Object.values(selectedAwards).flat().length *
-                        BASE_FEE *
-                        GST_RATE,
+                      BASE_FEE *
+                      GST_RATE,
                     )}
                   </strong>
                 </div>

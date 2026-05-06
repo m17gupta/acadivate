@@ -31,7 +31,7 @@ function checkNewPage(doc: jsPDF, y: number, needed = 12): number {
   return y;
 }
 
-export async function downloadNominationPDF(data: NominationFormType, filename?: string) {
+export async function generateNominationPDF(data: NominationFormType) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
   // ---------- HEADER BACKGROUND ----------
@@ -246,6 +246,12 @@ export async function downloadNominationPDF(data: NominationFormType, filename?:
     doc.text(`PAGE ${i} OF ${pageCount}`, PAGE_W - MARGIN, 292, { align: 'right' });
   }
 
+  return doc;
+}
+
+export async function downloadNominationPDF(data: NominationFormType, filename?: string) {
+  const doc = await generateNominationPDF(data);
   const safeName = (data.orgName || 'submission').replace(/\s+/g, '_').toLowerCase();
   doc.save(filename ?? `Nomination_Form_${safeName}.pdf`);
 }
+

@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { cn } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { GetAllEvents } from '../components/events/GetAllEvents';
+import { useSelector } from 'react-redux';
+import { RootState } from '../hook/store';
 
 const FILTERS = [
   { id: 'all', label: 'All Events' },
@@ -27,19 +30,19 @@ export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsPr
   const [loading, setLoading] = React.useState(true);
   const [filter, setFilter] = React.useState('all');
   const [mounted, setMounted] = React.useState(false);
+    const { allEvent, isFetchedEvent } = useSelector((state: RootState) => state.events)
+ const { allAwardCategories } = useSelector((state: RootState) => state.awardCategories)
    const router= useRouter()
   React.useEffect(() => {
-    setMounted(true);
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch('/api/events');
-        const data = await response.json();
-        if (data.success) {
+      
+       if (allEvent && 
+      allEvent.length > 0 && 
+      allAwardCategories && allAwardCategories.length > 0) {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
           // Filter only published events and map to frontend structure
-          const mappedEvents = data.items
+          const mappedEvents = allEvent
             .filter((item: any) => item.status === 'Published')
             .filter((item: any) =>
               includeHiddenEvents ||
@@ -73,34 +76,29 @@ export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsPr
             .filter(Boolean);
           setEvents(mappedEvents);
         }
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvents();
-  }, []);
+      },[allEvent,allAwardCategories])
+   
 
   const filteredEvents = events
     .filter(ev => filter === 'all' || ev.type === filter)
     .sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
 
-  if (!mounted) return null;
+  // if (!mounted) return null;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-app-bg flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-app-bg flex items-center justify-center">
+  //       <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" />
+  //     </div>
+  //   );
+  // }
 
    const handleOpenNomination=()=>{
      router.push("/nomination-form")
    }
   return (
+    <>
+    <GetAllEvents />
     <div className="bg-app-bg">
       {/* --- PREMIUM DARK HERO SECTION --- */}
       <section data-annotate-id="international-conferences-hero-section" className="relative py-20 lg:py-32 bg-navy overflow-hidden">
@@ -290,6 +288,7 @@ export const UpcomingEvents = ({ includeHiddenEvents = false }: UpcomingEventsPr
         </div>
       </section>
     </div>
+    </>
   );
 };
 

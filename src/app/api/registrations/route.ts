@@ -51,6 +51,11 @@ export async function POST(req: NextRequest) {
        return NextResponse.json({ success: false, error: 'Email and Full Name are required' }, { status: 400 });
     }
 
+    const existingUser = await collection.findOne({ email: payload.email });
+    if (existingUser) {
+      return NextResponse.json({ success: true, item: existingUser, alreadyExists: true }, { status: 200 });
+    }
+
     const document = {
       ...payload,
       userName: payload.email, // Required for existing login system
